@@ -2,7 +2,10 @@ Project Roaster
 ===============
 Automatically grades _your_ code!
 
----
+## Project status
+| Build status | Test coverage |
+|:------------:|:-------------:|
+| [![Build Status](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster.svg?branch=master)](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster) | [![Coverage Status](https://coveralls.io/repos/github/LuleaUniversityOfTechnology/2018-project-roaster/badge.svg)](https://coveralls.io/github/LuleaUniversityOfTechnology/2018-project-roaster) |
 
 ## Development guidelines
 ### Lint and format
@@ -41,8 +44,3 @@ Fixes #159
 
 ### Code style
 Take a look at: https://github.com/golang/go/wiki/CodeReviewComments
-
-## Project status
-| Build status | Test coverage |
-|:------------:|:-------------:|
-| N/A          | N/A           |
