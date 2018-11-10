@@ -1,5 +1,7 @@
 language: go
 
+sudo: false
+
 go:
   - "1.11.x"
   - tip
@@ -10,4 +12,9 @@ env:
 install: true
 
 script:
-  - go build github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd
+  - go build github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/...
+  - go test -v -cover -race -covermode=atomic -coverprofile=profile.cov ./...
+  - go run golang.org/x/lint/golint -min_confidence 0.0 -set_exit_status ./...
+
+after_success:
+  - go run github.com/mattn/goveralls -coverprofile=profile.cov -service=travis-ci

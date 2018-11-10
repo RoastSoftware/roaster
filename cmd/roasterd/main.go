@@ -1,3 +1,4 @@
+// Package main is the starting point for the roasterd web server.
 package main
 
 import (
