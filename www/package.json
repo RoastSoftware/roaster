@@ -1,0 +1,33 @@
+{
+  "name": "roasterc",
+  "version": "0.0.1",
+  "description": "The Roaster client/frontend for the roast.software website.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "client",
+    "roaster",
+    "roasterc",
+    "frontend"
+  ],
+  "contributors": [
+    "William Wennerström <william@willeponken.me>",
+    "Philip Hjortsberg <philip@hjortsberg.me>"
+  ],
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.2.1",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.1.6",
+    "webpack": "^4.25.1",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "@types/react": "^16.7.3",
+    "@types/react-dom": "^16.0.9",
+    "react": "^16.6.1",
+    "react-dom": "^16.6.1"
+  }
+}
