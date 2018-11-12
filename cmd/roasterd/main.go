@@ -3,7 +3,23 @@ package main
 
 import (
 	"log"
+	"net/http"
+	"time"
+
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller"
 )
+
+type flags struct {
+	address      string
+	readTimeout  time.Duration
+	writeTimeout time.Duration
+}
+
+var context = flags{
+	address:      ":80",
+	readTimeout:  15,
+	writeTimeout: 15,
+}
 
 func init() {
 	// Log line file:linenumber.
@@ -13,5 +29,14 @@ func init() {
 }
 
 func main() {
-	log.Println("TODO") // TODO
+	controller := controller.New()
+
+	server := &http.Server{
+		Handler:      controller,
+		Addr:         context.address,
+		WriteTimeout: context.writeTimeout * time.Second,
+		ReadTimeout:  context.readTimeout * time.Second,
+	}
+
+	log.Fatal(server.ListenAndServe())
 }
