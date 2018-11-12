@@ -2,11 +2,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller"
+)
+
+const (
+	portEnvKey = "PORT"
 )
 
 type flags struct {
@@ -16,7 +22,7 @@ type flags struct {
 }
 
 var context = flags{
-	address:      ":80",
+	address:      ":5000",
 	readTimeout:  15,
 	writeTimeout: 15,
 }
@@ -29,6 +35,10 @@ func init() {
 }
 
 func main() {
+	if port := os.Getenv(portEnvKey); port != "" {
+		context.address = fmt.Sprintf(":%s", port)
+	}
+
 	controller := controller.New()
 
 	server := &http.Server{

@@ -1,1 +1,1 @@
-roasterd: ./roasterd
+web: ./roasterd
