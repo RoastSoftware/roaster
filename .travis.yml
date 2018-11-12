@@ -1,20 +1,27 @@
 language: go
-
 sudo: false
-
 go:
-  - "1.11.x"
-  - tip
-
+- 1.11.x
 env:
-  - GO111MODULE=on
-
+- GO111MODULE=on
 install: true
-
 script:
-  - go build github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/...
-  - go test -v -cover -race -covermode=atomic -coverprofile=profile.cov ./...
-  - go run golang.org/x/lint/golint -min_confidence 0.0 -set_exit_status ./...
-
+- go build github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/...
+- go test -v -cover -race -covermode=atomic -coverprofile=profile.cov ./...
+- go run golang.org/x/lint/golint -min_confidence 0.0 -set_exit_status ./...
 after_success:
-  - go run github.com/mattn/goveralls -coverprofile=profile.cov -service=travis-ci
+- go run github.com/mattn/goveralls -coverprofile=profile.cov -service=travis-ci
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: AKIAJPSL4DAVQIDTX7VQ
+  secret_access_key:
+    secure: dZNfl7gK3FO8nuqrkemG8/EHeGxLSDObO4klPf1BlETNxUyBJtLITFBebjZGXkZlYdinTdnxlWIr/esLx4TynONvKo0kqjTs18OOBdy1caLeY58vhLxxH9bL7GcmPltoiV42eO8ErThU8dnuPyep/ww+gSAyARV5lw7ChQ3LTqTHVQf7rzpWsMy86tmZhKZCzTHVi0oNTUeCow6GVsYTgCBnX8wPlmh62ubevPYWzeoqvFpIO+5Gqo57Se2qN9k2l8NBO1LKR7MgBrdduIbezNawmr0ru5gV/chVLPNTxKzET7mepQ57JHEY3RvTBWC00XYcQsf4jAK8U3yfdqUmjQ+uSsRgOg13wjEVKBFILI2yIT0916KM7SUnOXop6nYY/BmtQ+TG2SdfSQC6vJnCNzlcrg+Vhh6tnoEW9LdsnxcyWGYpWtpn9h5lPKu4XU5dlfMGRGGhMrukQNgIMLZ3+Jjmq0bfxjQEs+Y4xuXeMtG7YOf+4/1I0KT3XsyZBWtqmUTb3+Ab6yuWK98j9a+8kgnLSWgqtZebS9VPIzo71sO1M4kMR2nSWe5mZbMFnAWypS/DvacnrvX+viU6u9nXXaS1/8R75lli61mRUw/rGiqwjPePUVVgWApuHw5MmRm9EJ8cercEp14gedH0UsWmnXQu2NuzaAb+l02S/CPBpSE=
+  region: eu-west-1
+  app: Roaster
+  env: Roaster-env
+  bucket_name: elasticbeanstalk-eu-west-1-622175800905
+  skip_cleanup: true
+  on:
+    repo: LuleaUniversityOfTechnology/2018-project-roaster
+    branch: master
+    
