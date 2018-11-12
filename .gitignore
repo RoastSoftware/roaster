@@ -1,2 +1,4 @@
 roasterd
 profile.cov
+www/node_modules
+www/dist
