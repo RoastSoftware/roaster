@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Warning: no test specified.\"",
-    "start": "webpack-dev-server --open --config webpack.dev.js",
+    "start": "webpack --config webpack.dev.js -d --watch",
     "build": "webpack --config webpack.prod.js"
   },
   "keywords": [
@@ -20,12 +20,15 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
+    "@types/mithril": "^1.1.13",
     "awesome-typescript-loader": "^5.2.1",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.1.6",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.4"
+  },
+  "dependencies": {
+    "mithril": "^1.1.6"
   }
 }
