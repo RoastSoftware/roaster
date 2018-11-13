@@ -16,5 +16,5 @@ RUN npm install
 RUN npm run build
 
 WORKDIR /roaster
-EXPOSE 5000/tcp
-ENTRYPOINT ["/usr/bin/roasterd"]
+EXPOSE 5000
+CMD ["/usr/bin/roasterd"]
