@@ -27,7 +27,11 @@ jobs:
     - go run github.com/mattn/goveralls -coverprofile=profile.cov -service=travis-ci
 
   - stage: Deploy
-    script: skip
+    sudo: required
+    services:
+    - docker
+    script:
+    - docker build -t roaster .
     deploy:
       provider: elasticbeanstalk
       access_key_id: AKIAJPSL4DAVQIDTX7VQ
