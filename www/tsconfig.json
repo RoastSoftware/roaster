@@ -4,7 +4,11 @@
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "commonjs",
-        "target": "es5"
+        "target": "es5",
+        "esModuleInterop": true,
+        "lib": [
+            "dom", "es2015.promises", "es5"
+        ]
     },
     "include": [
         "./src/**/*"
