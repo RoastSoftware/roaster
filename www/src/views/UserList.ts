@@ -1,11 +1,14 @@
 import * as m from "mithril";
-import { User } from "../model/User";
+import { User } from "../models/User";
 
-module.exports = {
-	oninit: User.loadList,
-	view: function() {
-		return m(".user-list", User.list.map(function(user) {
+export default {
+    oninit() {
+        return User.loadList();
+    },
+
+    view(vnode) {
+        return m(".user-list", User.list.map((user: any) => {
 			return m(".user-list-item", user.firstName + " " + user.lastName);
 		}));
-	}
-};
+    }
+} as m.Component<{}, {}>;
