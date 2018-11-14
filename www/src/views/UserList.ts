@@ -1,13 +1,13 @@
 import m, { ClassComponent } from "mithril";
-import User from "../models/User";
+import Users, { User } from "../models/Users";
 
 export default class UserList implements ClassComponent {
-  oninit = User.loadList;
+  oninit = Users.loadList;
 
   view() {
     return m(
       ".user-list",
-      User.list.map((user: any) => {
+      Users.list.map((user: User) => {
         return m(".user-list-item", user.firstName + " " + user.lastName);
       })
     );

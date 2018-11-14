@@ -1,7 +1,13 @@
 import m, { ClassComponent } from "mithril";
 
-export default class User {
-  static list: string[] = [];
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export default class Users {
+  static list: User[] = [];
 
   static loadList() {
     return m
@@ -10,8 +16,8 @@ export default class User {
         url: "https://rem-rest-api.herokuapp.com/api/users",
         withCredentials: true
       })
-      .then((result: m.RequestOptions<any>) => {
-        User.list = result.data;
+      .then((result: m.RequestOptions<User[]>) => {
+        Users.list = result.data;
       });
   }
 }
