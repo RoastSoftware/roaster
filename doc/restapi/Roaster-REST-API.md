@@ -185,3 +185,115 @@ API.
 	```
 	Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
 	```
+## Roast [/roast]
+### Analyze code snippet [POST]
++ Relation: roast
++ Request: A static analysation of provided code snippet (application/json)
+	+ Headers
+	```
+	Cookie: roaster_auth=AB32DEAC21A91DE123[...] (string, optional) - Should be sent if user has an active session.
+	```
+	+ Body
+	```json
+	{
+		"language": "python3",
+		"code": "print('I´m Roastin´ Roger... Roger.', invalid = 'Bönor är ändå rätt gött')",
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"language": {
+				"type": "string"
+			},
+			"code": {
+				"type": "string"
+			}
+
+		}
+	}
+	```
++ Response: 200
+	+ Body
+	```json
+	{
+		"grade": 12,
+		"warnings": [
+			{
+				"row": 1,
+				"column": 48,
+				"engine": "pycodestyle",
+				"name": "E251",
+				"description": "no spaces around keyword / parameter equals"
+			}
+		],
+		"errors": [
+			{
+				"row": 1,
+				"column": 41,
+				"engine": "pyflakes",
+				"name": "TypeError",
+				"description": "print() got an unexpected keyword argument 'invalid'"
+			}
+		]
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"grade": {
+				"type": "number"
+			},
+			"warning": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"row": {
+							"type": "number"
+						},
+						"column": {
+							"type": "number"
+						},
+						"engine": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"errors": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"row": {
+							"type": "number"
+						},
+						"column": {
+							"type": "number"
+						},
+						"engine": {
+							"type": "string"
+						},
+						"name": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+	```
