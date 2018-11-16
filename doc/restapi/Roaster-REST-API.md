@@ -138,5 +138,50 @@ API.
 + Response: 200
 	+ Headers
 	```
-	Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GM
-	```,
+	Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
+	```
+
+## Session [/session]
+### Authenticate for New Session (sign in) [POST]
++ Relation: session
++ Request: A session authentication (application/json)
+	+ Body
+	```json
+	{
+		"username": "roastin_roger",
+		"password": "MyTr3me3d0usPassw0rd!",
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"username": {
+				"type": "string"
+			},
+			"password": {
+				"type": "string"
+			}
+
+		}
+	}
+	```
++ Response: 200
+	+ Headers
+	```
+	Set-Cookie: roaster_auth=AB32DEAC21A91DE123[...]; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
+	```
+
+### Remove Current Session (sign out) [DELETE]
++ Relation: session
++ Request: Remove current session
+	+ Headers
+	```
+	Cookie: roaster_auth=AB32DEAC21A91DE123[...]
+	```
++ Response: 200
+	+ Headers
+	```
+	Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
+	```
