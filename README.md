@@ -34,7 +34,7 @@ Run the PostgreSQL Docker image with (exposed at port: `5432`):
 docker run --name roaster-postgresql -e POSTGRES_PASSWORD=AReallyGreatPassword -d postgres
 ```
 
-And run the Redis Docker image with (exposed at port: `6379`, non-persistant):
+And run the Redis Docker image with (exposed at port: `6379`, non-persistent):
 ```
 docker run --name roaster-redis -d redis
 ```
@@ -84,5 +84,5 @@ npm start
 ```
 
 Now, everytime you make any change to the frontend, everything will
-automatically recompile and can be accesses from: `http://localhost:5000`
+automatically recompile and can be accessed from: `http://localhost:5000`
 (hosted by the `roasterd` backend).
