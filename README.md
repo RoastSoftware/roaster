@@ -19,40 +19,70 @@ displayed on a page that can be viewed by everyone.
 |:------------:|:-------------:|
 | [![Build Status](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster.svg?branch=master)](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster) | [![Coverage Status](https://coveralls.io/repos/github/LuleaUniversityOfTechnology/2018-project-roaster/badge.svg)](https://coveralls.io/github/LuleaUniversityOfTechnology/2018-project-roaster) |
 
-## Development guidelines
-### Lint and format
-Before you commit, the affected files should be run through `goimports`. Bonus: Also run `go vet`.
+## Set up Roaster (for developers)
+### Prerequisites
+ * Go >= v1.11
+ * NodeJS w/npm
+ * Docker
 
- * goimports: `go get golang.org/x/tools/cmd/goimports`
+### Initial setup
+We use PostgreSQL and Redis as our databases. The simplest way to set them up is
+using the official Docker images.
 
-### Tests
-Write tests for everything.
-
-### Branches
-Develop inside your own branch until you're done, then send a pull request.
-
-### Commits
-Commits should be formatted with primary affected package as prefix, a short descriptive one liner and then an optional description of the context and what the change does. Also use GitHub's `Fixes #123` feature for closing issues. All commits must be signed with GPG.
-
-Example:
+Run the PostgreSQL Docker image with (exposed at port: `5432`):
 ```
-math: improve Sin, Cos and Tan precision for very large arguments
-
-The existing implementation has poor numerical properties for
-large arguments, so use the McGillicutty algorithm to improve
-accuracy above 1e10.
-
-The algorithm is described at http://wikipedia.org/wiki/McGillicutty_Algorithm
-
-Fixes #159
-
-# Please enter the commit message for your changes. Lines starting
-# with '#' will be ignored, and an empty message aborts the commit.
-# On branch foo
-# Changes not staged for commit:
-#	modified:   editedfile.go
-#
+docker run --name roaster-postgresql -e POSTGRES_PASSWORD=AReallyGreatPassword -d postgres
 ```
 
-### Code style
-Take a look at: https://github.com/golang/go/wiki/CodeReviewComments
+And run the Redis Docker image with (exposed at port: `6379`, non-persistent):
+```
+docker run --name roaster-redis -d redis
+```
+
+Clone the Roaster repository:
+```
+git@github.com:LuleaUniversityOfTechnology/2018-project-roaster.git
+```
+
+And enter the directory:
+```
+cd 2018-project-roaster
+```
+
+### Backend (roasterd)
+The backend is written in Go and therefore requires that Go is installed
+correctly on your machine. Also, a version >= v1.11 is required for Go modules
+which is used in this project.
+
+Make sure you enable Go modules if you are using Go v1.11:
+```
+export GO111MODULE=on
+```
+
+To run the `roasterd` server, simply run:
+```
+go run github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd
+```
+
+### Frontend
+The frontend is written in TypeScript, HTML and CSS. Everything is packaged and
+compiled using webpack.
+
+First you have to be located in the `www/` folder:
+```
+cd www/
+```
+
+Then, install the required dependencies with:
+```
+npm install
+```
+
+Finally, start the frontend autobuild with:
+```
+npm start
+```
+
+Now, everytime you make any change to the frontend, everything will
+automatically recompile and can be accessed from: `http://localhost:5000`
+(hosted by the `roasterd` backend).
