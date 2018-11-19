@@ -41,7 +41,7 @@ docker run --name roaster-redis -d redis
 
 Clone the Roaster repository:
 ```
-git@github.com:LuleaUniversityOfTechnology/2018-project-roaster.git
+git clone git@github.com:LuleaUniversityOfTechnology/2018-project-roaster.git
 ```
 
 And enter the directory:
