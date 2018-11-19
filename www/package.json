@@ -29,6 +29,8 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
-    "mithril": "^1.1.6"
+    "mithril": "^1.1.6",
+    "semantic-ui-forest-themes": "^1.0.3",
+    "semantic-ui-site": "^2.3.1"
   }
 }
