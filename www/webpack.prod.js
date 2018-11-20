@@ -7,6 +7,8 @@ module.exports = merge(common, {
   optimization: {
     minimizer: [
       new Uglify({
+        cache: false,
+        parallel: true,
         uglifyOptions: {
           mangle: true,
           compress: {
