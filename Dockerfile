@@ -13,7 +13,7 @@ RUN cp roasterd /usr/bin/roasterd
 
 WORKDIR /roaster/www
 RUN npm install
-RUN npm run build
+RUN npm run build-quick
 
 WORKDIR /roaster
 EXPOSE 5000
