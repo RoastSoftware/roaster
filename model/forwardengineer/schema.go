@@ -1,5 +1,6 @@
-// Package forwardengineer is generated automatically by inlinesql at 2018-11-20 09:26:25.635639547 +0100 CET m=+0.002059762.
+// Package forwardengineer was generated automatically by inlinesql at 2018-11-20 09:40:30.452539335 +0100 CET m=+0.002059635.
 package forwardengineer
+// GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
 	return []string{
 		"create database roaster with owner postgres",

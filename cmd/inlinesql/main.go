@@ -1,3 +1,5 @@
+// Package main implements inlinesql which generates a Go file containing SQL
+// queries.
 package main
 
 import (
@@ -16,7 +18,7 @@ func removeComments(s []byte) []byte {
 	return matchComments.ReplaceAll(s, nil)
 }
 
-func parseSqlFile(in []byte) []string {
+func parseSQLFile(in []byte) []string {
 	in = removeComments(in)
 
 	// Split file into seperate queries.
@@ -24,7 +26,7 @@ func parseSqlFile(in []byte) []string {
 	tmp = strings.Split(string(in), ";")
 
 	// Remove superflous spaces around each query.
-	for i, _ := range tmp {
+	for i := range tmp {
 		tmp[i] = strings.TrimSpace(tmp[i])
 		tmp[i] = strings.Join(strings.Fields(tmp[i]), " ")
 	}
@@ -65,7 +67,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	queries := parseSqlFile(sqlFile)
+	queries := parseSQLFile(sqlFile)
 
 	outFile, err := os.Create(out)
 	if err != nil {
@@ -85,8 +87,9 @@ func main() {
 }
 
 var pkgTmpl = template.Must(template.New("").Parse(
-	`// Package {{ .Package }} is generated automatically by inlinesql at {{ .Timestamp }}.
+	`// Package {{ .Package }} was generated automatically by inlinesql at {{ .Timestamp }}.
 package {{ .Package }}
+// GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
 	return []string{
 		{{- range .Queries }}
