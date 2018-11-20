@@ -5,13 +5,29 @@ import (
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/static"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/user"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware/redirect"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 // New returns a router with all handles configured.
-func New() *mux.Router {
-	mux := mux.NewRouter()
-	mux.PathPrefix("/").Handler(http.StripPrefix("", static.NewHandler("www")))
+func New() http.Handler {
+	var handler http.Handler
 
-	return mux
+	router := mux.NewRouter()
+
+	// User [/user]
+	user.Init(router.PathPrefix("/user").Subrouter())
+
+	// Retrieve the roast.software SPA [GET]
+	static.Init(router.PathPrefix("/").Subrouter(), "www")
+
+	// Redirect HTTP to HTTPS if X-Forward-Proto is set.
+	handler = redirect.Middleware(router)
+
+	// Recover from panics in handler routines and log the error.
+	handler = handlers.RecoveryHandler(handlers.PrintRecoveryStack(true))(handler)
+
+	return handler
 }
