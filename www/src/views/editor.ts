@@ -6,8 +6,17 @@ declare global {
 }
 
 export default class Editor implements ClassComponent {
+    editor: monaco.editor.IStandaloneCodeEditor;
+
     oncreate(vnode: CVnodeDOM) {
-        monaco.editor.create(vnode.dom as HTMLElement);
+        this.editor = monaco.editor.create(vnode.dom as HTMLElement);
+    };
+    
+    onupdate(vnode: CVnodeDOM){
+        // TODO: call editor.layout() here to get the new size of the editor when
+        // the container changes size.
+        this.editor.layout();
+        console.log("LOLOLO");
     };
 
     view(vnode: CVnode) {
