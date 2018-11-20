@@ -9,7 +9,7 @@ export default class Base implements ClassComponent {
             m(".ui.container",
                 m(header)
             ),
-            m(".ui.main.container.segment.inverted [style=min-height: 8rem;]", vnode.children)
+            m(".ui.main.container.segment.inverted", vnode.children)
         ];
     }
 };
