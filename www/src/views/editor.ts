@@ -1,37 +1,75 @@
-import m, { ClassComponent, CVnode, CVnodeDOM} from "mithril";
-import * as monaco from 'monaco-editor';
-import 'monaco-editor/esm/vs/basic-languages/python/python.contribution';
-// @ts-ignore
-import solarizedMonacoTheme from 'monaco-themes/themes/Solarized-dark.json';
+import m from 'mithril';
 
 declare global {
-  interface Window { MonacoEnvironment: any }
+  interface Window {
+    MonacoEnvironment: any;
+  }
 }
 
-export default class Editor implements ClassComponent {
-    oncreate(vnode: CVnodeDOM) {
-        monaco.editor.defineTheme('solarized', solarizedMonacoTheme as monaco.editor.IStandaloneThemeData);
-        monaco.editor.setTheme('solarized');
+self.MonacoEnvironment = {
+  getWorkerUrl(moduleId: number, label: string) {
+    switch (label) {
+      case 'json':
+        return './dist/json.worker.js';
+      case 'css':
+        return './dist/css.worker.js';
+      case 'html':
+        return './dist/html.worker.js';
+      case 'javascript':
+      case 'typescript':
+        return './dist/ts.worker.js';
 
-        let editor = monaco.editor.create(vnode.dom as HTMLElement, {language: 'python'});
-        window.addEventListener("resize", () => editor.layout());
-    };
-    
-    view(vnode: CVnode) {
-        return m("#editor[style=min-height: 50rem;]");
+      default:
+        return './dist/editor.worker.js';
     }
+  },
 };
 
-self.MonacoEnvironment = {
-    getWorkerUrl(moduleId: number, label: string) {
-        switch(label) {
-            case 'json': return './dist/json.worker.js'
-            case 'css': return './dist/css.worker.js'
-            case 'html': return './dist/html.worker.js'
-            case 'javascript':
-            case 'typescript': return './dist/ts.worker.js'
+/**
+ * Lazy-load the Monaco Editor assets.
+ * @param {string} themeName - The theme name to use (see monaco-themes/themes/)
+ */
+async function loadMonacoEditor(
+    themeName: string
+): Promise<monaco.editor.IStandaloneEditor> {
+  const [monaco, themeData] = await Promise.all([
+    import('monaco-editor'), // @ts-ignore
+    import('monaco-themes/themes/' + themeName + '.json'),
+  ]);
 
-            default: return './dist/editor.worker.js'
-        }
-    }
+  monaco.editor.defineTheme(
+      themeName,
+    themeData as monaco.editor.IStandaloneThemeData
+  );
+
+  monaco.editor.setTheme(themeName);
+
+  return monaco;
+}
+
+/**
+ * Editor component wraps a Monaco Editor.
+ */
+export default class Editor implements ClassComponent {
+  /**
+   * Loads and adds a Monaco Editor to the empty div#editor created by view.
+   * @param {CVnode} vnode - Virtual node.
+   */
+  oncreate(vnode: CVnodeDOM) {
+    loadMonacoEditor('Solarized-dark').then((monaco) => {
+      const editor = monaco.editor.create(vnode.dom as HTMLElement, {
+        language: 'python',
+      });
+      window.addEventListener('resize', () => editor.layout());
+    });
+  }
+
+  /**
+   * Creates a empty div#editor that is used by oncreate.
+   * @param {CVnode} vnode - Virtual node.
+   * @return {CVnode}
+   */
+  view(vnode: CVnode) {
+    return m('#editor[style=min-height: 35rem;]');
+  }
 }
