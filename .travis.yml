@@ -31,10 +31,14 @@ jobs:
     sudo: required
     services:
     - docker
+    before_install:
+    - mkdir .aws-deploy
+    - cp Dockerfile .aws-deploy/Dockerfile
     script:
-    - mkdir deploy
-    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r $PWD/www $PWD/deploy/www
-    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/deploy/roasterd
+    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www ./.aws-deploy/www
+    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/.aws-deploy/roasterd
+    - cd ./.aws-deploy
+    - ls -al
     - docker build -t roaster .
     deploy:
       provider: elasticbeanstalk

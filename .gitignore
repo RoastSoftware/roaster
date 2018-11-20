@@ -1,3 +1,6 @@
 www/node_modules
 www/dist
+.aws-deploy
+roasterd
+profile.cov
 travis-*.zip
