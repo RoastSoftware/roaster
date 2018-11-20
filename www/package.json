@@ -7,7 +7,7 @@
     "test": "echo \"Warning: no test specified.\"",
     "start": "webpack --config webpack.dev.js -d --watch",
     "build": "webpack --config webpack.prod.js",
-    "build-small": "webpack --config webpack.small.js"
+    "build-quick": "webpack --config webpack.quick.js"
   },
   "keywords": [
     "client",
