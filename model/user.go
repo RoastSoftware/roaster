@@ -3,8 +3,8 @@ package model
 
 // User holds a user.
 type User struct {
-	Username string
-	Email    string
-	Fullname string
-	Password string
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Fullname string `json:"fullname"`
+	Password string `json:"password"`
 }
