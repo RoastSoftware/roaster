@@ -29,8 +29,13 @@
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
+    "css-loader": "^1.0.1",
     "mithril": "^1.1.6",
+    "monaco-editor": "^0.15.5",
+    "monaco-editor-webpack-plugin": "^1.6.0",
+    "monaco-themes": "^0.2.5",
     "semantic-ui-forest-themes": "^1.0.3",
-    "semantic-ui-site": "^2.3.1"
+    "semantic-ui-site": "^2.3.1",
+    "style-loader": "^0.23.1"
   }
 }

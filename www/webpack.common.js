@@ -1,8 +1,11 @@
+const MonacoWebPackPlugin = require('monaco-editor-webpack-plugin');
+
 module.exports = {
     entry: "./src/index.ts",
     output: {
         filename: "bundle.js",
-        path: __dirname + "/dist"
+        path: __dirname + "/dist",
+        publicPath: "./dist/"
     },
 
     resolve: {
@@ -16,7 +19,13 @@ module.exports = {
             { test: /\.ts?$/, loader: "awesome-typescript-loader" },
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+            { enforce: "pre", test: /\.js$/, loader: "source-map-loader", exclude: [ /.*monaco-editor.*/ ] },
+
+            // All files with a '.css' extension will be handled by 'style-loader'.
+            { test: /\.css$/, use: ['style-loader', 'css-loader']}
         ]
-    }
+    },
+    plugins: [
+        new MonacoWebPackPlugin()
+    ]
 };
