@@ -6,7 +6,12 @@ export default class Home implements ClassComponent {
     view(vnode: CVnode) {
         return m(base,
             m("p", "this is a fabulous placeholder"),
-            m(editor)
+            m(".ui.two.column.grid", [
+                m(".ui.column", 
+                    m(editor)),
+                m(".ui.column", 
+                    m("p", "Really roasting error msg"))
+            ])
         );
     }
 };

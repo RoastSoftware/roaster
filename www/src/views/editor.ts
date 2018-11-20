@@ -1,26 +1,23 @@
 import m, { ClassComponent, CVnode, CVnodeDOM} from "mithril";
 import * as monaco from 'monaco-editor';
+import * as SolarizedTheme from 'monaco-themes/themes/Solarized-dark.json';
+// TODO: import languages for syntaxhighlighting.
 
 declare global {
   interface Window { MonacoEnvironment: any }
 }
 
 export default class Editor implements ClassComponent {
-    editor: monaco.editor.IStandaloneCodeEditor;
-
     oncreate(vnode: CVnodeDOM) {
-        this.editor = monaco.editor.create(vnode.dom as HTMLElement);
+        monaco.editor.defineTheme('solarized', SolarizedTheme);
+        monaco.editor.setTheme('solarized');
+
+        let editor = monaco.editor.create(vnode.dom as HTMLElement);
+        window.addEventListener("resize", () => editor.layout());
     };
     
-    onupdate(vnode: CVnodeDOM){
-        // TODO: call editor.layout() here to get the new size of the editor when
-        // the container changes size.
-        this.editor.layout();
-        console.log("LOLOLO");
-    };
-
     view(vnode: CVnode) {
-        return m("#editor");
+        return m("#editor[style=min-height: 50rem;]");
     }
 };
 
