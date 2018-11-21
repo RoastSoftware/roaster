@@ -27,7 +27,7 @@ jobs:
     - travis_retry go run github.com/mattn/goveralls -coverprofile=profile.cov -service=travis-ci
 
   - stage: Deploy
-    if: branch = issue-74-rev AND type = push
+    if: branch = master AND type = push
     sudo: required
     services:
     - docker
@@ -57,4 +57,4 @@ jobs:
       skip_cleanup: true
       on:
         repo: LuleaUniversityOfTechnology/2018-project-roaster
-        branch: issue-74-rev
+        branch: master
