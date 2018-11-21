@@ -1,11 +1,16 @@
-const MonacoWebPackPlugin = require('monaco-editor-webpack-plugin');
+const webpack = require('webpack');
+const CopyWebpack = require('copy-webpack-plugin');
+const HtmlWebpack = require('html-webpack-plugin');
+const HtmlWebpackIncludeAssets = require('html-webpack-include-assets-plugin');
+const CleanWebpack = require('clean-webpack-plugin');
+const MonacoWebPack = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   entry: './src/index.ts',
   output: {
-    filename: 'bundle.js',
+    filename: '[name].[contenthash].js',
     path: __dirname + '/dist',
-    publicPath: './dist/',
+    publicPath: './',
   },
 
   resolve: {
@@ -31,9 +36,33 @@ module.exports = {
         exclude: [/.*monaco-editor.*/],
       },
 
-      // All files with a '.css' extension will be handled by 'style-loader'.
+      // All files with a '.css' extension are handled style-loader.
       {test: /\.css$/, use: ['style-loader', 'css-loader']},
+
+      // Media and fonts are handled by the url-loader.
+      {
+        test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+        loader: 'url-loader?limit=100000',
+      },
     ],
   },
-  plugins: [new MonacoWebPackPlugin()],
+  plugins: [
+    new CopyWebpack([
+      {from: 'node_modules/semantic-ui-site', to: 'semantic/'},
+      {
+        from: 'node_modules/semantic-ui-forest-themes',
+        to: 'semantic-themes/',
+      },
+    ]),
+    new HtmlWebpack({title: 'Get Roasted!'}),
+    new HtmlWebpackIncludeAssets({
+      assets: [
+        'semantic/site.min.css',
+        'semantic-themes/semantic.solar.min.css',
+      ],
+      append: false,
+    }),
+    new CleanWebpack(['dist']),
+    new MonacoWebPack(),
+  ],
 };
