@@ -48,18 +48,19 @@ module.exports = {
   },
   plugins: [
     new CopyWebpack([
-      {from: 'node_modules/semantic-ui-site', to: 'semantic/'},
+      {from: 'node_modules/semantic-ui-site/site.min.css', to: 'semantic/'},
       {
-        from: 'node_modules/semantic-ui-forest-themes',
-        to: 'semantic-themes/',
+        from: 'node_modules/semantic-ui-forest-themes/semantic.solar.min.css',
+        to: 'semantic/',
+      },
+      {
+        from: 'node_modules/semantic-ui-forest-themes/themes',
+        to: 'semantic/themes',
       },
     ]),
     new HtmlWebpack({title: 'Get Roasted!'}),
     new HtmlWebpackIncludeAssets({
-      assets: [
-        'semantic/site.min.css',
-        'semantic-themes/semantic.solar.min.css',
-      ],
+      assets: ['semantic/site.min.css', 'semantic/semantic.solar.min.css'],
       append: false,
     }),
     new CleanWebpack(['dist']),
