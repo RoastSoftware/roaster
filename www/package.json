@@ -36,11 +36,13 @@
     "file-loader": "^2.0.0",
     "html-webpack-include-assets-plugin": "^1.0.6",
     "html-webpack-plugin": "^3.2.0",
-    "mini-css-extract-plugin": "^0.4.4",
     "source-map-loader": "^0.2.4",
     "tslint": "^5.11.0",
     "typescript": "^3.1.6",
     "typescript-eslint-parser": "^21.0.1",
+    "html-minifier": "^3.5.21",
+    "style-loader": "^0.23.1",
+    "css-loader": "^1.0.1",
     "url-loader": "^1.1.2",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
@@ -49,14 +51,11 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime": "^7.1.5",
-    "css-loader": "^1.0.1",
-    "html-minifier": "^3.5.21",
     "mithril": "^1.1.6",
     "monaco-editor": "^0.15.5",
     "monaco-editor-webpack-plugin": "^1.6.0",
     "monaco-themes": "^0.2.5",
     "semantic-ui-forest-themes": "^1.0.3",
-    "semantic-ui-site": "^2.3.1",
-    "style-loader": "^0.23.1"
+    "semantic-ui-site": "^2.3.1"
   }
 }
