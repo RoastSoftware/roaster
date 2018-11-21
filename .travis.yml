@@ -32,17 +32,18 @@ jobs:
     services:
     - docker
     before_install:
-    - mkdir .aws-deploy
-    - cp Dockerfile .aws-deploy/Dockerfile
+    - mkdir build
     script:
-    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www ./.aws-deploy/www
-    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/.aws-deploy/roasterd
-    - pushd .aws-deploy
-    - du -h -d1 *
+    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www ./build/www
+    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/build/roasterd
+    - du -h -d1 build/*
     - docker build -t roaster .
-    - popd
+    before_deploy:
+    - git add --force build Dockerfile
     deploy:
       provider: elasticbeanstalk
+      edge:
+        branch: ebignore
       access_key_id:
         secure: MnyzuNOu1Kwj3Ol6msXAiEDbiXaY24xPxJzbBXd9ZG3k9NR7G3O/aHPEFeeYQ13VTPZL9/+YaS+tU9Hxv79DoVup7ZyeO/P8jsmn2vAUrSH2tBQLB6IEk0yFo5tU45JTU0O/Nf2+MFcWlpHavKaUL2pwxMlftn00+WHe4jqCgGYy2bcxYeIbC6D3J59mTb8i18SzAGopx5HoOGRmfUbg3VHD0kQOEuRACmHKI0XbkfTI7BRQr/Tbmvk69lOmA5XnHdVilv+gtB+zWmDujjOYn5wRKf4o2NKQbyO5qbV5y/6/trloKKQHZHT1tPDOKeb6lkRva4fvYP6WBF70HklapxBIgBZs+2lWUidkIxBVrV/uDXbyenvpFi7K1NQ66VowMW+dahCf6yP0A6lmfYLRIyl80dBNvcdtkxdhjIfFQjn+s2LnRNOeYsNZDgkDeIEibaSrIAmI1dTh0LROlCNAUrOnFhBuUmx9fow83HLKS0HXHIRLDGdSP2jFGMflguizz5zJx4YRDz9nrSpu0BbKnF1hT64H1j6Yv4Gyg+xOC3cmwByybnXUrK4L6LnLaseQY6D8YCjFn3ZGrP0FKKf8x4wBQXJQ/hniqtkxrrRUtpQxndx/uDgt6/ZVRXShZRINjW8k4eQeJezQ0Zm+RvGgviZY0ArFqYmSeLR22sgu09I=
       secret_access_key:
@@ -56,7 +57,6 @@ jobs:
       bucket_name:
         secure: TVD0mXwAkrm/xnnIf4PuKwQvzfjSvnGSFOuYLjB4LW854LhIBzaZ7sWd0vGdPM/1/S4R8NYEtw9aZozrl9a8yk+g1HT4+NICmkHaEaOa6fAA9mMnLZxPDGF1Dwk9kowMk3O2ZrxJl6pO0M7Ww/VU+T5zyS+j7ydEYT1peHsGtEQF06PTzSEp4fzeoM1MS7PpTpbwNmIdv4BypDaXTwuQxBfuqgoQ9ALOHW+kCXxxpm4CEWGaYFIjMWghrPY3biiiwqDdbR+mc++8/lWDDo5W/0k0iEJkIfGFh8aWcG/LQ4UlzVcRkz6dTRTPtYnjMD3iSRdhivL7vM1756JV0WRNpEWe+77J1Ewv8hI76UIX353Ngh8KKFPHQrfDWJ16yFdK+EbjFD4og/XYpaJUuD2UxUGUWYP+SbsqUsvq/02kE5ju+I4JuiD8+D8i+mvfSVs0hgOueTj70VmhGwH0RfTlJ4mjL8T6ahjQx2l1ymmqyYteMgEoKnXIcpEg5ysplRsxwbiDNzVVBqLw16Lmq2H9c/tZlXlDCSwAljv7ZxGQUArrCUfFU8iUuwzTCMqK0vSz+uptJVeNZfehfmdvzEnJsg7XX8WJOZI7uojlRI0BVS6JOrniwDuXFJ9R8pbZiuAgbNjnvWnXZNuF1CLadOPfZx9OnjSQmFGBVTQiEnPNOpA=
       skip_cleanup: true
-      local-dir: .aws-deploy
       on:
         repo: LuleaUniversityOfTechnology/2018-project-roaster
         branch: issue-78
