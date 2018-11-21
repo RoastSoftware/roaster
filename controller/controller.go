@@ -11,7 +11,7 @@ import (
 // New returns a router with all handles configured.
 func New() *mux.Router {
 	mux := mux.NewRouter()
-	mux.PathPrefix("/").Handler(http.StripPrefix("", static.NewHandler("www")))
+	mux.PathPrefix("/").Handler(http.StripPrefix("", static.NewHandler("www/dist")))
 
 	return mux
 }
