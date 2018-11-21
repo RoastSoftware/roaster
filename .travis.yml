@@ -37,8 +37,8 @@ jobs:
     script:
     - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www ./.aws-deploy/www
     - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/.aws-deploy/roasterd
-    - pushd ./.aws-deploy
-    - ls -alb
+    - pushd .aws-deploy
+    - du -h -d1 *
     - docker build -t roaster .
     - popd
     deploy:
