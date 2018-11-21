@@ -31,9 +31,14 @@ jobs:
     sudo: required
     services:
     - docker
+    before_install:
+    - mkdir .aws-deploy
+    - cp Dockerfile .aws-deploy/Dockerfile
     script:
-    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build"
-    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/bin/roasterd
+    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www ./.aws-deploy/www
+    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/.aws-deploy/roasterd
+    - cd ./.aws-deploy
+    - ls -al
     - docker build -t roaster .
     deploy:
       provider: elasticbeanstalk
@@ -50,3 +55,6 @@ jobs:
       bucket_name:
         secure: TVD0mXwAkrm/xnnIf4PuKwQvzfjSvnGSFOuYLjB4LW854LhIBzaZ7sWd0vGdPM/1/S4R8NYEtw9aZozrl9a8yk+g1HT4+NICmkHaEaOa6fAA9mMnLZxPDGF1Dwk9kowMk3O2ZrxJl6pO0M7Ww/VU+T5zyS+j7ydEYT1peHsGtEQF06PTzSEp4fzeoM1MS7PpTpbwNmIdv4BypDaXTwuQxBfuqgoQ9ALOHW+kCXxxpm4CEWGaYFIjMWghrPY3biiiwqDdbR+mc++8/lWDDo5W/0k0iEJkIfGFh8aWcG/LQ4UlzVcRkz6dTRTPtYnjMD3iSRdhivL7vM1756JV0WRNpEWe+77J1Ewv8hI76UIX353Ngh8KKFPHQrfDWJ16yFdK+EbjFD4og/XYpaJUuD2UxUGUWYP+SbsqUsvq/02kE5ju+I4JuiD8+D8i+mvfSVs0hgOueTj70VmhGwH0RfTlJ4mjL8T6ahjQx2l1ymmqyYteMgEoKnXIcpEg5ysplRsxwbiDNzVVBqLw16Lmq2H9c/tZlXlDCSwAljv7ZxGQUArrCUfFU8iUuwzTCMqK0vSz+uptJVeNZfehfmdvzEnJsg7XX8WJOZI7uojlRI0BVS6JOrniwDuXFJ9R8pbZiuAgbNjnvWnXZNuF1CLadOPfZx9OnjSQmFGBVTQiEnPNOpA=
       skip_cleanup: true
+      on:
+        repo: LuleaUniversityOfTechnology/2018-project-roaster
+        branch: master

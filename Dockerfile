@@ -1,8 +1,7 @@
 FROM golang:1.11
 LABEL authors="William Wennerström <william@willeponken.me>; Philip Hjortsberg <philip@hjortsberg.me>"
 
-COPY ./bin/roasterd /roaster/roasterd
-COPY ./www /roaster/www
+COPY . /roaster
 
 WORKDIR /roaster
 
