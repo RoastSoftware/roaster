@@ -32,9 +32,9 @@ jobs:
     services:
     - docker
     before_install:
-    - mkdir build
+    - mkdir -p build/www/dist
     script:
-    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www ./build/www
+    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www/dist ./build/www/dist
     - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/build/roasterd
     - du -h -d1 build/*
     - docker build -t roaster .
