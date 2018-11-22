@@ -8,6 +8,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Set Bcrypt work factor so it takes >250 ms on a modern CPU.
+const bcryptWorkFactor = 12
+
 // User holds a user.
 type User struct {
 	Username string `json:"username"`
@@ -23,13 +26,14 @@ type User struct {
 // The plaintext password that is provided will first be transformed to a
 // hash sum with SHA-512. This is due to that Bcrypt limits the input to 72
 // bytes. By hashing the password with SHA-512 more entropy of the original
-// password is kept. Also, some implementations of Bcrypts allows for longer
+// password is kept. Also, some implementations of Bcrypt that allows for longer
 // passwords can be vulnerable to DoS attacks[0].
 //
 // The SHA-512 hash sum is then hashed again using Bcrypt. This is because
 // SHA-512 is a _fast_ hash algorithm not made for password hashing. Bcrypt is
 // designed to be slow and hard to speed up using hardware such as FPGAs and
-// ASICs. The work factor is set to the default for Go, 10.
+// ASICs. The work factor is set to 12 which should make the expensive Blowfish
+// setup take >250 ms (364.815906 ms precisely on my sucky laptop).
 //
 // Dropbox has a great article[1] on their password hashing scheme which our
 // scheme shares many similarities with, we do not, however, use AES-256 with a
@@ -44,14 +48,15 @@ func generateHash(password []byte) (hash []byte, err error) {
 	return
 }
 
-// sha512Sum wraps the sha512.Sum512 method and returns a variadic slice instead
-// of the fixed size byte array that sha512.Sum512 provides.
-// The function will also zero out any variables that is passed (except for the
-// actual output).
+// sha512Sum wraps the sha512.Sum512 method and returns a variadic byte slice
+// instead of the fixed size byte array that sha512.Sum512 provides.
+//
+// Note: The function will also zero out any variables that is passed (except
+// for the actual output).
 func sha512Sum(in []byte) (out []byte) {
 	sum := sha512.Sum512(in)
 	in = []byte{}              // Empty the password variable.
-	out = sum[:]               // Create slice of variadic length.
+	out = sum[:]               // Convert to byte slice of variadic length.
 	sum = [sha512.Size]byte{0} // Empty the sum variable.
 
 	return out
@@ -72,7 +77,7 @@ func validPassword(hash, password []byte) bool {
 // password that will be hashed before insertion. Note that the password
 // parameter value will be replaced with a empty slice.
 //
-// The Username and E-mail for the user will be trimmed from whitespace.
+// Note: The username and e-mail for the user will be trimmed from whitespace.
 func PutUser(user User, password []byte) (err error) {
 	var hash []byte
 	defer func() {
@@ -102,7 +107,7 @@ func PutUser(user User, password []byte) (err error) {
 // If the authentication fails an empty user with the ok boolean set to false is
 // returned. Else the user struct is filled and the ok boolean is set to true.
 //
-// Note that the password parameter will be emptied.
+// Note: That the password parameter will be emptied.
 func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 	var hash []byte
 
@@ -124,8 +129,8 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 
 // GetUser returns a user by their username or e-mail.
 //
-// The username and e-mail for the user will be trimmed from whitespace before
-// searching in the database.
+// Note: The username and e-mail for the user will be trimmed from whitespace
+// before searching in the database.
 func GetUser(identifier string) (user User, err error) {
 	err = database.QueryRow(`
 		SELECT username, email, fullname
