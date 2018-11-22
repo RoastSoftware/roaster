@@ -13,22 +13,41 @@ import (
 func createUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
-	var user model.User
+	// Create anonymous struct with model.User and seperated password field.
+	// The password will be handled differently and not be a part of the
+	// final user.
+	u := struct {
+		model.User
+		Password string `json:"password"`
+	}{}
+	defer func() {
+		u.Password = "" // Empty password field on function return.
+	}()
 
-	err := decoder.Decode(&user)
+	err := decoder.Decode(&u)
 	if err != nil {
 		http.Error(w, "Cannot decode data as user.", http.StatusBadRequest)
 		return
 	}
 
-	if user.Username == "" || user.Email == "" || user.Password == "" {
+	// TODO: Maybe add some kind of helper for empty fields?
+	if u.Username == "" || u.Email == "" || u.Password == "" {
 		http.Error(w, "Missing fields.", http.StatusBadRequest)
 		return
 	}
 
-	// TODO
-	// model.CreateUser(user)
-	log.Println(user)
+	/* TODO: Enable when database initialization has been added.
+	err = model.PutUser(u.User, []byte(u.Password))
+	if err != nil {
+		// TODO: Implement better error handling.
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	user := u.User
+	*/
+
+	// TODO: Answer with a session.
+	// log.Println(user)
 }
 
 func changeUser(w http.ResponseWriter, r *http.Request) {
