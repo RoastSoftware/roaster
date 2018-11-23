@@ -40,6 +40,12 @@ type User struct {
 // global pepper (shared global encryption key) which is overkill for our use
 // case.
 //
+// Note:
+// Some implementations of Bcrypt uses a null byte (\x00) to determine the end
+// of the input, the Go implementations does _not_ have this problem. So there
+// is no need to encode the data as base 64 etc. This is verified using the
+// program in cmd/testbcrypt.
+//
 // [0]: https://arstechnica.com/information-technology/2013/09/long-passwords-are-good-but-too-much-length-can-be-bad-for-security/
 // [1]: https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/
 func generateHash(password []byte) (hash []byte, err error) {

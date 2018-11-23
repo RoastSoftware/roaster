@@ -1,3 +1,4 @@
+// Package main tests the Go Bcrypt implementation for common problems.
 package main
 
 import (
