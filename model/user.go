@@ -40,11 +40,20 @@ type User struct {
 // global pepper (shared global encryption key) which is overkill for our use
 // case.
 //
-// Note:
+// Note 1:
 // Some implementations of Bcrypt uses a null byte (\x00) to determine the end
 // of the input, the Go implementations does _not_ have this problem. So there
 // is no need to encode the data as base 64 etc. This is verified using the
 // program in cmd/testbcrypt.
+//
+// Note 2:
+// The approach used by Dropbox where they encode with base 64 will generate a
+// ~88 byte long key, which is then truncated to 72 bytes. This results in a
+// input with 64^72 possible combinations. Our approach of not encoding the
+// input as base 64 results in a 64 byte long key (the output size of SHA-512),
+// where there is 256 possible combinations _per byte_. This results in a input
+// with 256^64 possible combinations. Therefore our approach allows for far more
+// possible entropy because 64^72 << 256^64 (like 99.999... % more entropy ;)).
 //
 // [0]: https://arstechnica.com/information-technology/2013/09/long-passwords-are-good-but-too-much-length-can-be-bad-for-security/
 // [1]: https://blogs.dropbox.com/tech/2016/09/how-dropbox-securely-stores-your-passwords/
