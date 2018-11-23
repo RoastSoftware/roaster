@@ -3,6 +3,10 @@ package model
 
 import (
 	"crypto/sha512"
+	"database/sql"
+	"errors"
+	"fmt"
+	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -105,10 +109,10 @@ func PutUser(user User, password []byte) (err error) {
 	}
 
 	_, err = database.Exec(`
-		INSERT INTO user
+		INSERT INTO "user"
 		(username, email, fullname, create_time, hash)
 		VALUES
-		(TRIM(?), LOWER(TRIM(?)), ?, ?)
+		(TRIM($1), LOWER(TRIM($2)), $3, $4, $5)
 	`, user.Username, user.Email, user.Fullname, time.Now(), hash)
 
 	return
@@ -128,8 +132,8 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 
 	err := database.QueryRow(`
 		SELECT username, email, fullname, hash
-		FROM user
-		WHERE (username=TRIM(?) OR email=LOWER(TRIM(?)))
+		FROM "user"
+		WHERE (username=TRIM($1) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Email, &user.Username, &user.Fullname, &hash)
 	if err != nil {
 		ok = false
@@ -149,9 +153,19 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 func GetUser(identifier string) (user User, err error) {
 	err = database.QueryRow(`
 		SELECT username, email, fullname
-		FROM user
-		WHERE (username=TRIM(?) OR email=LOWER(TRIM(?)))
+		FROM "user"
+		WHERE (username=TRIM($1) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Email, &user.Username, &user.Fullname)
+
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			err = fmt.Errorf(`user: "%s" does not exist`, identifier)
+		default:
+			log.Println(err)
+			err = errors.New("failed to execute your request")
+		}
+	}
 
 	return
 }

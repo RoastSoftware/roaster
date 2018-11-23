@@ -9,16 +9,19 @@ import (
 	"time"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 )
 
 const (
-	portEnvKey = "PORT"
+	portEnvKey           = "PORT"
+	databaseSourceEnvKey = "DATABASE_SOURCE"
 )
 
 type flags struct {
-	address      string
-	readTimeout  time.Duration
-	writeTimeout time.Duration
+	address        string
+	databaseSource string
+	readTimeout    time.Duration
+	writeTimeout   time.Duration
 }
 
 var context = flags{
@@ -37,6 +40,20 @@ func init() {
 func main() {
 	if port := os.Getenv(portEnvKey); port != "" {
 		context.address = fmt.Sprintf(":%s", port)
+	}
+
+	// The source argument is prioritized before the environment variable.
+	if context.databaseSource == "" {
+		if source := os.Getenv(databaseSourceEnvKey); source != "" {
+			context.databaseSource = source
+		} else {
+			log.Fatalln("must provide database source address with credentials")
+		}
+	}
+
+	err := model.Open(context.databaseSource)
+	if err != nil {
+		log.Fatalf("database returned error: %v", err)
 	}
 
 	controller := controller.New()

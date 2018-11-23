@@ -1,5 +1,5 @@
-// Package redirect checks forward protocol and redirects to https.
-package redirect
+// Package middleware implements http.Handler middleware.
+package middleware
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ var (
 	xForwardedProto = http.CanonicalHeaderKey("X-Forwarded-Proto")
 )
 
-// Middleware redirects all HTTP requests to HTTPS.
-func Middleware(h http.Handler) http.Handler {
+// Redirect redirects all HTTP requests to HTTPS.
+func Redirect(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		proto := r.Header.Get(xForwardedProto)
 		if strings.ToUpper(proto) == "HTTP" {

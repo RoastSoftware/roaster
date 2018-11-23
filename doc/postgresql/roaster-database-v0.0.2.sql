@@ -1,28 +1,18 @@
-create database roaster
-with owner postgres;
+set search_path to roaster;
 
-create sequence roaster.roast_id_seq
+create sequence if not exists roast_id_seq
   as integer
   maxvalue 2147483647;
 
-alter sequence roaster.roast_id_seq
-  owner to postgres;
-
-create sequence roaster.error_id_seq
+create sequence if not exists error_id_seq
   as integer
   maxvalue 2147483647;
 
-alter sequence roaster.error_id_seq
-  owner to postgres;
-
-create sequence roaster.warning_id_seq
+create sequence if not exists warning_id_seq
   as integer
   maxvalue 2147483647;
 
-alter sequence roaster.warning_id_seq
-  owner to postgres;
-
-create table if not exists roaster."user"
+create table if not exists "user"
 (
   username text  not null
     constraint user_pkey
@@ -30,6 +20,7 @@ create table if not exists roaster."user"
     constraint username_chk
     check (char_length(username) <= 30),
   hash     bytea not null,
+  create_time	timestamp with time zone not null,
   fullname text
     constraint fullname_chk
     check (char_length(fullname) < 255),
@@ -38,10 +29,7 @@ create table if not exists roaster."user"
     check (char_length(email) < 255)
 );
 
-alter table roaster."user"
-  owner to postgres;
-
-create table if not exists roaster.roast
+create table if not exists roast
 (
   id       serial        not null
     constraint roast_pk
@@ -51,17 +39,14 @@ create table if not exists roaster.roast
     check (char_length(code) <= 500000),
   username text          not null
     constraint user_fk
-    references "user",
+    references "user" (username),
   score    numeric(5, 4) not null
     constraint score_chk
     check ((score >= (0) :: numeric) AND (score <= (1) :: numeric)),
   language text          not null
 );
 
-alter table roaster.roast
-  owner to postgres;
-
-create table if not exists roaster.warning
+create table if not exists warning
 (
   hash        bytea   not null,
   row         integer not null,
@@ -74,13 +59,10 @@ create table if not exists roaster.warning
     primary key
 );
 
-alter table roaster.warning
-  owner to postgres;
-
 create unique index if not exists warning_hash_idx
-  on roaster.warning (hash);
+  on warning (hash);
 
-create table if not exists roaster.error
+create table if not exists error
 (
   hash        bytea   not null,
   row         integer not null,
@@ -93,36 +75,25 @@ create table if not exists roaster.error
     primary key
 );
 
-alter table roaster.error
-  owner to postgres;
-
 create unique index if not exists error_hash_idx
-  on roaster.error (hash);
+  on error (hash);
 
-create table if not exists roaster.roast_has_errors
+create table if not exists roast_has_errors
 (
   roast integer not null
     constraint roast_fk
     references roast (id),
   error integer not null
     constraint error_fk
-    references error
+    references error (id)
 );
 
-alter table roaster.roast_has_errors
-  owner to postgres;
-
-create table if not exists roaster.roast_has_warnings
+create table if not exists roast_has_warnings
 (
   roast   integer not null
     constraint roast_fk
     references roast (id),
   warning integer not null
     constraint warning_fk
-    references warning
+    references warning (id)
 );
-
-alter table roaster.roast_has_warnings
-  owner to postgres;
-
-
