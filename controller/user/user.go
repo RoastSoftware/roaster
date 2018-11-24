@@ -7,6 +7,7 @@ import (
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
 )
 
@@ -41,17 +42,33 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u.Password = "" // Empty the password value.
-	//user := u.User
 
-	// TODO: Answer with a session.
-	// log.Println(user)
+	// TODO: Implement auth middleware instead.
+	s, _ := session.Get(r, "auth")
+	s.Values["username"] = u.Username
+
+	session.Save(r, w, s)
 }
 
 func changeUser(w http.ResponseWriter, r *http.Request) {
+	/* TODO
+	s, _ := session.Get(r, "auth")
+	if s.Values["username"] == mux.Vars(r)["username"] {
+
+	}
+	*/
+
 	http.Error(w, "", http.StatusNotImplemented)
 }
 
 func removeUser(w http.ResponseWriter, r *http.Request) {
+	/* TODO
+	s, _ := session.Get(r, "auth")
+	if s.Values["username"] == mux.Vars(r)["username"] {
+
+	}
+	*/
+
 	http.Error(w, "", http.StatusNotImplemented)
 }
 

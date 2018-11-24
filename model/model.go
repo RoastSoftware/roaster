@@ -5,13 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
-
-	_ "github.com/lib/pq" // pq hooks into database/sql as the 'postgres' driver
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model/forwardengineer"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/util"
+	_ "github.com/lib/pq" // pq hooks into database/sql as the 'postgres' driver
 )
 
 // Holds the database handle, sql.DB. It's thread safe for concurrent use, see:
@@ -31,7 +28,7 @@ func Open(source string) error {
 	}
 
 	// Start thread that waits for program exit and closes the database.
-	defer graceful(db.Close)
+	defer util.Graceful(db.Close)
 
 	database = db
 
@@ -45,22 +42,4 @@ func Open(source string) error {
 	}
 
 	return nil
-}
-
-// graceful calls a function upon program exit.
-func graceful(fn func() error) {
-	go func() {
-		sig := make(chan os.Signal, 1)
-		defer close(sig)
-
-		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-		<-sig
-
-		err := fn()
-		if err != nil {
-			panic(err)
-		}
-
-		os.Exit(0)
-	}()
 }

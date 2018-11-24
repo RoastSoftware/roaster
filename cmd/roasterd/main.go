@@ -10,24 +10,36 @@ import (
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 )
 
 const (
 	portEnvKey           = "PORT"
 	databaseSourceEnvKey = "DATABASE_SOURCE"
+	csrfTokenEnvKey      = "CSRF_TOKEN"
+	sessionEnvKey        = "SESSION_KEY"
 )
 
 type flags struct {
-	address        string
-	databaseSource string
-	readTimeout    time.Duration
-	writeTimeout   time.Duration
+	address          string
+	databaseSource   string
+	redisAddress     string
+	redisPassword    string
+	redisNetwork     string
+	sessionKey       string
+	csrfKey          string
+	readTimeout      time.Duration
+	writeTimeout     time.Duration
+	redisMaxIdleConn uint
 }
 
 var context = flags{
-	address:      ":5000",
-	readTimeout:  15,
-	writeTimeout: 15,
+	address:          ":5000",
+	readTimeout:      15,
+	writeTimeout:     15,
+	redisMaxIdleConn: 10,
+	redisAddress:     ":6379",
+	redisNetwork:     "tcp",
 }
 
 func init() {
@@ -42,13 +54,17 @@ func main() {
 		context.address = fmt.Sprintf(":%s", port)
 	}
 
-	// The source argument is prioritized before the environment variable.
+	// TODO: Implement flags. The stuff below could be much more DRY.
 	if context.databaseSource == "" {
-		if source := os.Getenv(databaseSourceEnvKey); source != "" {
-			context.databaseSource = source
-		} else {
-			log.Fatalln("must provide database source address with credentials")
-		}
+		context.databaseSource = os.Getenv(databaseSourceEnvKey)
+	}
+
+	if context.csrfKey == "" {
+		context.csrfKey = os.Getenv(csrfTokenEnvKey)
+	}
+
+	if context.sessionKey == "" {
+		context.sessionKey = os.Getenv(sessionEnvKey)
 	}
 
 	err := model.Open(context.databaseSource)
@@ -56,7 +72,17 @@ func main() {
 		log.Fatalf("database returned error: %v", err)
 	}
 
-	controller := controller.New()
+	err = session.Open(
+		context.redisMaxIdleConn,
+		context.redisNetwork,
+		context.redisAddress,
+		context.redisPassword,
+		[]byte(context.sessionKey))
+	if err != nil {
+		log.Fatalf("session store returned error: %v", err)
+	}
+
+	controller := controller.New([]byte(context.csrfKey))
 
 	server := &http.Server{
 		Handler:      controller,

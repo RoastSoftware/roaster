@@ -12,10 +12,14 @@ import (
 )
 
 // New returns a router with all handles configured.
-func New() http.Handler {
+func New(csrfKey []byte) http.Handler {
 	var handler http.Handler
 
 	router := mux.NewRouter()
+
+	// Protect all methods except GET, HEAD, OPTIONS and TRACE with CSRF
+	// tokens.
+	router.Use(middleware.CSRF(csrfKey))
 
 	// User [/user].
 	user.Init(router.PathPrefix("/user").Subrouter())
