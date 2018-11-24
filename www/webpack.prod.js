@@ -5,6 +5,9 @@ const Uglify = require('uglifyjs-webpack-plugin');
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
     minimizer: [
       new Uglify({
         cache: false,
