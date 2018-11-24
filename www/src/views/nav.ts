@@ -19,14 +19,11 @@ export default class Nav implements ClassComponent {
               m('i.coffee.icon.logo'),
               'Roaster'
           ),
-          m('a.item', {href: '/about', oncreate: m.route.link}, 'About'),
+          m('a.item', {href: '/about', oncreate: m.route.link}, 'ABOUT'),
           m('a.item', {href: '/register', oncreate: m.route.link}, 'REGISTER'),
-          m('a.item', {href: '/profile', oncreate: m.route.link}, 'Profile'),
-          m(
-              'a.item',
-              {href: '/statistics', oncreate: m.route.link},
-              'Statistics'
-          )
+          m('a.item', {href: '/login', oncreate: m.route.link}, 'LOGIN'),
+          m('a.item', {href: '/profile', oncreate: m.route.link}, 'PROFILE'),
+          m('a.item', {href: '/statistics', oncreate: m.route.link},'STATISTICS')
       ),
     ]);
   }

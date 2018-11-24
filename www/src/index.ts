@@ -1,14 +1,16 @@
 import m from "mithril";
-import Home from "./views/home";
-import About from "./views/about";
-import Register from "./views/register";
-import Profile from "./views/profile";
-import Statistics from "./views/statistics";
+import home from "./views/home";
+import about from "./views/about";
+import register from "./views/register";
+import profile from "./views/profile";
+import statistics from "./views/statistics";
+import login from "./views/login";
 
 m.route(document.body, "/", {
-    "/": Home,
-    "/about": About,
-    "/register": Register,
-    "/profile": Profile,
-    "/statistics": Statistics
+    "/": home,
+    "/about": about,
+    "/register": register,
+    "/profile": profile,
+    "/statistics": statistics,
+    "/login": login
 });
