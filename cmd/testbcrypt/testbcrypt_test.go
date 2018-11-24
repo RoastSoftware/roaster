@@ -38,6 +38,15 @@ func BenchmarkBcrypt14(b *testing.B) {
 	benchmarkBcrypt(14, b)
 }
 
+func TestWithSamePassword(t *testing.T) {
+	res := testbcrypt.HashWithSamePassword(-1)
+	if err := bcrypt.CompareHashAndPassword(res,
+		[]byte("G;H.#Wj9PLH<>TmkgzDn{?FY&U_")); err != nil {
+
+		t.Error("Must use same input password")
+	}
+}
+
 func TestExpectNoNullByteBug(t *testing.T) {
 	res1 := testbcrypt.HashWithSameCost("abc\x00def")
 	if err := bcrypt.CompareHashAndPassword(res1, []byte("abc\x00ghi")); err != nil {
