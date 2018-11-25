@@ -13,8 +13,6 @@ var xCSRFToken = http.CanonicalHeaderKey("X-Csrf-Token")
 // CSRF wraps the gorilla/csrf Protect middleware with an initiated key and
 // injects the X-Csrf-Token.
 func CSRF(key []byte) mux.MiddlewareFunc {
-	csrf.Secure(false) // TODO Remove this.
-
 	if len(key) < 32 {
 		panic("CSRF token must be atleast 32 bytes long")
 	}
