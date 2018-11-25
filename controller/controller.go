@@ -4,6 +4,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/session"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/static"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/user"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -23,6 +24,9 @@ func New(csrfKey []byte) http.Handler {
 
 	// User [/user].
 	user.Init(router.PathPrefix("/user").Subrouter())
+
+	// Session [/session].
+	session.Init(router.PathPrefix("/session").Subrouter())
 
 	// Retrieve the roast.software SPA [GET].
 	static.Init(router.PathPrefix("/").Subrouter(), "www")

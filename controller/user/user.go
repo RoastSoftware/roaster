@@ -41,10 +41,9 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	u.Password = "" // Empty the password value.
 
 	// TODO: Implement auth middleware instead.
-	s, _ := session.Get(r, "auth")
+	s, _ := session.Get(r, "roaster_auth")
 	s.Values["username"] = u.Username
 
 	session.Save(r, w, s)
@@ -52,7 +51,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 func changeUser(w http.ResponseWriter, r *http.Request) {
 	/* TODO
-	s, _ := session.Get(r, "auth")
+	s, _ := session.Get(r, "roaster_auth")
 	if s.Values["username"] == mux.Vars(r)["username"] {
 
 	}
@@ -63,7 +62,7 @@ func changeUser(w http.ResponseWriter, r *http.Request) {
 
 func removeUser(w http.ResponseWriter, r *http.Request) {
 	/* TODO
-	s, _ := session.Get(r, "auth")
+	s, _ := session.Get(r, "roaster_auth")
 	if s.Values["username"] == mux.Vars(r)["username"] {
 
 	}
