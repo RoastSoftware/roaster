@@ -54,8 +54,7 @@ func removeSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Options.MaxAge = -1 // Set MaxAge to -1 to invalidate session.
-	session.Save(r, w, s)
+	session.Invalidate(r, w, s)
 }
 
 // Init adds the handlers for the Session [/session] endpoint.
