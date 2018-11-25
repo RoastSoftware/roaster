@@ -29,7 +29,7 @@ func New(csrfKey []byte) http.Handler {
 	session.Init(router.PathPrefix("/session").Subrouter())
 
 	// Retrieve the roast.software SPA [GET].
-	static.Init(router.PathPrefix("/").Subrouter(), "www")
+	static.Init(router.PathPrefix("/").Subrouter(), "www/dist")
 
 	// Redirect HTTP to HTTPS if X-Forward-Proto is set.
 	handler = middleware.Redirect(router)
