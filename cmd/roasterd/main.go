@@ -18,6 +18,8 @@ import (
 const (
 	portEnvKey           = "PORT"
 	databaseSourceEnvKey = "DATABASE_SOURCE"
+	redisAddressEnvKey   = "REDIS_ADDRESS"
+	redisPasswordEnvKey  = "REDIS_PASSWORD"
 	csrfTokenEnvKey      = "CSRF_TOKEN"
 	sessionEnvKey        = "SESSION_KEY"
 )
@@ -82,6 +84,14 @@ func init() {
 
 	if context.databaseSource == "" {
 		context.databaseSource = os.Getenv(databaseSourceEnvKey)
+	}
+
+	if context.redisAddress == "" {
+		context.redisAddress = os.Getenv(redisAddressEnvKey)
+	}
+
+	if context.redisPassword == "" {
+		context.redisPassword = os.Getenv(redisPasswordEnvKey)
 	}
 
 	if context.csrfKey == "" {
