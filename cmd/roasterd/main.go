@@ -21,7 +21,7 @@ const (
 	redisAddressEnvKey   = "REDIS_ADDRESS"
 	redisPasswordEnvKey  = "REDIS_PASSWORD"
 	csrfKeyEnvKey        = "CSRF_KEY"
-	sessionEnvKey        = "SESSION_KEY"
+	sessionKeyEnvKey     = "SESSION_KEY"
 )
 
 type flags struct {
@@ -82,24 +82,24 @@ func init() {
 		context.address = fmt.Sprintf(":%s", port)
 	}
 
-	if context.databaseSource == "" {
-		context.databaseSource = os.Getenv(databaseSourceEnvKey)
+	if redisAddress := os.Getenv(redisAddressEnvKey); redisAddress != "" {
+		context.redisAddress = redisAddress
 	}
 
-	if context.redisAddress == "" {
-		context.redisAddress = os.Getenv(redisAddressEnvKey)
+	if databaseSource := os.Getenv(databaseSourceEnvKey); databaseSource != "" {
+		context.databaseSource = databaseSource
 	}
 
-	if context.redisPassword == "" {
-		context.redisPassword = os.Getenv(redisPasswordEnvKey)
+	if redisPassword := os.Getenv(redisPasswordEnvKey); redisPassword != "" {
+		context.redisPassword = redisPassword
 	}
 
-	if context.csrfKey == "" {
-		context.csrfKey = os.Getenv(csrfKeyEnvKey)
+	if csrfKey := os.Getenv(csrfKeyEnvKey); csrfKey != "" {
+		context.csrfKey = csrfKey
 	}
 
-	if context.sessionKey == "" {
-		context.sessionKey = os.Getenv(sessionEnvKey)
+	if sessionKey := os.Getenv(sessionKeyEnvKey); sessionKey != "" {
+		context.sessionKey = sessionKey
 	}
 }
 
