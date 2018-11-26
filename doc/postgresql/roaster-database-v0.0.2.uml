@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>b620e56f-ca13-4d10-af8a-649b35b72ac0.SCHEMA:roaster.roaster</OriginalElement>
+  <nodes>
+    <node x="107.0" y="0.0">b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.user</node>
+    <node x="159.0" y="212.0">b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast</node>
+    <node x="0.0" y="190.0">b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.error</node>
+    <node x="270.5" y="424.0">b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_warnings</node>
+    <node x="337.0" y="190.0">b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.warning</node>
+    <node x="71.5" y="424.0">b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_errors</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast" target="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.user">
+      <point x="0.0" y="-70.0" />
+      <point x="0.0" y="70.0" />
+    </edge>
+    <edge source="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_errors" target="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast">
+      <point x="31.25" y="-36.5" />
+      <point x="165.25" y="399.0" />
+      <point x="198.5" y="399.0" />
+      <point x="-39.5" y="70.0" />
+    </edge>
+    <edge source="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_errors" target="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.error">
+      <point x="-31.25" y="-36.5" />
+      <point x="102.75" y="399.0" />
+      <point x="69.5" y="399.0" />
+      <point x="0.0" y="92.0" />
+    </edge>
+    <edge source="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_warnings" target="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.warning">
+      <point x="35.75" y="-36.5" />
+      <point x="377.75" y="399.0" />
+      <point x="406.5" y="399.0" />
+      <point x="0.0" y="92.0" />
+    </edge>
+    <edge source="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_warnings" target="b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast">
+      <point x="-35.75" y="-36.5" />
+      <point x="306.25" y="399.0" />
+      <point x="277.5" y="399.0" />
+      <point x="39.5" y="70.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="238.0" y="248.5" />
+  <SelectedNodes>
+    <node>b620e56f-ca13-4d10-af8a-649b35b72ac0.TABLE:roaster.roaster.roast_has_errors</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+  </Categories>
+</Diagram>
+

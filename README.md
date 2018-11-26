@@ -31,13 +31,29 @@ using the official Docker images.
 
 Run the PostgreSQL Docker image with (exposed at port: `5432`):
 ```
-docker run --name roaster-postgresql -e POSTGRES_PASSWORD=AReallyGreatPassword -d postgres
+docker run --name roaster-postgresql -e POSTGRES_PASSWORD=<db password> -p 5432:5432 -d postgres
 ```
 
-And run the Redis Docker image with (exposed at port: `6379`, non-persistent):
+And run the Redis Docker image with (exposed at port: `6379`, non-persistent, w/o password):
 ```
-docker run --name roaster-redis -d redis
+docker run -it --rm -p 6379:6379 --name roaster-redis -d redis
 ```
+
+The PostgreSQL database can be configured with pgAdmin4:
+```
+docker pull dpage/pgadmin4
+docker run -p 80:80 \
+	--name roaster-pgadmin4 \
+	-e "PGADMIN_DEFAULT_EMAIL=user@domain.com" \
+	-e "PGADMIN_DEFAULT_PASSWORD=SuperSecret" \
+	-d dpage/pgadmin4 \
+	--link roaster-pgadmin4:roaster-postgresql
+```
+
+Access the pgAdmin4 website at: http://localhost
+
+The PostgreSQL database should be setup with a new database with a schema called
+`roaster` and a user who only has privilege to that schema.
 
 Clone the Roaster repository:
 ```
@@ -59,10 +75,45 @@ Make sure you enable Go modules if you are using Go v1.11:
 export GO111MODULE=on
 ```
 
-To run the `roasterd` server, simply run:
+#### Requirements (see Initial setup above)
+ * A PostgreSQL database must be set up with a scheme named `roaster` that the
+provided user has access to.
+ * A Redis server on localhost without any password listening on port `6379`.
+
+#### Start web server (development mode)
+To run the `roasterd` server in development mode, simply run:
 ```
-go run github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd
+go run github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd \
+	-dev-mode \
+	-database-source="user=<db user> dbname=<db name> password=<db password> sslmode=disable"
 ```
+
+#### Start web server (production mode)
+The `roasterd` server requires two cryptographically secure random keys. They
+can be generated and set to their environment variables with:
+```
+export SESSION_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
+export CSRF_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
+```
+This will produce two unique keys with 32 bytes of random characters.
+Make sure that you do **NOT** use the same key for both environment variables.
+
+Then run the `roasterd` server with:
+```
+go run github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd \
+	-database-source="user=<db user> dbname=<db name> password=<db password> sslmode=disable"
+```
+
+If you do not set the environment variables above you can expect a crash from
+the server telling you that you do not have enough amount of bytes for the two
+keys.
+
+#### A note about `sslmode`
+The `sslmode` key can be set to one of:
+ * `require` - Use SSL/TLS w/o verification
+ * `verify_ca` - Verify CA for SSL/TLS, but not the hostname
+ * `verify_full` - Verify both CA and hostname for SSL/TLS
+ * `disable` - No SSL/TLS
 
 ### Frontend
 The frontend is written in TypeScript, HTML and CSS. Everything is packaged and
