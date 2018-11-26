@@ -3,7 +3,7 @@ import m from 'mithril';
 /**
  * Nav component provides a navigation bar for the top of the page.
  */
-export default class Nav implements ClassComponent {
+export default {
   /**
    * Creates a navigation bar.
    * @param {CVnode} vnode - Virtual node.
@@ -23,8 +23,11 @@ export default class Nav implements ClassComponent {
           m('a.item', {href: '/register', oncreate: m.route.link}, 'REGISTER'),
           m('a.item', {href: '/login', oncreate: m.route.link}, 'LOGIN'),
           m('a.item', {href: '/profile', oncreate: m.route.link}, 'PROFILE'),
-          m('a.item', {href: '/statistics', oncreate: m.route.link},'STATISTICS')
+          m('a.item', {
+            href: '/statistics',
+            oncreate: m.route.link},
+          'STATISTICS')
       ),
     ]);
-  }
-}
+  },
+} as m.Component;

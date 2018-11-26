@@ -1,4 +1,4 @@
-import m, {CVnodeDOM} from 'mithril';
+import m from 'mithril';
 
 declare global {
   interface Window {
@@ -47,37 +47,43 @@ async function loadMonacoEditor(
   return monaco;
 }
 
+export interface State {
+    ready: boolean;
+}
+
 /**
  * Editor component wraps a Monaco Editor.
  */
-export default class Editor implements ClassComponent {
-  ready: boolean = false;
+export default {
+  ready: false as boolean,
 
   /**
    * Loads and adds a Monaco Editor to the empty div#editor created by view.
    * @param {CVnode} vnode - Virtual node.
    */
-  oncreate(vnode: CVnodeDOM) {
+  oncreate({dom}) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
       this.ready = true;
       m.redraw();
 
-      const editor = monaco.editor.create(vnode.dom as HTMLElement, {
+      const editor = monaco.editor.create(dom as HTMLElement, {
         language: 'python',
       });
 
       window.addEventListener('resize', () => editor.layout());
     });
-  }
+  },
 
   /**
    * Creates a empty div#editor that is used by oncreate.
    * @param {CVnode} vnode - Virtual node.
    * @return {CVnode}
    */
-  view(vnode: CVnode) {
-      return this.ready ? m('#editor[style=min-height: 35rem;]') : m(".ui.active[style=min-height: 35rem;]",
-          m('.ui.large.loader[style=display: block;]') 
-      );
-  }
-}
+  view(vnode) {
+    return this.ready ?
+          m('#editor[style=min-height: 35rem;]') :
+          m('.ui.active[style=min-height: 35rem;]',
+              m('.ui.large.loader[style=display: block;]')
+          );
+  },
+} as m.Component<State>;
