@@ -20,7 +20,7 @@ const (
 	databaseSourceEnvKey = "DATABASE_SOURCE"
 	redisAddressEnvKey   = "REDIS_ADDRESS"
 	redisPasswordEnvKey  = "REDIS_PASSWORD"
-	csrfTokenEnvKey      = "CSRF_TOKEN"
+	csrfKeyEnvKey        = "CSRF_KEY"
 	sessionEnvKey        = "SESSION_KEY"
 )
 
@@ -95,7 +95,7 @@ func init() {
 	}
 
 	if context.csrfKey == "" {
-		context.csrfKey = os.Getenv(csrfTokenEnvKey)
+		context.csrfKey = os.Getenv(csrfKeyEnvKey)
 	}
 
 	if context.sessionKey == "" {
