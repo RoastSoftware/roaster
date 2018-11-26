@@ -10,7 +10,7 @@ export default class Nav implements ClassComponent {
    * @return {CVnode}
    */
   view(vnode: CVnode) {
-    return m('nav.ui.massive.borderless.menu[style=margin-top: 0;]', [
+    return m('nav.ui.massive.borderless.stackable.menu[style=margin-top: 0;]', [
       m(
           '.ui.container',
           m(
