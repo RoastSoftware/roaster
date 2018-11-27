@@ -47,6 +47,16 @@ async function loadMonacoEditor(
   return monaco;
 }
 
+const fillAreaStyle = `\
+height: 100%;\
+width: 100%;\
+padding: 0;\
+margin: 0;\
+border: 0;\
+box-shadown: none;\
+border-radius: 0;\
+`;
+
 /**
  * Editor component wraps a Monaco Editor.
  */
@@ -76,9 +86,11 @@ def welcome(ξ):
         minimap: {
           enabled: this.minimap,
         },
+        scrollBeyondLastLine: false, // Display scrollbar only on overflow.
       });
 
       window.addEventListener('resize', () => this.editor.layout());
+      window.addEventListener('zoom', () => this.editor.layout());
     });
   }
 
@@ -88,14 +100,11 @@ def welcome(ξ):
    * @return {CVnode}
    */
   view(vnode: CVnode) {
-    return [
-      (this.ready ?
-          ξ('#editor[style=height: 100%;]')
-        :
-          ξ('.ui.active[style=height: 100%;]',
-              ξ('.ui.large.loader[style=display: block;]')
-          )
-      ),
-    ];
+    return this.ready ?
+          ξ('#editor', {style: fillAreaStyle})
+          :
+          ξ('.ui.segment', {style: fillAreaStyle},
+              ξ('.ui.large.loader', {style: 'display: block;'})
+          );
   }
 }
