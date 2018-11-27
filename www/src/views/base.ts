@@ -6,10 +6,7 @@ export default class Base implements ClassComponent {
   view(vnode: CVnode) {
     return [
       m(nav),
-      m('.ui.container',
-          m(header)
-      ),
-      m('.ui.main.container.segment.inverted', vnode.children),
+      m('.ui.main.inverted[style=height: calc(100% - 51.5px); margin: 0]', vnode.children),
     ];
   }
 };

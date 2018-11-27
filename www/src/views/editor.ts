@@ -1,4 +1,4 @@
-import m, {CVnodeDOM} from 'mithril';
+import ξ from 'mithril';
 
 declare global {
   interface Window {
@@ -52,6 +52,9 @@ async function loadMonacoEditor(
  */
 export default class Editor implements ClassComponent {
   ready: boolean = false;
+  minimap: boolean = false;
+  editor: monaco.editor.IStandaloneEditor;
+  language: string = 'python';
 
   /**
    * Loads and adds a Monaco Editor to the empty div#editor created by view.
@@ -60,13 +63,22 @@ export default class Editor implements ClassComponent {
   oncreate(vnode: CVnodeDOM) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
       this.ready = true;
-      m.redraw();
+      ξ.redraw();
 
-      const editor = monaco.editor.create(vnode.dom as HTMLElement, {
-        language: 'python',
+      this.editor = monaco.editor.create(vnode.dom as HTMLElement, {
+        value: `\
+"""
+Roaster roasts your code with static code analysis, for free!
+"""
+def welcome(ξ):
+    print('Please write your fabulous code here!')`,
+        language: this.language,
+        minimap: {
+          enabled: this.minimap,
+        },
       });
 
-      window.addEventListener('resize', () => editor.layout());
+      window.addEventListener('resize', () => this.editor.layout());
     });
   }
 
@@ -76,8 +88,14 @@ export default class Editor implements ClassComponent {
    * @return {CVnode}
    */
   view(vnode: CVnode) {
-      return this.ready ? m('#editor[style=min-height: 35rem;]') : m(".ui.active[style=min-height: 35rem;]",
-          m('.ui.large.loader[style=display: block;]') 
-      );
+    return [
+      (this.ready ?
+          ξ('#editor[style=height: 100%;]')
+        :
+          ξ('.ui.active[style=height: 100%;]',
+              ξ('.ui.large.loader[style=display: block;]')
+          )
+      ),
+    ];
   }
 }

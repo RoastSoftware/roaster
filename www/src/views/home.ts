@@ -5,16 +5,12 @@ import editor from './editor';
 export default class Home implements ClassComponent {
   view(vnode: CVNode) {
     return ξ(base,
-        ξ('.ui.two.column.stackable.grid', [
-          ξ('.ui.ten.wide.column',
-              ξ('p', 'Please write your fabulous code below:'),
-              ξ('.ui.segment.inverted',
+        ξ('div[style=height: 100%; overflow: hidden;]',
+            ξ('.ui.two.column.stackable.grid[style=height: 100%; margin: 0;]', [
+              ξ('.ui.ten.wide.column[style=padding: 0;]',
                   ξ(editor)
               ),
-          ),
-          ξ('.ui.six.wide.column',
-              ξ('p', 'Problems detected:'),
-              ξ('.ui.segment.inverted[style=overflow: auto; max-height: 35em;]',
+              ξ('.ui.six.wide.column',
                   ξ('.ui.relaxed.list.divided',
                       ξ('.item',
                           ξ('i.big.frown.icon[style=color: #dc322f;]'),
@@ -143,9 +139,26 @@ export default class Home implements ClassComponent {
                           ),
                       ),
                   ),
+                  ξ('.ui.column.grid', [
+                    ξ('.six.wide.column',
+                        ξ(`select.ui.fluid.selection.dropdown[style=\
+                border: none;\
+                -webkit-appearance: none;\
+                -moz-appearance: none;\
+                appearance: none;]`, [
+
+                          ξ('option', {value: 'python3'}, 'Python 3'),
+                          ξ('option', {value: 'python2'}, 'Python 2.7'),
+                        ])
+                    ),
+                    ξ('.four.wide.column'),
+                    ξ('.six.wide.column',
+                        ξ('button.ui.big.fluid.primary.button', 'ROAST ME!')
+                    ),
+                  ]),
               ),
-          ),
-        ])
+            ])
+        )
     );
   }
 };
