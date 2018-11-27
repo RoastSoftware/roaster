@@ -1,55 +1,61 @@
-
-import m from 'mithril';
+import ξ from 'mithril';
 import base from './base';
-import user from '../models/user';
+import {User, authenticateUser} from '../models/user';
 
 /**
  *  Onsubmit function sends form data
- */
-function onsubmit() {
-  console.log('On submit function called, but not implemented');
-  user.authenticateSession();
-}
-/**
- * Validate checks field input data
- */
-function validate() {
-  console.log('Un-implemented validator');
-}
-/**
- * input generates input form fields
- * @param {string} fieldName name of input field
- * @param {string} type HTML type of input field
  *
- * @return {undefined}
+ *  @param {User} user current user object to be sent
  */
-function input(fieldName: string, type: string) {
-  return m('.field',
-      m('label', fieldName + ':'),
-      m('input', {
-        type: type,
-        placeholder: fieldName,
-        oninput: m.withAttr('value', validate),
-        // TODO: inplement on input
-      })
-  );
+function authenticate(user: User) {
+  console.log('On submit function called, but not implemented');
+  if (user.validLogin()) {
+    authenticateUser(user);
+  }
 }
 
-export default {
-  view(vnode: CVnode) {
-    return m(base,
-        m('.ui.grid',
-            m('.ui.container.six.wide.column.centered',
-                m('.ui.segments',
-                    m('.ui.segment', m('h2', 'LOGIN')),
-                    m('.ui.segment', m('form.ui.form', {onsubmit}, [
-                      input('Username', 'text'),
-                      input('Password', 'password'),
-                      m('button.ui.teal.basic.button', 'LOGIN!'),
-                    ]))
-                )
-            )
-        )
-    );
-  },
-} as m.Component;
+
+export default class Login implements ξ.ClassComponent {
+    user: User = new User();
+    view(vnode: ξ.CVnode) {
+      return ξ(base,
+          ξ('.ui.grid',
+              ξ('.ui.container.six.wide.column.centered',
+                  ξ('.ui.segments',
+                      ξ('.ui.segment', ξ('h2', 'LOGIN')),
+                      ξ('.ui.segment', ξ('form.ui.form', {onsubmit: () => {
+                        authenticate(this.user);
+                      }}, [
+                        ξ('.field', {
+                          class: this.user.validUsername() ? '' : 'error'}, [
+                          ξ('label', 'Username'),
+                          ξ('.ui.input',
+                              ξ('input', {
+                                type: 'text',
+                                value: this.user.getUsername(),
+                                oninput: (e: any) =>
+                                  this.user.setUsername(e.currentTarget.value),
+                                placeholder: 'Thisisausername',
+                              }))]),
+                        ξ('.field', {
+                          class: this.user.validPassword() ? '' : 'error'}, [
+                          ξ('label', 'Password'),
+                          ξ('.ui.input',
+                              ξ('input', {
+                                type: 'password',
+                                value: this.user.getPassword(),
+                                oninput: (e: any) =>
+                                  this.user.setPassword(e.currentTarget.value),
+                                placeholder: 's3cur3p#55w0rd',
+                              }))]),
+                        ξ('button.ui.teal.basic.button', {
+                          disabled: !(this.user.validLogin()),
+                        },
+                        'LOGIN!'),
+                      ]))
+                  ),
+              ),
+          ),
+      );
+    }
+};

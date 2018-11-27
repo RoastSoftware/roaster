@@ -54,6 +54,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime": "^7.1.5",
+    "d3": "^5.7.0",
     "mithril": "^1.1.6",
     "monaco-editor": "^0.15.5",
     "monaco-editor-webpack-plugin": "^1.6.0",
