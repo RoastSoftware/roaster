@@ -1,4 +1,4 @@
-import m from 'mithril';
+import ξ from 'mithril';
 
 declare global {
   interface Window {
@@ -47,43 +47,63 @@ async function loadMonacoEditor(
   return monaco;
 }
 
-export interface State {
-    ready: boolean;
-}
+const fillAreaStyle = `\
+height: 100%;\
+width: 100%;\
+padding: 0;\
+margin: 0;\
+border: 0;\
+box-shadown: none;\
+border-radius: 0;\
+`;
 
 /**
  * Editor component wraps a Monaco Editor.
  */
-export default {
-  ready: false as boolean,
+export default class Editor implements ClassComponent {
+  ready: boolean = false;
+  minimap: boolean = false;
+  editor: monaco.editor.IStandaloneEditor;
+  language: string = 'python';
 
   /**
    * Loads and adds a Monaco Editor to the empty div#editor created by view.
    * @param {CVnode} vnode - Virtual node.
    */
-  oncreate({dom}) {
+  oncreate(vnode: ξ.CVnodeDOM) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
       this.ready = true;
-      m.redraw();
+      ξ.redraw();
 
-      const editor = monaco.editor.create(dom as HTMLElement, {
-        language: 'python',
+      this.editor = monaco.editor.create(vnode.dom as HTMLElement, {
+        value: `\
+"""
+Roaster roasts your code with static code analysis, for free!
+"""
+def welcome(ξ):
+    print('Please write your fabulous code here!')`,
+        language: this.language,
+        minimap: {
+          enabled: this.minimap,
+        },
+        scrollBeyondLastLine: false, // Display scrollbar only on overflow.
       });
 
-      window.addEventListener('resize', () => editor.layout());
+      window.addEventListener('resize', () => this.editor.layout());
     });
-  },
+  };
 
   /**
    * Creates a empty div#editor that is used by oncreate.
    * @param {CVnode} vnode - Virtual node.
    * @return {CVnode}
    */
-  view(vnode) {
+  view(vnode: ξ.CVnode) {
     return this.ready ?
-          m('#editor[style=min-height: 35rem;]') :
-          m('.ui.active[style=min-height: 35rem;]',
-              m('.ui.large.loader[style=display: block;]')
+          ξ('#editor', {style: fillAreaStyle})
+          :
+          ξ('.ui.segment', {style: fillAreaStyle},
+              ξ('.ui.large.loader', {style: 'display: block;'})
           );
-  },
-} as m.Component<State>;
+  };
+};
