@@ -8,6 +8,7 @@ jobs:
     before_install:
     - cd ./www
     script:
+    - npm run lint
     - npm run build
     - npm test
 

@@ -1,11 +1,13 @@
-import m, { ClassComponent, CVnode} from "mithril";
-import base from "./base";
+import ξ from 'mithril';
+import base from './base';
 
-export default class Statistics implements ClassComponent {
-    view(vnode: CVnode) {
-        return m(base,
-            m("p", "Let there be GRAPHS! "),
-            m("p", "later...")
-        );
-    }
-};
+export default {
+  view(vnode: CVnode) {
+    return ξ(base,
+        ξ('.ui.main.text.container[style=margin-top: 2em;]',
+            ξ('p', 'Let there be GRAPHS! '),
+            ξ('p', 'later...')
+        )
+    );
+  },
+} as ξ.Component;

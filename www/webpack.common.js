@@ -1,4 +1,3 @@
-const webpack = require('webpack');
 const CopyWebpack = require('copy-webpack-plugin');
 const HtmlWebpack = require('html-webpack-plugin');
 const HtmlWebpackIncludeAssets = require('html-webpack-include-assets-plugin');

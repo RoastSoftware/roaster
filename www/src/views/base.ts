@@ -1,6 +1,5 @@
-import ξ, {ClassComponent, CVnode} from 'mithril';
+import ξ from 'mithril';
 import nav from './nav';
-import header from './header';
 
 const fillMainAreaStyle = `\
 display: flex;\
@@ -28,8 +27,8 @@ white-space: nowrap; /* Added line */\
 width: 1px;\
 `;
 
-export default class Base implements ClassComponent {
-  view(vnode: CVnode) {
+export default class Base implements ξ.ClassComponent {
+  view(vnode: ξ.CVnode) {
     return [
       ξ('div', {style: fillMainAreaStyle},
           ξ(nav),

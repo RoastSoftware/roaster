@@ -8,7 +8,7 @@ z-index: 9999;\
 /**
  * Nav component provides a navigation bar for the top of the page.
  */
-export default class Nav implements ClassComponent {
+export default {
   /**
    * Creates a navigation bar.
    * @param {CVnode} vnode - Virtual node.
@@ -23,13 +23,15 @@ export default class Nav implements ClassComponent {
               ξ('i.brown.coffee.icon.logo'),
               'Roaster'
           ),
-          ξ('a.item', {href: '/about', oncreate: ξ.route.link}, 'About'),
+          ξ('a.item', {href: '/about', oncreate: ξ.route.link}, 'ABOUT'),
           ξ('a.item', {href: '/register', oncreate: ξ.route.link}, 'REGISTER'),
-          ξ('a.item', {href: '/profile', oncreate: ξ.route.link}, 'Profile'),
-          ξ('a.item', {href: '/statistics', oncreate: ξ.route.link},
-              'Statistics',
-          ),
+          ξ('a.item', {href: '/login', oncreate: ξ.route.link}, 'LOGIN'),
+          ξ('a.item', {href: '/profile', oncreate: ξ.route.link}, 'PROFILE'),
+          ξ('a.item', {
+            href: '/statistics',
+            oncreate: ξ.route.link},
+          'STATISTICS')
       ),
     ]);
-  }
-}
+  },
+} as ξ.Component;

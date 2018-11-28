@@ -70,7 +70,7 @@ export default class Editor implements ClassComponent {
    * Loads and adds a Monaco Editor to the empty div#editor created by view.
    * @param {CVnode} vnode - Virtual node.
    */
-  oncreate(vnode: CVnodeDOM) {
+  oncreate(vnode: ξ.CVnodeDOM) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
       this.ready = true;
       ξ.redraw();
@@ -90,21 +90,20 @@ def welcome(ξ):
       });
 
       window.addEventListener('resize', () => this.editor.layout());
-      window.addEventListener('zoom', () => this.editor.layout());
     });
-  }
+  };
 
   /**
    * Creates a empty div#editor that is used by oncreate.
    * @param {CVnode} vnode - Virtual node.
    * @return {CVnode}
    */
-  view(vnode: CVnode) {
+  view(vnode: ξ.CVnode) {
     return this.ready ?
           ξ('#editor', {style: fillAreaStyle})
           :
           ξ('.ui.segment', {style: fillAreaStyle},
               ξ('.ui.large.loader', {style: 'display: block;'})
           );
-  }
-}
+  };
+};

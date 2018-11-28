@@ -43,8 +43,8 @@ height: 14px;\
 appearance: none;\
 `;
 
-export default class Home implements ClassComponent {
-  view(vnode: CVNode) {
+export default class Home implements ξ.ClassComponent {
+  view(vnode: ξ.CVnode) {
     return ξ(base,
         ξ('section#roast-container', {style: containerStyle},
 
