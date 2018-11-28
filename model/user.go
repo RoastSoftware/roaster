@@ -25,7 +25,7 @@ type User struct {
 // generateHash hashes the password as:
 // 	hash = bcrypt(sha512(password))
 //
-// Bcrypt is used as the core hashing algorithm with 10 rounds.
+// Bcrypt is used as the core hashing algorithm with 12 rounds.
 //
 // The plaintext password that is provided will first be transformed to a
 // hash sum with SHA-512. This is due to that Bcrypt limits the input to 72
@@ -42,15 +42,14 @@ type User struct {
 // Dropbox has a great article[1] on their password hashing scheme which our
 // scheme shares many similarities with, we do not, however, use AES-256 with a
 // global pepper (shared global encryption key) which is overkill for our use
+// case. They also encode their SHA-512 with base 64, which is not needed in our
 // case.
 //
-// Note 1:
 // Some implementations of Bcrypt uses a null byte (\x00) to determine the end
 // of the input, the Go implementations does _not_ have this problem. So there
-// is no need to encode the data as base 64 etc. This is verified using the
-// program in cmd/testbcrypt.
+// is no need to encode the data as base 64. This is verified using the program
+// in cmd/testbcrypt.
 //
-// Note 2:
 // The approach used by Dropbox where they encode with base 64 will generate a
 // ~88 byte long key, which is then truncated to 72 bytes. This results in a
 // input with 64^72 possible combinations. Our approach of not encoding the
