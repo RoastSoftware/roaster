@@ -1,19 +1,21 @@
-import m from 'mithril';
+import ξ from 'mithril';
 import base from './base';
 
 export default {
   view(vnode: CVnode) {
-    return m(base,
-        m('img.ui.image.rounded.medium',
-            {src: 'http://c0419384.cdn2.cloudfiles.rackspacecloud.com/adjnbivz-27337_l-avatar-main.jpg'}, 'User profile picture.'),
-        m('h2',
-            'Mr. Bean-A-Tar'),
-        m('h3',
-            m('i.user.icon'),
-            'mr-bean-a-tar'),
-        m('p',
-            m('i.mail.icon'),
-            'mr@bean-a-tar.example.org')
+    return ξ(base,
+        ξ('.ui.main.text.container[style=margin-top: 2em;]',
+            ξ('img.ui.image.rounded.medium',
+                {src: 'http://c0419384.cdn2.cloudfiles.rackspacecloud.com/adjnbivz-27337_l-avatar-main.jpg'}, 'User profile picture.'),
+            ξ('h2',
+                'Mr. Bean-A-Tar'),
+            ξ('h3',
+                ξ('i.user.icon'),
+                'mr-bean-a-tar'),
+            ξ('p',
+                ξ('i.mail.icon'),
+                'mr@bean-a-tar.example.org')
+        )
     );
   },
-}as m.Component;
+}as ξ.Component;

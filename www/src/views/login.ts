@@ -18,7 +18,7 @@ function authenticate(user: User) {
 export default class Login implements ξ.ClassComponent {
     user: User = new User();
     view(vnode: ξ.CVnode) {
-      return ξ(base,
+      return ξ(base, ξ('.ui.main.text.container[style=margin-top: 2em;]',
           ξ('.ui.grid',
               ξ('.ui.container.six.wide.column.centered',
                   ξ('.ui.segments',
@@ -55,7 +55,6 @@ export default class Login implements ξ.ClassComponent {
                       ]))
                   ),
               ),
-          ),
-      );
+          )));
     }
 };
