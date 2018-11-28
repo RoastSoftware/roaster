@@ -14,7 +14,6 @@ function authenticate(user: User) {
   }
 }
 
-
 export default class Login implements ξ.ClassComponent {
     user: User = new User();
     view(vnode: ξ.CVnode) {

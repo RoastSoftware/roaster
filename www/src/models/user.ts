@@ -131,7 +131,7 @@ function retrieveUser(username: string): Promise<User> {
 export function createUser(user: User) {
   return ξ.request({
     method: 'POST',
-    url: '/user/',
+    url: '/user',
     data: user,
   });
 };
@@ -147,7 +147,7 @@ function saveUser() {
 export function authenticateUser(user: User) {
   return ξ.request({
     method: 'POST',
-    url: '/session/',
+    url: '/session',
     data: user,
   });
 };
@@ -155,7 +155,7 @@ export function authenticateUser(user: User) {
 function deAuthenticateUser() {
   return ξ.request({
     method: 'DELETE',
-    url: '/session/',
+    url: '/session',
   });
 };
 /* eslint-enable */
