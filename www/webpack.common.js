@@ -60,7 +60,11 @@ module.exports = {
     ]),
     new HtmlWebpack({title: 'Get Roasted!'}),
     new HtmlWebpackIncludeAssets({
-      assets: ['semantic/site.min.css', 'semantic/semantic.solar.min.css'],
+      assets: [
+        'semantic/site.min.css',
+        'semantic/semantic.solar.min.css',
+      ],
+      hash: true,
       append: false,
     }),
     new CleanWebpack(['dist']),

@@ -1,4 +1,9 @@
-import m from 'mithril';
+import ξ from 'mithril';
+
+const navBarStyle = `\
+border: 1px solid #094959;\
+z-index: 9999;\
+`;
 
 /**
  * Nav component provides a navigation bar for the top of the page.
@@ -10,23 +15,20 @@ export default class Nav implements ClassComponent {
    * @return {CVnode}
    */
   view(vnode: CVnode) {
-    return m('nav.ui.massive.borderless.menu[style=margin-top: 0;]', [
-      m(
-          '.ui.container',
-          m(
-              'a.header.item',
-              {href: '/', oncreate: m.route.link},
-              m('i.coffee.icon.logo'),
+    return ξ('nav.ui.massive.borderless.stackable.menu.attached', {
+      style: navBarStyle,
+    }, [
+      ξ('.ui.container',
+          ξ('a.header.item', {href: '/', oncreate: ξ.route.link},
+              ξ('i.brown.coffee.icon.logo'),
               'Roaster'
           ),
-          m('a.item', {href: '/about', oncreate: m.route.link}, 'About'),
-          m('a.item', {href: '/register', oncreate: m.route.link}, 'REGISTER'),
-          m('a.item', {href: '/profile', oncreate: m.route.link}, 'Profile'),
-          m(
-              'a.item',
-              {href: '/statistics', oncreate: m.route.link},
-              'Statistics'
-          )
+          ξ('a.item', {href: '/about', oncreate: ξ.route.link}, 'About'),
+          ξ('a.item', {href: '/register', oncreate: ξ.route.link}, 'REGISTER'),
+          ξ('a.item', {href: '/profile', oncreate: ξ.route.link}, 'Profile'),
+          ξ('a.item', {href: '/statistics', oncreate: ξ.route.link},
+              'Statistics',
+          ),
       ),
     ]);
   }
