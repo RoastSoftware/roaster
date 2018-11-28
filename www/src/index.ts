@@ -6,40 +6,39 @@ import profile from './views/profile';
 import statistics from './views/statistics';
 import login from './views/login';
 
-const xCSRFTokenHeader: string = 'X-Csrf-Token';
+const xCsrfToken: string = 'X-Csrf-Token';
 
 class Network {
-  private static csrfToken: string = '';
+  private static nextCSRFToken: string = '';
 
   private static extractCSRFToken(xhr, xhrOptions): string {
-    return xhr.getResponseHeader(xCSRFTokenHeader);
+    const token: string = xhr.getResponseHeader(xCsrfToken);
+
+    if (token == '') {
+      throw new Error('empty CSRF token received');
+    }
+
+    Network.nextCSRFToken = token;
   };
 
-  private static async initCSRFToken(): Promise<string> {
-    return ξ.request<string>({
+  private static async initCSRFToken(): Promise {
+    return ξ.request({
       method: 'HEAD',
       url: '/',
-      withCredentials: true,
       extract: Network.extractCSRFToken,
-    }).then((result: string) => {
-      if (result == '') {
-        throw new Error('unable to fetch CSRF token');
-      }
-
-      Network.csrfToken = result;
     });
   };
 
   public static async request<T>(method: string, url: string): Promise<T> {
-    if (Network.csrfToken == '') {
+    if (Network.nextCSRFToken == '') {
       await Network.initCSRFToken();
     }
 
     return ξ.request<T>({
       method: method,
       url: url,
-      withCredentials: true,
-      headers: {xCSRFTokenHeader: Network.csrfToken},
+      headers: {[xCsrfToken]: Network.nextCSRFToken},
+      extract: Network.extractCSRFToken,
     });
   };
 }
@@ -49,7 +48,7 @@ class Auth {
 
   async authenticate(): Promise<boolean> {
     // TODO
-    return Network.request<boolean>('GET', '/');
+    return Network.request<boolean>('POST', '/user');
   }
 
   getUser(): User {

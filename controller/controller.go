@@ -8,19 +8,20 @@ import (
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/static"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/user"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 // New returns a router with all handles configured.
-func New(csrfKey []byte) http.Handler {
+func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 	var handler http.Handler
 
 	router := mux.NewRouter()
 
 	// Protect all methods except GET, HEAD, OPTIONS and TRACE with CSRF
 	// tokens.
-	router.Use(middleware.CSRF(csrfKey))
+	router.Use(middleware.CSRF(csrfKey, csrfOpts...))
 
 	// User [/user].
 	user.Init(router.PathPrefix("/user").Subrouter())

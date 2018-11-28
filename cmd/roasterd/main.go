@@ -68,10 +68,6 @@ func init() {
 		log.Println("WARNING: Running in development mode, using " +
 			"insecure CSRF and session keys without verification.")
 
-		// Do not require secure verification for CSRF middleware, such
-		// as verifying that the connection goes over HTTPS.
-		csrf.Secure(false)
-
 		// Do not require that the CSRF and session keys are set for
 		// dev-mode, instead use hardcoded 'insecure' keys.
 		context.csrfKey = "insecure-dev-mode-csrf-123456789"
@@ -120,7 +116,10 @@ func main() {
 		log.Fatalf("session store returned error: %v", err)
 	}
 
-	controller := controller.New([]byte(context.csrfKey))
+	// Do not require secure verification for CSRF middleware if in
+	// dev-mode, such as verifying that the connection goes over HTTPS.
+	csrfOpt := csrf.Secure(!context.devMode)
+	controller := controller.New([]byte(context.csrfKey), csrfOpt)
 
 	server := &http.Server{
 		Handler:      controller,
