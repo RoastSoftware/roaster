@@ -13,6 +13,7 @@ display: flex;\
 `;
 
 const roastColumnStyle = `\
+border-left: 1px solid #094959;\
 flex: 1 0 35%;\
 flex-flow: column;\
 ` + columnStyle;
