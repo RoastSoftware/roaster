@@ -133,7 +133,7 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 		SELECT username, email, fullname, hash
 		FROM "user"
 		WHERE (username=TRIM($1) OR email=LOWER(TRIM($1)))
-	`, identifier).Scan(&user.Email, &user.Username, &user.Fullname, &hash)
+	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname, &hash)
 	if err != nil {
 		ok = false
 		return

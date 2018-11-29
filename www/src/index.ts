@@ -6,77 +6,38 @@ import profile from './views/profile';
 import statistics from './views/statistics';
 import login from './views/login';
 
-const xCsrfToken: string = 'X-Csrf-Token';
+import {User} from './models/user';
 
-class Network {
-  private static nextCSRFToken: string = '';
-
-  private static extractCSRFToken(xhr, xhrOptions): string {
-    const token: string = xhr.getResponseHeader(xCsrfToken);
-
-    if (token == '') {
-      throw new Error('empty CSRF token received');
-    }
-
-    Network.nextCSRFToken = token;
+function redirectMatcher(
+    view: ξ.ClassComponent,
+    policy: () => boolean,
+    redirect: string): () => ξ.ClassComponent {
+  return () => {
+    if (!policy) ξ.route.set(redirect);
+    else return view;
   };
-
-  private static async initCSRFToken(): Promise {
-    return ξ.request({
-      method: 'HEAD',
-      url: '/',
-      extract: Network.extractCSRFToken,
-    });
-  };
-
-  public static async request<T>(method: string, url: string): Promise<T> {
-    if (Network.nextCSRFToken == '') {
-      await Network.initCSRFToken();
-    }
-
-    return ξ.request<T>({
-      method: method,
-      url: url,
-      headers: {[xCsrfToken]: Network.nextCSRFToken},
-      extract: Network.extractCSRFToken,
-    });
-  };
-}
-
-class Auth {
-  private user: User;
-
-  async authenticate(): Promise<boolean> {
-    // TODO
-    return Network.request<boolean>('POST', '/user');
-  }
-
-  getUser(): User {
-    return this.user;
-  }
-}
+};
 
 class Roaster {
   private body: HTMLBodyElement;
-  private auth: Auth;
 
   constructor(private body: HTMLBodyElement) {
-    this.auth = new Auth();
-    this.auth.authenticate().then((loggedIn) => {
-      if (loggedIn) {
-        ξ.redraw();
-      }
-    });
   };
 
   start() {
     ξ.route(document.body, '/', {
       '/': home,
       '/about': about,
-      '/register': register,
-      '/profile': profile,
       '/statistics': statistics,
-      '/login': login,
+      '/profile': {onmatch: redirectMatcher(profile, () => {
+        return User.isLoggedIn();
+      }, '/')},
+      '/register': {onmatch: redirectMatcher(register, () => {
+        return !User.isLoggedIn();
+      }, '/')},
+      '/login': {onmatch: redirectMatcher(login, () => {
+        return !User.isLoggedIn();
+      }, '/')},
     });
   };
 }

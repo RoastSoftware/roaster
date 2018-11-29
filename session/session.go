@@ -13,10 +13,10 @@ import (
 var store sessions.Store
 
 // Open a new connection to Redis and initialize a new store.
-func Open(maxIdleConn uint, network, address, password string, keyPairs ...[]byte) (err error) {
+func Open(maxIdleConn uint, network, address, password string, secure bool, keyPairs ...[]byte) (err error) {
 	for _, key := range keyPairs {
-		if len(key) < 32 {
-			panic("session key(s) must be atleast 32 bytes long")
+		if len(key) != 32 {
+			panic("session key(s) for AES-256 must be exactly 32 bytes long")
 		}
 	}
 
@@ -26,6 +26,14 @@ func Open(maxIdleConn uint, network, address, password string, keyPairs ...[]byt
 	}
 
 	defer util.Graceful(rs.Close)
+
+	rs.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 7,
+		HttpOnly: true,
+		Secure:   secure,
+		SameSite: http.SameSiteStrictMode,
+	}
 
 	store = rs
 

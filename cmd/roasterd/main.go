@@ -16,12 +16,13 @@ import (
 )
 
 const (
-	portEnvKey           = "PORT"
-	databaseSourceEnvKey = "DATABASE_SOURCE"
-	redisAddressEnvKey   = "REDIS_ADDRESS"
-	redisPasswordEnvKey  = "REDIS_PASSWORD"
-	csrfKeyEnvKey        = "CSRF_KEY"
-	sessionKeyEnvKey     = "SESSION_KEY"
+	portEnvKey            = "PORT"
+	databaseSourceEnvKey  = "DATABASE_SOURCE"
+	redisAddressEnvKey    = "REDIS_ADDRESS"
+	redisPasswordEnvKey   = "REDIS_PASSWORD"
+	csrfKeyEnvKey         = "CSRF_KEY"
+	sessionKeyHashEnvKey  = "SESSION_HASH_KEY"
+	sessionKeyBlockEnvKey = "SESSION_BLOCK_KEY"
 )
 
 type flags struct {
@@ -31,7 +32,8 @@ type flags struct {
 	redisAddress     string
 	redisPassword    string
 	redisNetwork     string
-	sessionKey       string
+	sessionHashKey   string
+	sessionBlockKey  string
 	csrfKey          string
 	readTimeout      time.Duration
 	writeTimeout     time.Duration
@@ -54,7 +56,8 @@ func init() {
 	flag.StringVar(&context.redisPassword, "redis-password", context.redisPassword, "Redis instance password")
 	flag.StringVar(&context.redisNetwork, "redis-network", context.redisNetwork, "Redis instance network type (tcp or udp)")
 	flag.UintVar(&context.redisMaxIdleConn, "redis-max-idle-conn", context.redisMaxIdleConn, "Redis max idle connections")
-	flag.StringVar(&context.sessionKey, "session-key", context.sessionKey, "Session key used as secret key for secure cookies")
+	flag.StringVar(&context.sessionHashKey, "session-hash-key", context.sessionHashKey, "Session key used as hash key for secure cookies")
+	flag.StringVar(&context.sessionBlockKey, "session-block-key", context.sessionBlockKey, "Session key used as block key for secure cookies")
 	flag.StringVar(&context.csrfKey, "csrf-key", context.csrfKey, "CSRF key used as secret key for CSRF mitigation")
 	flag.BoolVar(&context.devMode, "dev-mode", context.devMode, "Run server in (insecure) development mode")
 	flag.Parse()
@@ -71,7 +74,8 @@ func init() {
 		// Do not require that the CSRF and session keys are set for
 		// dev-mode, instead use hardcoded 'insecure' keys.
 		context.csrfKey = "insecure-dev-mode-csrf-123456789"
-		context.sessionKey = "insecure-dev-mode-session-123456789"
+		context.sessionHashKey = "insecure-dev-mode-session-hash01"
+		context.sessionBlockKey = "insecure-dev-mode-session-block0"
 	}
 
 	if port := os.Getenv(portEnvKey); port != "" {
@@ -94,8 +98,12 @@ func init() {
 		context.csrfKey = csrfKey
 	}
 
-	if sessionKey := os.Getenv(sessionKeyEnvKey); sessionKey != "" {
-		context.sessionKey = sessionKey
+	if sessionHashKey := os.Getenv(sessionKeyHashEnvKey); sessionHashKey != "" {
+		context.sessionHashKey = sessionHashKey
+	}
+
+	if sessionBlockKey := os.Getenv(sessionKeyBlockEnvKey); sessionBlockKey != "" {
+		context.sessionBlockKey = sessionBlockKey
 	}
 }
 
@@ -111,7 +119,8 @@ func main() {
 		context.redisNetwork,
 		context.redisAddress,
 		context.redisPassword,
-		[]byte(context.sessionKey))
+		!context.devMode, // Disable Secure cookie attribute in dev-mode
+		[]byte(context.sessionHashKey), []byte(context.sessionBlockKey))
 	if err != nil {
 		log.Fatalf("session store returned error: %v", err)
 	}

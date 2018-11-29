@@ -33,17 +33,28 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, ok := model.AuthenticateUser(u.Username, []byte(u.Password))
+	user, ok := model.AuthenticateUser(u.Username, []byte(u.Password))
 	if !ok {
 		http.Error(w, "", http.StatusUnauthorized)
 		return
 	}
 
 	// TODO: Implement auth middleware instead.
-	s, _ := session.Get(r, "roaster_auth")
+	s, err := session.Get(r, "roaster_auth")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	s.Values["username"] = u.Username
 
 	session.Save(r, w, s)
+
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func removeSession(w http.ResponseWriter, r *http.Request) {
@@ -67,5 +78,5 @@ func Init(r *mux.Router) {
 	r.HandleFunc("", createSession).Methods(http.MethodPost)
 
 	// Remove Current Session (sign out) [DELETE]
-	r.HandleFunc("", removeSession).Methods(http.MethodPatch)
+	r.HandleFunc("", removeSession).Methods(http.MethodDelete)
 }

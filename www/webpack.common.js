@@ -1,6 +1,7 @@
 const CopyWebpack = require('copy-webpack-plugin');
 const HtmlWebpack = require('html-webpack-plugin');
 const HtmlWebpackIncludeAssets = require('html-webpack-include-assets-plugin');
+const WebappWebpack = require('webapp-webpack-plugin');
 const CleanWebpack = require('clean-webpack-plugin');
 const MonacoWebPack = require('monaco-editor-webpack-plugin');
 
@@ -41,7 +42,7 @@ module.exports = {
       // Media and fonts are handled by the url-loader.
       {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-        loader: 'url-loader?limit=100000',
+        loader: 'url-loader?limit=8000', // Limit inline file size to 8 kb.
       },
     ],
   },
@@ -57,7 +58,7 @@ module.exports = {
         to: 'semantic/themes',
       },
     ]),
-    new HtmlWebpack({title: 'Get Roasted!'}),
+    new HtmlWebpack({title: 'Get Roasted! - Roaster Inc.'}),
     new HtmlWebpackIncludeAssets({
       assets: [
         'semantic/site.min.css',
@@ -66,6 +67,7 @@ module.exports = {
       hash: true,
       append: false,
     }),
+    new WebappWebpack('./src/assets/icons/roaster-icon-teal.svg'),
     new CleanWebpack(['dist']),
     new MonacoWebPack(),
   ],
