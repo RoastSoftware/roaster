@@ -11,7 +11,7 @@ The request then propagates through our VPC (Virtual private cloud) in AWS as pl
 CSRF
 ----
 The site has implemented protection against CSRF (Cross Site Request Forgery), 
-> this is a manin the middle attack that abuses the browser’s automatic cookie submission for cross-origin requests to issue state changing requests on the user’s behalf. 
+> this is a man-in-the middle attack that abuses the browser’s automatic cookie submission for cross-origin requests to issue state changing requests on the user’s behalf. 
 > In other words, the attack is meant to trick users into issuing requests by abusing browser session cookie management.
 [1](https://blog.securityevaluators.com/cracking-javas-rng-for-csrf-ea9cacd231d2)
 
@@ -24,9 +24,9 @@ Roast.software cookies is stored in the cookie store in the browser. These are v
 
 Password storage
 ----------------
-There's alot of challenges keeping user credentials secured. Our solution is based on well known algorithms, Bcrypt and SHA512. The implementation is made of the official libraries for go, so that we don't make the mistake of "rolling our own crypto". The methodology used is to first hash the password with SHA512, and then strongly hashing it with Bcrypt.
+There's alot of challenges keeping user credentials secured. Our solution is based on well known algorithms, Bcrypt and SHA512. The implementation is made of the official libraries in Golang, the language in which the server is written, so that we don't make the mistake of "rolling our own crypto". The methodology used is to first hash the password with SHA512, and then strongly hashing it with Bcrypt.
 
-Below quote is found in `/model/user.go`.
+The quote below is found in `/model/user.go`.
 > The plaintext password that is provided will first be transformed to a
 > hash sum with SHA-512. This is due to that Bcrypt limits the input to 72
 > bytes. By hashing the password with SHA-512 more entropy of the original
