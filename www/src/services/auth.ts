@@ -11,7 +11,7 @@ export default class Auth {
   };
 
   public static async resume<T>(): Promise<T> {
-    return Network.request('GET', '/session'); // TODO
+    return Network.request<T>('GET', '/session');
   };
 
   public static async logout(): Promise {

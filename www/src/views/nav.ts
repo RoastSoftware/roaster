@@ -13,10 +13,18 @@ height: 1.5em;\
 color: #fff;\
 `;
 
+const headerTextStyle = `\
+color: #00b5ad;\
+`;
+
 /**
  * Nav component provides a navigation bar for the top of the page.
  */
-export default {
+export default class Nav implements ξ.ClassComponent {
+  setItemActive(url: string): string {
+    return ξ.route.get() == url ? 'active' : '';
+  };
+
   /**
    * Creates a navigation bar.
    * @param {CVnode} vnode - Virtual node.
@@ -26,37 +34,57 @@ export default {
     return ξ('nav.ui.massive.borderless.stackable.menu.attached', {
       style: navBarStyle,
     }, [
-      ξ('a.header.item', {href: '/', oncreate: ξ.route.link},
-          ξ('img', {
-            src: roasterLogo,
-            style: logotypeStyle,
-          }),
-          'ROASTER INC.'
+      ξ('a.header.item', {
+        href: '/',
+        oncreate: ξ.route.link,
+        style: headerTextStyle},
+      ξ('img', {
+        src: roasterLogo,
+        style: logotypeStyle,
+      }),
+      'ROASTER INC.'
       ),
 
-      ξ('a.item', {href: '/about', oncreate: ξ.route.link},
+      // TODO: Make this DRY, generate the navbar instead?
+      ξ('.right.menu',
+          ξ('a.item', {
+            href: '/about',
+            oncreate: ξ.route.link,
+            class: this.setItemActive('/about')},
           ξ('i.question.circle.outline.icon'),
           'ABOUT'),
 
-      ξ('a.item', {href: '/statistics', oncreate: ξ.route.link},
+          ξ('a.item', {
+            href: '/statistics',
+            oncreate: ξ.route.link,
+            class: this.setItemActive('/statistics')},
           ξ('i.chart.bar.icon'),
           'STATISTICS'),
-      ξ('.right.menu',
 
           (User.isLoggedIn() ?
-            ξ('a.item', {href: '/profile', oncreate: ξ.route.link},
-                'PROFILE')
+            ξ('a.item', {
+              href: '/profile',
+              oncreate: ξ.route.link,
+              class: this.setItemActive('/profile')},
+            ξ('i.user.icon'),
+            'PROFILE')
           :
             [
-              ξ('a.item', {href: '/register', oncreate: ξ.route.link},
-                  ξ('i.user.plus.icon'),
-                  'REGISTER'),
-              ξ('a.item', {href: '/login', oncreate: ξ.route.link},
-                  ξ('i.sign.in.icon'),
-                  'LOGIN'),
+              ξ('a.item', {
+                href: '/register',
+                oncreate: ξ.route.link,
+                class: this.setItemActive('/register')},
+              ξ('i.user.plus.icon'),
+              'REGISTER'),
+              ξ('a.item', {
+                href: '/login',
+                oncreate: ξ.route.link,
+                class: this.setItemActive('/login')},
+              ξ('i.sign.in.icon'),
+              'LOGIN'),
             ]
           ),
       ),
     ]);
-  },
-} as ξ.Component;
+  };
+};

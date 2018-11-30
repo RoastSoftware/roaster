@@ -6,6 +6,7 @@ import profile from './views/profile';
 import statistics from './views/statistics';
 import login from './views/login';
 
+import Auth from './services/auth';
 import {User} from './models/user';
 
 function redirectMatcher(
@@ -22,6 +23,13 @@ class Roaster {
   private body: HTMLBodyElement;
 
   constructor(private body: HTMLBodyElement) {
+    Auth.resume<string>().then((user) => {
+      console.log(user);
+      // TODO
+      User.setUsername(user.username);
+      User.setFullname(user.fullname);
+      User.setEmail(user.email);
+    });
   };
 
   start() {

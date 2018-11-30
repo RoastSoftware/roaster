@@ -57,6 +57,37 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func retrieveSession(w http.ResponseWriter, r *http.Request) {
+	s, err := session.Get(r, "roaster_auth")
+	if err != nil {
+		log.Println(err)
+	}
+
+	username, ok := s.Values["username"].(string)
+	if !ok {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	if username == "" {
+		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+		return
+	}
+
+	user, err := model.GetUser(username)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func removeSession(w http.ResponseWriter, r *http.Request) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
@@ -76,6 +107,9 @@ func Init(r *mux.Router) {
 
 	// Authenticate for New Session (sign in) [POST]
 	r.HandleFunc("", createSession).Methods(http.MethodPost)
+
+	// Get Existing Authenticated Session [GET].
+	r.HandleFunc("", retrieveSession).Methods(http.MethodGet)
 
 	// Remove Current Session (sign out) [DELETE]
 	r.HandleFunc("", removeSession).Methods(http.MethodDelete)

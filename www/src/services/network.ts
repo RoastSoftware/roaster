@@ -36,7 +36,10 @@ export default class Network {
       url: url,
       data: data,
       headers: {[xCsrfToken]: Network.nextCSRFToken},
-      extract: Network.extractCSRFToken,
+      extract: Network.extractCSRFToken, // TODO: Apparently JSON data isn't returned.
+    }).then((result: T) => {
+      console.log(result);
+      return result;
     });
   };
 }
