@@ -1,6 +1,6 @@
 import ξ from 'mithril';
 import base from './base';
-import {User, createUser} from '../models/user';
+import {UserModel, createUser} from '../models/user';
 
 
 /**
@@ -8,7 +8,7 @@ import {User, createUser} from '../models/user';
  *
  *  @param {User} user current user object to be registered
  */
-function registerUser(user: User) {
+function registerUser(user: UserModel) {
   console.log('On submit function called, but not implemented');
   if (user.validUsername()) {
     createUser(user);
@@ -30,57 +30,57 @@ export default class Register implements ξ.ClassComponent {
                             }}, [
                               ξ('.field', {
                                 class:
-                                User.validUsername() ? '' : 'error'}, [
+                                UserModel.validUsername() ? '' : 'error'}, [
                                 ξ('label', 'Username'),
                                 ξ('.ui.input',
                                     ξ('input', {
                                       type: 'text',
-                                      value: User.getUsername(),
+                                      value: UserModel.getUsername(),
                                       oninput: (e: any) =>
-                                        User.setUsername(
+                                        UserModel.setUsername(
                                             e.currentTarget.value),
                                       placeholder: 'Thisisausername',
                                     }))]),
                               ξ('.field', {
                                 class:
-                                User.validFullname() ? '' : 'error'}, [
+                                UserModel.validFullname() ? '' : 'error'}, [
                                 ξ('label', 'Full name'),
                                 ξ('.ui.input',
                                     ξ('input', {
                                       type: 'text',
-                                      value: User.getFullname(),
+                                      value: UserModel.getFullname(),
                                       oninput: (e: any) =>
-                                        User.setFullname(
+                                        UserModel.setFullname(
                                             e.currentTarget.value),
                                       placeholder: 'Mynameis',
                                     }))]),
                               ξ('.field', {
                                 class:
-                                User.validPassword() ? '' : 'error'}, [
+                                UserModel.validPassword() ? '' : 'error'}, [
                                 ξ('label', 'Password'),
                                 ξ('.ui.input',
                                     ξ('input', {
                                       type: 'password',
-                                      value: User.getPassword(),
+                                      value: UserModel.getPassword(),
                                       oninput: (e: any) =>
-                                        User.setPassword(
+                                        UserModel.setPassword(
                                             e.currentTarget.value),
                                       placeholder: 's3cur3p#55w0rd',
                                     }))]),
                               ξ('.field', {
                                 class:
-                                User.validEmail() ? '' : 'error'}, [
+                                UserModel.validEmail() ? '' : 'error'}, [
                                 ξ('label', 'Email'),
                                 ξ('.ui.input',
                                     ξ('input', {
                                       type: 'text',
-                                      value: User.getEmail(),
-                                      oninput: (e: any) => User.setEmail(
+                                      value: UserModel.getEmail(),
+                                      oninput: (e: any) => UserModel.setEmail(
                                           e.currentTarget.value),
                                       placeholder: 'Mynameis@example.com',
                                     }))]),
                               ξ('button.ui.teal.basic.button', {
-                                disabled: !(User.validAll()),
+                                disabled: !(UserModel.validAll()),
                               },
                               'GET ROASTED!'),
                             ])),

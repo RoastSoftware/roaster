@@ -1,5 +1,6 @@
 import ξ from 'mithril';
-import {User} from '../models/user';
+import {UserModel} from '../models/user';
+import Auth from '../services/auth';
 import roasterLogo from '../assets/icons/roaster-icon-teal.svg';
 
 const navBarStyle = `\
@@ -23,6 +24,14 @@ color: #00b5ad;\
 export default class Nav implements ξ.ClassComponent {
   setItemActive(url: string): string {
     return ξ.route.get() == url ? 'active' : '';
+  };
+
+  deauthenticate(): Promise {
+    return Auth.logout()
+        .then(() => {
+          UserModel.setLoggedIn(false);
+          ξ.route.set('/');
+        });
   };
 
   /**
@@ -61,24 +70,34 @@ export default class Nav implements ξ.ClassComponent {
           ξ('i.chart.bar.icon'),
           'STATISTICS'),
 
-          (User.isLoggedIn() ?
-            ξ('a.item', {
-              href: '/profile',
-              oncreate: ξ.route.link,
-              class: this.setItemActive('/profile')},
-            ξ('i.user.icon'),
-            'PROFILE')
+          (UserModel.isLoggedIn() ?
+            [
+              ξ('a.item', {
+                href: '/profile',
+                oncreate: ξ.route.link,
+                onupdate: ξ.route.link,
+                class: this.setItemActive('/profile')},
+              ξ('i.user.icon'),
+              'PROFILE'),
+              ξ('a.item', {
+                href: '#!/',
+                onclick: this.deauthenticate},
+              ξ('i.sign.out.icon'),
+              'LOGOUT'),
+            ]
           :
             [
               ξ('a.item', {
                 href: '/register',
                 oncreate: ξ.route.link,
+                onupdate: ξ.route.link,
                 class: this.setItemActive('/register')},
               ξ('i.user.plus.icon'),
               'REGISTER'),
               ξ('a.item', {
                 href: '/login',
                 oncreate: ξ.route.link,
+                onupdate: ξ.route.link,
                 class: this.setItemActive('/login')},
               ξ('i.sign.in.icon'),
               'LOGIN'),

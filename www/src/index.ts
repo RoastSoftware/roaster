@@ -7,14 +7,14 @@ import statistics from './views/statistics';
 import login from './views/login';
 
 import Auth from './services/auth';
-import {User} from './models/user';
+import {UserModel} from './models/user';
 
 function redirectMatcher(
     view: ξ.ClassComponent,
     policy: () => boolean,
     redirect: string): () => ξ.ClassComponent {
   return () => {
-    if (!policy) ξ.route.set(redirect);
+    if (!policy()) ξ.route.set(redirect);
     else return view;
   };
 };
@@ -23,12 +23,13 @@ class Roaster {
   private body: HTMLBodyElement;
 
   constructor(private body: HTMLBodyElement) {
-    Auth.resume<string>().then((user) => {
-      console.log(user);
-      // TODO
-      User.setUsername(user.username);
-      User.setFullname(user.fullname);
-      User.setEmail(user.email);
+    Auth.resume<User>().then((user) => {
+      if (user) {
+        Object.assign(UserModel, user);
+        UserModel.setLoggedIn(true);
+      } else {
+        UserModel.setLoggedIn(false);
+      }
     });
   };
 
@@ -37,14 +38,14 @@ class Roaster {
       '/': home,
       '/about': about,
       '/statistics': statistics,
-      '/profile': {onmatch: redirectMatcher(profile, () => {
-        return User.isLoggedIn();
+      '/profile': {onmatch: redirectMatcher(profile, (): boolean => {
+        return UserModel.isLoggedIn();
       }, '/')},
-      '/register': {onmatch: redirectMatcher(register, () => {
-        return !User.isLoggedIn();
+      '/register': {onmatch: redirectMatcher(register, (): boolean => {
+        return !UserModel.isLoggedIn();
       }, '/')},
-      '/login': {onmatch: redirectMatcher(login, () => {
-        return !User.isLoggedIn();
+      '/login': {onmatch: redirectMatcher(login, (): boolean => {
+        return !UserModel.isLoggedIn();
       }, '/')},
     });
   };

@@ -64,12 +64,7 @@ func retrieveSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	username, ok := s.Values["username"].(string)
-	if !ok {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	if username == "" {
+	if !ok || username == "" {
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		return
 	}

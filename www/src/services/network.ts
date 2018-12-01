@@ -1,6 +1,7 @@
 import ξ from 'mithril';
 
 const xCsrfToken: string = 'X-Csrf-Token';
+const contentType: string = 'Content-Type';
 
 export default class Network {
   private static nextCSRFToken: string = '';
@@ -13,9 +14,16 @@ export default class Network {
     }
 
     Network.nextCSRFToken = token;
+
+    if (xhr.responseText.length > 0
+      && xhr.getResponseHeader(contentType) == 'application/json') {
+      return JSON.parse(xhr.responseText);
+    }
+
+    return '';
   };
 
-  private static async initCSRFToken(): Promise {
+  private static async initCSRFToken() {
     return ξ.request({
       method: 'HEAD',
       url: '/',
@@ -26,7 +34,7 @@ export default class Network {
   public static async request<T>(
       method: string,
       url: string,
-      data?: any): Promise<T> {
+      data?: any): T {
     if (Network.nextCSRFToken == '') {
       await Network.initCSRFToken();
     }
@@ -36,7 +44,7 @@ export default class Network {
       url: url,
       data: data,
       headers: {[xCsrfToken]: Network.nextCSRFToken},
-      extract: Network.extractCSRFToken, // TODO: Apparently JSON data isn't returned.
+      extract: Network.extractCSRFToken,
     }).then((result: T) => {
       console.log(result);
       return result;

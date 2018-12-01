@@ -1,16 +1,16 @@
 import ξ from 'mithril';
 import base from './base';
-import {User} from '../models/user';
+import {UserModel} from '../models/user';
 import Auth from '../services/auth';
 
 export default class Login implements ξ.ClassComponent {
   loginError: APIError;
 
   authenticate(): Promise {
-    if (User.validLogin()) {
-      return Auth.login(User.getUsername(), User.getPassword())
+    if (UserModel.validLogin()) {
+      return Auth.login(UserModel.getUsername(), UserModel.getPassword())
           .then(() => {
-            User.setLoggedIn(true);
+            UserModel.setLoggedIn(true);
             ξ.route.set('/');
           })
           .catch((err: APIError) => {
@@ -38,31 +38,31 @@ export default class Login implements ξ.ClassComponent {
                       onsubmit: this.authenticate},
                     [
                       ξ('.field', {
-                        class: User.validUsername() ? '' : 'error'}, [
+                        class: UserModel.validUsername() ? '' : 'error'}, [
                         ξ('label', 'Username'),
                         ξ('.ui.input',
                             ξ('input', {
                               type: 'text',
-                              value: User.getUsername(),
+                              value: UserModel.getUsername(),
                               oninput: (e: any) =>
-                                User.setUsername(e.currentTarget.value),
+                                UserModel.setUsername(e.currentTarget.value),
                               placeholder: 'Thisisausername',
                             }))]),
 
                       ξ('.field', {
-                        class: User.validPassword() ? '' : 'error'}, [
+                        class: UserModel.validPassword() ? '' : 'error'}, [
                         ξ('label', 'Password'),
                         ξ('.ui.input',
                             ξ('input', {
                               type: 'password',
-                              value: User.getPassword(),
+                              value: UserModel.getPassword(),
                               oninput: (e: any) =>
-                                User.setPassword(e.currentTarget.value),
+                                UserModel.setPassword(e.currentTarget.value),
                               placeholder: 's3cur3p#55w0rd',
                             }))]),
 
                       ξ('button.ui.teal.basic.button', {
-                        disabled: !(User.validLogin()),
+                        disabled: !(UserModel.validLogin()),
                       }, 'LOGIN!'),
                     ]))
                 ),

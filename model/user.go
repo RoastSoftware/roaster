@@ -154,7 +154,7 @@ func GetUser(identifier string) (user User, err error) {
 		SELECT username, email, fullname
 		FROM "user"
 		WHERE (username=TRIM($1) OR email=LOWER(TRIM($1)))
-	`, identifier).Scan(&user.Email, &user.Username, &user.Fullname)
+	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
 
 	if err != nil {
 		switch err {
