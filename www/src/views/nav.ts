@@ -23,13 +23,13 @@ color: #00b5ad;\
  */
 export default class Nav implements ξ.ClassComponent {
   setItemActive(url: string): string {
-    return ξ.route.get() == url ? 'active' : '';
+    return ξ.route.get() == url ? 'item active' : 'item';
   };
 
   deauthenticate(): Promise {
     return Auth.logout()
         .then(() => {
-          UserModel.setLoggedIn(false);
+          UserModel.empty();
           ξ.route.set('/');
         });
   };
@@ -60,15 +60,13 @@ export default class Nav implements ξ.ClassComponent {
             href: '/about',
             oncreate: ξ.route.link,
             class: this.setItemActive('/about')},
-          ξ('i.question.circle.outline.icon'),
-          'ABOUT'),
+          ξ('i.question.circle.outline.icon'), 'ABOUT'),
 
           ξ('a.item', {
             href: '/statistics',
             oncreate: ξ.route.link,
             class: this.setItemActive('/statistics')},
-          ξ('i.chart.bar.icon'),
-          'STATISTICS'),
+          ξ('i.chart.bar.icon'), 'STATISTICS'),
 
           (UserModel.isLoggedIn() ?
             [
@@ -78,12 +76,14 @@ export default class Nav implements ξ.ClassComponent {
                 onupdate: ξ.route.link,
                 class: this.setItemActive('/profile')},
               ξ('i.user.icon'),
-              'PROFILE'),
+              UserModel.getUsername().toUpperCase()),
               ξ('a.item', {
                 href: '#!/',
+                // For some reason this dissappears when the
+                // class above gets evaluated, bug in Mithril?
+                class: 'item',
                 onclick: this.deauthenticate},
-              ξ('i.sign.out.icon'),
-              'LOGOUT'),
+              ξ('i.sign.out.icon'), 'LOGOUT'),
             ]
           :
             [
@@ -92,15 +92,13 @@ export default class Nav implements ξ.ClassComponent {
                 oncreate: ξ.route.link,
                 onupdate: ξ.route.link,
                 class: this.setItemActive('/register')},
-              ξ('i.user.plus.icon'),
-              'REGISTER'),
+              ξ('i.user.plus.icon'), 'REGISTER'),
               ξ('a.item', {
                 href: '/login',
                 oncreate: ξ.route.link,
                 onupdate: ξ.route.link,
                 class: this.setItemActive('/login')},
-              ξ('i.sign.in.icon'),
-              'LOGIN'),
+              ξ('i.sign.in.icon'), 'LOGIN'),
             ]
           ),
       ),

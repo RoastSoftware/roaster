@@ -18,6 +18,14 @@ export class UserModel implements User {
     static email: string = '';
     private static emailError: string = '';
 
+    static empty() {
+      UserModel.username = '';
+      UserModel.fullname = '';
+      UserModel.password = '';
+      UserModel.email = '';
+      UserModel.loggedIn = false;
+    };
+
     static isLoggedIn(): boolean {
       return UserModel.loggedIn;
     };
@@ -95,7 +103,6 @@ that is more than 1 googol^98 in entropy`;
       if (!(UserModel.email.length < 255)) {
         UserModel.emailError = 'Email must be shorter than 255 characters';
       } else if (!(re.test(UserModel.email))) {
-        console.log('noo, es not valid');
         UserModel.emailError = 'Must be an valid email';
       } else {
         UserModel.emailError = '';

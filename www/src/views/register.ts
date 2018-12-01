@@ -1,32 +1,49 @@
 import ξ from 'mithril';
 import base from './base';
-import {UserModel, createUser} from '../models/user';
+import {UserModel} from '../models/user';
+import Auth from '../services/auth';
 
-
-/**
- *  Onsubmit function sends form data
- *
- *  @param {User} user current user object to be registered
- */
-function registerUser(user: UserModel) {
-  console.log('On submit function called, but not implemented');
-  if (user.validUsername()) {
-    createUser(user);
-  }
-}
 
 export default class Register implements ξ.ClassComponent {
+  registerError: APIError;
+
+  registerUser() {
+    if (UserModel.validUsername()) {
+      Auth.register<User>(
+          Object.assign({}, UserModel), // TODO: Implement encode/decode funcs.
+          UserModel.getPassword()) // TODO: Password isn't separated yet.
+          .then((user) => {
+            if (user) {
+              Object.assign(UserModel, user);
+              UserModel.setLoggedIn(true);
+              ξ.route.set('/');
+            }
+          })
+          .catch((err: APIError) => {
+            this.registerError = err;
+          });
+    }
+  };
+
   view(vnode: ξ.CVnode) {
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 2em;]',
             ξ('.ui.grid',
                 ξ('.ui.container.six.wide.column.centered',
                     ξ('.ui.segments',
-                        ξ('.ui.segment',
-                            ξ('h2', 'REGISTER')),
+                        ξ('.ui.segment', ξ('h2', 'REGISTER')),
+
+                        (this.registerError == null ? '':
+                          ξ('.ui.segment',
+                              ξ('.ui.negative.message',
+                                  ξ('i.close.icon'),
+                                  ξ('.header',
+                                      'Oh noeh!'),
+                                  ξ('p', this.registerError)))),
+
                         ξ('.ui.segment',
                             ξ('form.ui.form', {onsubmit: () => {
-                              registerUser(User);
+                              this.registerUser();
                             }}, [
                               ξ('.field', {
                                 class:

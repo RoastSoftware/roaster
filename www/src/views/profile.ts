@@ -1,5 +1,6 @@
 import ξ from 'mithril';
 import base from './base';
+import {UserModel} from '../models/user';
 
 export default {
   view(vnode: CVnode) {
@@ -8,13 +9,13 @@ export default {
             ξ('img.ui.image.rounded.medium',
                 {src: 'http://c0419384.cdn2.cloudfiles.rackspacecloud.com/adjnbivz-27337_l-avatar-main.jpg'}, 'User profile picture.'),
             ξ('h2',
-                'Mr. Bean-A-Tar'),
-            ξ('h3',
+                UserModel.getFullname()),
+            ξ('p',
                 ξ('i.user.icon'),
-                'mr-bean-a-tar'),
+                UserModel.getUsername()),
             ξ('p',
                 ξ('i.mail.icon'),
-                'mr@bean-a-tar.example.org')
+                UserModel.getEmail())
         )
     );
   },

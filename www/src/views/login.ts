@@ -9,8 +9,9 @@ export default class Login implements ξ.ClassComponent {
   authenticate(): Promise {
     if (UserModel.validLogin()) {
       return Auth.login(UserModel.getUsername(), UserModel.getPassword())
-          .then(() => {
+          .then((user) => {
             UserModel.setLoggedIn(true);
+            Object.assign(UserModel, user);
             ξ.route.set('/');
           })
           .catch((err: APIError) => {
@@ -26,13 +27,13 @@ export default class Login implements ξ.ClassComponent {
                 ξ('.ui.segments',
                     ξ('.ui.segment', ξ('h2', 'LOGIN')),
 
-                    (this.errorMessage == null ? '':
+                    (this.loginError == null ? '':
                       ξ('.ui.segment',
                           ξ('.ui.negative.message',
                               ξ('i.close.icon'),
                               ξ('.header',
                                   'Oh noeh!'),
-                              ξ('p', this.errorMessage)))),
+                              ξ('p', this.loginError)))),
 
                     ξ('.ui.segment', ξ('form.ui.form', {
                       onsubmit: this.authenticate},

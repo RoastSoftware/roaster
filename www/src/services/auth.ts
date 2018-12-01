@@ -17,6 +17,6 @@ export default class Auth {
   };
 
   public static async register<T>(user: T, password: string): T {
-    return Network.request<T>('POST', '/user', user);
+    return Network.request<T>('POST', '/user', user); // TODO: Handle password.
   };
 }

@@ -47,6 +47,12 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	s.Values["username"] = u.Username
 
 	session.Save(r, w, s)
+
+	err = json.NewEncoder(w).Encode(u.User)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func changeUser(w http.ResponseWriter, r *http.Request) {
