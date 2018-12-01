@@ -73,8 +73,9 @@ export class UserModel implements User {
     static setPassword(user: string) {
       UserModel.password = user;
       if (UserModel.password.length >= 4096) {
-        UserModel.passwordError = `Password must be shorter than 4096 characters,\
-          that is more than 1 googol^98 in entropy`;
+        UserModel.passwordError = `\
+Password must be shorter than 4096 characters, \
+that is more than 1 googol^98 in entropy`;
       } else if (UserModel.password.length < 8) {
         UserModel.passwordError = 'Password must be atleast 8 characters';
       } else {
