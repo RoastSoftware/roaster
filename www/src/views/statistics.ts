@@ -1,25 +1,25 @@
 import ξ from 'mithril';
 import base from './base';
-import * as d3 from 'd3';
+import Chart from 'chart.js';
+import model from './statistics';
 
 export default class Statistics implements ξ.ClassComponent {
-  oncreate(vnode: ξ.CVnodeDOM) {
-    d3.select('svg')
-        .append('circle')
-        .attr('r', 5)
-        .attr('cx', '50%')
-        .attr('cy', '50%')
-        .attr('fill', 'red');
-    // ξ.redraw();
-  }
+    dataModel = model;
 
-  view(vnode: ξ.CVnode) {
-    return ξ(base,
-        ξ('.ui.main.text.container[style=margin-top: 2em;]',
-            ξ('p', 'Let there be GRAPHS! '),
-            ξ('p', 'later...'),
-            ξ('svg', {width: '100%', height: '100%'} )
-        )
-    );
-  };
+    view(vnode: ξ.CVnode) {
+      return ξ(base,
+          ξ('.ui.main.text.container[style=margin-top: 2em;]',
+              ξ('p', 'Let there be GRAPHS! '),
+              ξ('p', 'later...'),
+              ξ('canvas#chart-area', {
+                oncreate: ({dom}) => {
+                  console.log((dom as HTMLCanvasElement).getContext('2d'));
+                  const ctx = (document.getElementById('chart-area') as HTMLCanvasElement).getContext('2d');
+                  new Chart(ctx, this.dataModel.config);
+                },
+              }
+              ),
+          )
+      );
+    };
 };
