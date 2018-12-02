@@ -1,10 +1,10 @@
 import ξ from 'mithril';
 import base from './base';
 import Chart from 'chart.js';
-import model from './statistics';
+import Model from '../models/statistics';
 
 export default class Statistics implements ξ.ClassComponent {
-    dataModel = model;
+    dataModel = new Model;
 
     view(vnode: ξ.CVnode) {
       return ξ(base,
