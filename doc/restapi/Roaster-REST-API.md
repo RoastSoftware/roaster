@@ -61,6 +61,31 @@ API.
 	```
 	Set-Cookie: roaster_auth=AB32DEAC21A91DE123[...]; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
 	```
+	+ Body
+	```json
+	{
+		"email": "email@example.com",
+		"username": "roastin_roger",
+		"fullname": "Roger Roger"
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"email": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"fullname": {
+				"type": "string"
+			}
+		}
+	}
+	```
 
 ### View/Handle Specific User [/user/{username}]
 + Relation: user
@@ -97,6 +122,34 @@ API.
 	}
 	```
 + Response: 200
+	+ Body
+	```json
+	{
+		"email": "email@example.com",
+		"password": "My3venM0reTr3mend0usP@ssw0rd!",
+		"fullname": "Sir. Roger Roger"
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"email": {
+				"type": "string",
+				"required": false
+			},
+			"password": {
+				"type": "string",
+				"required": false
+			},
+			"fullname": {
+				"type": "string",
+				"required": false
+			}
+		}
+	}
+	```
 
 #### Retrieve User Information [GET]
 + Relation: user/{username}
@@ -171,6 +224,65 @@ API.
 	+ Headers
 	```
 	Set-Cookie: roaster_auth=AB32DEAC21A91DE123[...]; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
+	```
+	+ Body
+	```json
+	{
+		"email": "email@example.com",
+		"username": "roastin_roger",
+		"fullname": "Roger Roger"
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"email": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"fullname": {
+				"type": "string"
+			}
+		}
+	}
+	```
+
+### Get Current Session (resume login session) [GET]
++ Relation: session
++ Request: Get current session
+	+ Headers
+	```
+	Cookie: roaster_auth=AB32DEAC21A91DE123[...]
+	```
++ Response: 200
+	+ Body
+	```json
+	{
+		"email": "email@example.com",
+		"username": "roastin_roger",
+		"fullname": "Roger Roger"
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"email": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"fullname": {
+				"type": "string"
+			}
+		}
+	}
 	```
 
 ### Remove Current Session (sign out) [DELETE]
