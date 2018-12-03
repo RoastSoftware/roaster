@@ -194,6 +194,73 @@ API.
 	Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
 	```
 
+### Handle Friend for User [/user/friend]
++ Relation: user/friend
+
+#### Add New Friend [POST]
++ Relation: user/friend
++ Request: Add new friend (application/json)
+	+ Headers
+	```
+	Cookie: roaster_auth=AB32DEAC21A91DE123[...]
+	```
+	+ Body
+	```json
+	{
+		"friend": "MyAwesomeFriend"
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"friend": {
+				"type": "string",
+				"required": true
+			}
+		}
+	}
+	```
++ Response: 200
+
+### View/Handle Specific Friends for User [/user/friend/{username}]
++ Relation: user/friend
+
+#### Retrieve User Friends [GET]
++ Relation: user/friend/{username}
++ Request: Retrieve user friends
++ Response: 200 (application/json)
+	+ Body
+	```json
+	{
+		"friends": ["MyAwesomeFriend", "MyNotSoAwesomeFriend"]
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"friends": {
+				"type": "array",
+				"items": {
+					"type": "string"
+				}
+			}
+		}
+	}
+	```
+
+#### Remove User Friend [DELETE]
++ Relation: user/friend/{username}
++ Request: Remove user friend
+	+ Headers
+	```
+	Cookie: roaster_auth=AB32DEAC21A91DE123[...]
+	```
++ Response: 200
+
 ## Session [/session]
 ### Authenticate for New Session (sign in) [POST]
 + Relation: session
