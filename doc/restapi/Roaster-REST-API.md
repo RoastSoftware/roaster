@@ -482,7 +482,7 @@ API.
 + Relation: feed
 + Request: A global feed (application/json)
 	+ Parameters
-		+ id: 0 (number) - Page of global feed to return.
+		+ page: 0 (number) - Page of global feed to return.
 + Response: 200
 	+ Body
 	```json
@@ -541,7 +541,7 @@ API.
 + Relation: feed/{username}
 + Request: A user feed (application/json)
 	+ Parameters
-		+ id: 0 (number) - Page of user feed to return.
+		+ page: 0 (number) - Page of user feed to return.
 + Response: 200
 	+ Body
 	```json
@@ -593,4 +593,159 @@ API.
 			}
 		}
 	}
+	```
+
+## Statistics [/statistic]
++ Relation: statistic
+
+### Global Language Statistics [/statistic/language{?start}{?end}{?interval}]
+#### Get For All Languages [GET]
++ Relation: statistic/language
++ Request: Get statistics for all languages
+	+ Parameters
+		+ start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
+		+ end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+		+ interval: 10 (number) - Interval for each data point in seconds.
++ Response: 200
+	+ Body
+	```json
+	{
+		"python": [
+			{
+				"start": "Mon Dec  3 10:41:52 CET 2018",
+				"end": "Mon Dec  3 10:51:52 CET 2018",
+				"errors": 5,
+				"warnings": 7,
+				"rows": 512
+			},
+			{
+				"start": "Mon Dec  3 10:31:52 CET 2018",
+				"end": "Mon Dec  3 10:41:52 CET 2018",
+				"errors": 5,
+				"warnings": 7,
+				"rows": 512
+			}
+		],
+		"fortran": [
+			{
+				"start": "Mon Dec  3 10:41:52 CET 2018",
+				"end": "Mon Dec  3 10:51:52 CET 2018",
+				"errors": 1125,
+				"warnings": 127,
+				"rows": 5
+			},
+			{
+				"start": "Mon Dec  3 10:31:52 CET 2018",
+				"end": "Mon Dec  3 10:41:52 CET 2018",
+				"errors": 5943,
+				"warnings": 712,
+				"rows": 3
+			}
+		]
+	}
+	```
+
+### Global Language Statistics [/statistic/language/{language}{?start}{?end}{?interval}]
+#### Get For Specific Languages [GET]
++ Relation: statistic/language/{language}
++ Request: Get statistics for specific languages
+	+ Parameters
+		+ start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
+		+ end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+		+ interval: 10 (number) - Interval for each data point in seconds.
++ Response: 200
+	+ Body
+	```json
+	[
+		{
+			"start": "Mon Dec  3 10:41:52 CET 2018",
+			"end": "Mon Dec  3 10:51:52 CET 2018",
+			"errors": 5,
+			"warnings": 7,
+			"rows": 512
+		},
+		{
+			"start": "Mon Dec  3 10:31:52 CET 2018",
+			"end": "Mon Dec  3 10:41:52 CET 2018",
+			"errors": 5,
+			"warnings": 7,
+			"rows": 512
+		}
+	]
+	```
+
+### User Language Statistics [/statistic/{username}/language{?start}{?end}{?interval}]
+#### Get For All Languages For User [GET]
++ Relation: statistic/{username}/language
++ Request: Get statistics for all languages for user
+	+ Parameters
+		+ start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
+		+ end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+		+ interval: 10 (number) - Interval for each data point in seconds.
++ Response: 200
+	+ Body
+	```json
+	{
+		"python": [
+			{
+				"start": "Mon Dec  3 10:41:52 CET 2018",
+				"end": "Mon Dec  3 10:51:52 CET 2018",
+				"errors": 5,
+				"warnings": 7,
+				"rows": 512
+			},
+			{
+				"start": "Mon Dec  3 10:31:52 CET 2018",
+				"end": "Mon Dec  3 10:41:52 CET 2018",
+				"errors": 5,
+				"warnings": 7,
+				"rows": 512
+			}
+		],
+		"fortran": [
+			{
+				"start": "Mon Dec  3 10:41:52 CET 2018",
+				"end": "Mon Dec  3 10:51:52 CET 2018",
+				"errors": 1125,
+				"warnings": 127,
+				"rows": 5
+			},
+			{
+				"start": "Mon Dec  3 10:31:52 CET 2018",
+				"end": "Mon Dec  3 10:41:52 CET 2018",
+				"errors": 5943,
+				"warnings": 712,
+				"rows": 3
+			}
+		]
+	}
+	```
+
+### User Language Statistics [/statistic/{username}/language/{language}{?start}{?end}{?interval}]
+#### Get For Specific Languages For User [GET]
++ Relation: statistic/{username}/language/{language}
++ Request: Get statistics for specific languages for user
+	+ Parameters
+		+ start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
+		+ end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+		+ interval: 10 (number) - Interval for each data point in seconds.
++ Response: 200
+	+ Body
+	```json
+	[
+		{
+			"start": "Mon Dec  3 10:41:52 CET 2018",
+			"end": "Mon Dec  3 10:51:52 CET 2018",
+			"errors": 5,
+			"warnings": 7,
+			"rows": 512
+		},
+		{
+			"start": "Mon Dec  3 10:31:52 CET 2018",
+			"end": "Mon Dec  3 10:41:52 CET 2018",
+			"errors": 5,
+			"warnings": 7,
+			"rows": 512
+		}
+	]
 	```
