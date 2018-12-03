@@ -1,23 +1,27 @@
 export default class StatisticsModel {
-    chartColors = {
-      red: 'rgb(255, 99, 132)',
-      orange: 'rgb(255, 159, 64)',
-      yellow: 'rgb(255, 205, 86)',
-      green: 'rgb(75, 192, 192)',
-      blue: 'rgb(54, 162, 235)',
-      purple: 'rgb(153, 102, 255)',
+    static chartColors = {
+      red: 'rgb(250, 20, 47)',
+      orange: 'rgb(203, 75, 22)',
+      yellow: 'rgb(181, 137, 0)',
+      green: 'rgb(133, 153, 0)',
+      blue: 'rgb(38, 139, 210)',
+      magenta: 'rgb(211, 54, 130)',
       grey: 'rgb(201, 203, 207)',
+      violet: 'rgb(108, 113, 196)',
+      cyan: 'rgb(42, 161, 152)',
     };
 
-    MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    config = {
+    static months = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
+    static config = {
       type: 'line',
       data: {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        labels: ['January', 'February', 'March', 'April',
+          'May', 'June', 'July'],
         datasets: [{
           label: 'My first dataset!',
-          backgroundColor: this.chartColors.red,
-          borderColor: this.chartColors.red,
+          backgroundColor: StatisticsModel.chartColors.magenta,
+          borderColor: StatisticsModel.chartColors.magenta,
           data: [
             100,
             10,
@@ -30,8 +34,8 @@ export default class StatisticsModel {
           fill: false,
         }, {
           label: 'My first dataset!',
-          backgroundColor: this.chartColors.blue,
-          borderColor: this.chartColors.blue,
+          backgroundColor: StatisticsModel.chartColors.blue,
+          borderColor: StatisticsModel.chartColors.blue,
           data: [
             100,
             50,
@@ -47,7 +51,7 @@ export default class StatisticsModel {
     };
 
 
-    options = {
+    static options = {
       responsive: true,
       title: {
         display: true,
