@@ -29,7 +29,7 @@ displayed on a page that can be viewed by everyone.
 We use PostgreSQL and Redis as our databases. The simplest way to set them up is
 using the official Docker images.
 
-Run the PostgreSQL Docker image with (exposed at port: `5432`):
+Run the PostgreSQL Docker image with (exposed at port: `5432`), replace "<db password>" with any password you want:
 ```
 docker run --name roaster-postgresql -e POSTGRES_PASSWORD=<db password> -p 5432:5432 -d postgres
 ```
@@ -51,6 +51,9 @@ docker run -p 80:80 \
 ```
 
 Access the pgAdmin4 website at: http://localhost
+
+If you are using windows, the easiest thing to do is to install pgAdmin4 through the installer on their website.
+Start the application, choose new server, under the connection tab, type the ip that is shown when running the command "docker-machine ip" in your docker terminal. Use the port "5432", name the server whatever you like, and the password is the one you set in the first step in this guide.
 
 The PostgreSQL database should be setup with a new database with a schema called
 `roaster` and a user who only has privilege to that schema.

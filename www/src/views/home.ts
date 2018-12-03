@@ -1,6 +1,7 @@
 import ξ from 'mithril';
 import base from './base';
 import editor from './editor';
+import roasterLogo from '../assets/icons/roaster-icon-white.svg';
 
 const containerStyle = `\
 min-height: 100%;\
@@ -13,6 +14,7 @@ display: flex;\
 `;
 
 const roastColumnStyle = `\
+border-left: 1px solid #094959;\
 flex: 1 0 35%;\
 flex-flow: column;\
 ` + columnStyle;
@@ -41,6 +43,11 @@ border: none;\
 -moz-appearance: none;\
 height: 14px;\
 appearance: none;\
+`;
+
+const roasterIconStyle = `\
+height: 1.5em;\
+margin: -0.6em 0.5em -0.3em 0em;\
 `;
 
 export default class Home implements ξ.ClassComponent {
@@ -86,9 +93,12 @@ export default class Home implements ξ.ClassComponent {
                 ),
 
                 ξ('#controls-row', {style: controlsRowStyle},
-                    ξ('.ui.buttons',
+                    ξ('.ui.buttons.large',
                         ξ('button.ui.primary.button',
-                            ξ('i.coffee.icon'),
+                            ξ('img.ui.image.spaced', {
+                              src: roasterLogo,
+                              style: roasterIconStyle,
+                            }),
                             'ROAST ME!'),
                         ξ('.or'),
                         ξ('button.ui.button',

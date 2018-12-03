@@ -1,122 +1,155 @@
 import ξ from 'mithril';
 
 export class User {
-    username: string = '';
-    private usernameError: string = '';
-    fullname: string = '';
-    private fullnameError: string = '';
-    password: string = '';
-    private passwordError: string = '';
-    email: string = '';
-    private emailError: string = '';
+  username: string;
+  fullname: string;
+  email: string;
+}
 
-    setUsername(user: string) {
-      this.username = user;
-      if (this.username.length < 1) {
-        this.usernameError = 'Username must be longer than 0 characters';
-      } else if (this.username.length > 30) {
-        this.usernameError = 'Username must be shorter than 30 characters';
+export class UserModel implements User {
+    static loggedIn: boolean = false;
+
+    static username: string = '';
+    private static usernameError: string = '';
+
+    static fullname: string = '';
+    private static fullnameError: string = '';
+
+    static email: string = '';
+    private static emailError: string = '';
+
+    static empty() {
+      UserModel.username = '';
+      UserModel.fullname = '';
+      UserModel.password = '';
+      UserModel.email = '';
+      UserModel.loggedIn = false;
+    };
+
+    static isLoggedIn(): boolean {
+      return UserModel.loggedIn;
+    };
+
+    static setLoggedIn(state: boolean) {
+      UserModel.loggedIn = state;
+    }
+
+    static setUsername(user: string) {
+      UserModel.username = user;
+      if (UserModel.username.length < 1) {
+        UserModel.usernameError = 'Username must be longer than 0 characters';
+      } else if (UserModel.username.length > 30) {
+        UserModel.usernameError = 'Username must be shorter than 30 characters';
       } else {
-        this.usernameError = '';
+        UserModel.usernameError = '';
       }
     };
 
-    getUsername(): string {
-      return this.username;
+    static getUsername(): string {
+      return UserModel.username;
     };
 
-    validUsername(): boolean {
-      return this.usernameError == '';
+    static validUsername(): boolean {
+      return UserModel.usernameError == '';
     };
 
-    errorUsername(): string {
-      return this.usernameError;
+    static errorUsername(): string {
+      return UserModel.usernameError;
     };
 
-    setFullname(user: string) {
-      this.fullname = user;
-      if (!(this.fullname.length < 255)) {
-        this.fullnameError = 'Name must be shorter than 255 characters';
+    static setFullname(user: string) {
+      UserModel.fullname = user;
+      if (!(UserModel.fullname.length < 255)) {
+        UserModel.fullnameError = 'Name must be shorter than 255 characters';
       } else {
-        this.fullnameError = '';
+        UserModel.fullnameError = '';
       }
     };
 
-    getFullname(): string {
-      return this.fullname;
+    static getFullname(): string {
+      return UserModel.fullname;
     };
 
-    validFullname(): boolean {
-      return this.fullnameError == '';
+    static validFullname(): boolean {
+      return UserModel.fullnameError == '';
     };
 
-    errorFullname(): string {
-      return this.fullnameError;
+    static errorFullname(): string {
+      return UserModel.fullnameError;
     };
 
-    setPassword(user: string) {
-      this.password = user;
-      if (this.password.length >= 4096) {
-        this.passwordError = `Password must be shorter than 4096 characters,\
-          that is more than 1 googol^98 in entropy`;
-      } else if (this.password.length < 8) {
-        this.passwordError = 'Password must be atleast 8 characters';
+    static setPassword(user: string) {
+      UserModel.password = user;
+      if (UserModel.password.length >= 4096) {
+        UserModel.passwordError = `\
+Password must be shorter than 4096 characters, \
+that is more than 1 googol^98 in entropy`;
+      } else if (UserModel.password.length < 8) {
+        UserModel.passwordError = 'Password must be atleast 8 characters';
       } else {
-        this.passwordError = '';
+        UserModel.passwordError = '';
       }
     };
 
-    getPassword(): string {
-      return this.password;
+    static getPassword(): string {
+      return UserModel.password;
     };
 
-    validPassword(): boolean {
-      return this.passwordError == '';
-    };
-
-    errorPassword(): string {
-      return this.passwordError;
-    };
-
-    setEmail(user: string) {
+    static setEmail(user: string) {
       /* eslint max-len: ["error", { "ignoreRegExpLiterals": true }] */
       const re = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
 
-      this.email = user;
-      if (!(this.email.length < 255)) {
-        this.emailError = 'Email must be shorter than 255 characters';
-      } else if (!(re.test(this.email))) {
-        console.log('noo, es not valid');
-        this.emailError = 'Must be an valid email';
+      UserModel.email = user;
+      if (!(UserModel.email.length < 255)) {
+        UserModel.emailError = 'Email must be shorter than 255 characters';
+      } else if (!(re.test(UserModel.email))) {
+        UserModel.emailError = 'Must be an valid email';
       } else {
-        this.emailError = '';
+        UserModel.emailError = '';
       }
     };
 
-    getEmail(): string {
-      return this.email;
+    static getEmail(): string {
+      return UserModel.email;
     };
 
-    validEmail(): boolean {
-      return this.emailError == '';
+    static validEmail(): boolean {
+      return UserModel.emailError == '';
     };
 
-    errorEmail(): string {
-      return this.emailError;
+    static errorEmail(): string {
+      return UserModel.emailError;
     };
 
-    validAll(): boolean {
-      return (this.validUsername() && this.validEmail() &&
-            this.validFullname() && this.validPassword()) &&
-            ((this.getUsername() !='') && (this.getEmail() != '') &&
-                (this.getFullname() != '') && (this.getPassword() != ''));
+    static validAll(): boolean {
+      return (
+        UserModel.validUsername() && UserModel.validEmail() &&
+        UserModel.validFullname() && UserModel.validPassword()
+      ) && (
+        (UserModel.getUsername() !='') && (UserModel.getEmail() != '') &&
+        (UserModel.getFullname() != '') && (UserModel.getPassword() != ''));
     };
 
-    validLogin(): boolean {
-      return (this.validUsername() && this.validPassword()) &&
-            ((this.getUsername() != '') && (this.getPassword() != ''));
+    static validLogin(): boolean {
+      return (
+        UserModel.validUsername() && UserModel.validPassword()
+      ) && (
+        (UserModel.getUsername() != '') && (UserModel.getPassword() != ''));
+    };
+
+    // TODO: Should we move this so it isn't inside the user model?
+    static password: string = '';
+    private static passwordError: string = '';
+
+    static errorPassword(): string {
+      return UserModel.passwordError;
+    };
+
+    static validPassword(): boolean {
+      return UserModel.passwordError == '';
     };
 };
+
 /* eslint-disable */
 function retrieveUser(username: string): Promise<User> {
   return ξ.request<User>({
@@ -131,7 +164,7 @@ function retrieveUser(username: string): Promise<User> {
 export function createUser(user: User) {
   return ξ.request({
     method: 'POST',
-    url: '/user/',
+    url: '/user',
     data: user,
   });
 };
@@ -147,7 +180,7 @@ function saveUser() {
 export function authenticateUser(user: User) {
   return ξ.request({
     method: 'POST',
-    url: '/session/',
+    url: '/session',
     data: user,
   });
 };
@@ -155,7 +188,7 @@ export function authenticateUser(user: User) {
 function deAuthenticateUser() {
   return ξ.request({
     method: 'DELETE',
-    url: '/session/',
+    url: '/session',
   });
 };
 /* eslint-enable */
