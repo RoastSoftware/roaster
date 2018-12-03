@@ -194,11 +194,36 @@ API.
 	Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
 	```
 
-### Handle Friend for User [/user/friend]
-+ Relation: user/friend
+### Avatar For User [/user/{username}/avatar]
++ Relation: user/{username}/avatar
+
+#### Upload User Avatar [PUT]
++ Relation: user/{username}/avatar
++ Request: Upload user avatar
++ Request: Image to upload (multipart/form-data; boundary=---BOUNDARY)
+	+ Headers
+	```
+	Cookie: roaster_auth=AB32DEAC21A91DE123[...]
+	```
+	+ Body
+        --{boundary value}
+        Content-Disposition: form-data; name="file"; filename="image.jpg"
+        Content-Type: image/jpeg (according to the type of the uploaded file)
+
+	{file content}
+	--{boundary value}
++ Response: 204
+
+#### Retrieve User Avatar [GET]
++ Relation: user/{username}/avatar
++ Request: Retrieve user avatar
++ Response: 200 (image/png)
+
+### Handle Friend For User [/user/{username}/friend]
++ Relation: user/{username}/friend
 
 #### Add New Friend [POST]
-+ Relation: user/friend
++ Relation: user/{username}/friend
 + Request: Add new friend (application/json)
 	+ Headers
 	```
@@ -224,11 +249,11 @@ API.
 	```
 + Response: 200
 
-### View/Handle Specific Friends for User [/user/friend/{username}]
-+ Relation: user/friend
+### View/Handle Specific Friends for User [/user/{username}/friend]
++ Relation: user/{username}friend
 
 #### Retrieve User Friends [GET]
-+ Relation: user/friend/{username}
++ Relation: user/{username}/friend
 + Request: Retrieve user friends
 + Response: 200 (application/json)
 	+ Body
@@ -253,7 +278,7 @@ API.
 	```
 
 #### Remove User Friend [DELETE]
-+ Relation: user/friend/{username}
++ Relation: user/{username}/friend
 + Request: Remove user friend
 	+ Headers
 	```
