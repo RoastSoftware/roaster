@@ -476,3 +476,121 @@ API.
 		}
 	}
 	```
+
+## Feed [/feed{?page}]
+### Get Global Feed [GET]
++ Relation: feed
++ Request: A global feed (application/json)
+	+ Parameters
+		+ id: 0 (number) - Page of global feed to return.
++ Response: 200
+	+ Body
+	```json
+	{
+		"items": [
+			{
+				"category": 0,
+				"username": "JustARegularUsername",
+				"title": "Woah, this user failed!",
+				"description": "Something happened [...]",
+				"time": "Mon Dec  3 10:51:52 CET 2018"
+			}, {
+				"category": 3,
+				"username": "JustAnotherRegularUsername",
+				"title": "Woah, this user also failed!",
+				"description": "Something happened [...]",
+				"time": "Mon Dec  3 09:48:12 CET 2018"
+			}
+		]
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"items": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"category": {
+							"type": "number"
+						},
+						"username": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"time": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+	```
+
+### User Feed [/feed/{username}{?page}]
+#### Get User Feed [GET]
++ Relation: feed/{username}
++ Request: A user feed (application/json)
+	+ Parameters
+		+ id: 0 (number) - Page of user feed to return.
++ Response: 200
+	+ Body
+	```json
+	{
+		"items": [
+			{
+				"category": 0,
+				"username": "JustARegularUsername",
+				"title": "Woah, this user failed!",
+				"description": "Something happened [...]",
+				"time": "Mon Dec  3 10:51:52 CET 2018"
+			}, {
+				"category": 3,
+				"username": "JustAnotherRegularUsername",
+				"title": "Woah, this user also failed!",
+				"description": "Something happened [...]",
+				"time": "Mon Dec  3 09:48:12 CET 2018"
+			}
+		]
+	}
+	```
+	+ Schema
+	```json
+	{
+		"type": "object",
+		"properties": {
+			"items": {
+				"type": "array",
+				"items": {
+					"type": "object",
+					"properties": {
+						"category": {
+							"type": "number"
+						},
+						"username": {
+							"type": "string"
+						},
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"time": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+	```
