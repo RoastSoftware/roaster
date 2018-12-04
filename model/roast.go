@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Message represents a general Roast message.
 type Message struct {
 	Hash        []byte `json:"hash"`
 	Row         uint   `json:"row"`
@@ -16,14 +17,17 @@ type Message struct {
 	Description string `json:"description"`
 }
 
+// Error represents a Roast error message.
 type Error struct {
 	Message
 }
 
+// Warning represents a Roast error message.
 type Warning struct {
 	Message
 }
 
+// Roast represent a Roast result.
 type Roast struct {
 	Username   string    `json:"username"`
 	Code       string    `json:"code"`
@@ -34,6 +38,7 @@ type Roast struct {
 	CreateTime time.Time `json:"create_time"`
 }
 
+// PutRoast adds a Roast result to the database.
 func PutRoast(roast Roast) (err error) {
 	tx, err := database.Begin()
 	if err != nil {
