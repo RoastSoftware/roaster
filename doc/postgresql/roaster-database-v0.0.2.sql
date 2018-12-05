@@ -97,3 +97,17 @@ create table if not exists roast_has_warnings
     constraint warning_fk
     references warning (id)
 );
+
+create table if not exists avatar
+(
+  avatar bytea not null,
+  username text not null,
+  constraint username_uq unique (username),
+  constraint username_fk foreign key (username)
+    references "user" (username) match simple
+    on update no action
+    on delete no action
+);
+
+create index if not exists username_idx
+  on avatar using btree (username);

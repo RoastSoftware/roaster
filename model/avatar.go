@@ -2,9 +2,14 @@
 package model
 
 import (
-    "fmt"
-    "log"
 	"database/sql"
+    "math/rand"
+    "time"
+    "image/png"
+    "image"
+    "bytes"
+
+    "github.com/o1egl/govatar"
 )
 
 // Avatar holds a avatar.
@@ -28,24 +33,58 @@ func PutAvatar(avatar Avatar) (err error) {
     return
 }
 
+// Encode generate image to png.
+func encodeToPNG(img image.Image) (raw []byte, err error) {
+    buf := new(bytes.Buffer)
+    err = png.Encode(buf, img)
+    raw = buf.Bytes()
+    return
+}
+
 // GetAvatar return a avatar by their username.
 //Note: Username will be trimmed for whitespace before quering the database.
 func GetAvatar(username string) (avatar Avatar, err error) {
+    avatar, err = getAvatar(username)
+    if err == sql.ErrNoRows {
+        err = nil
+        var img image.Image
+        var raw []byte
+
+        img, err = govatar.GenerateFromUsername(randomGender(), username)
+        if err != nil {
+            return
+        }
+
+        raw, err = encodeToPNG(img)
+        if err != nil {
+            return
+        }
+
+        avatar = Avatar{username, raw}
+        err = PutAvatar(avatar)
+    }
+
+    return
+}
+
+
+func getAvatar(username string) (avatar Avatar, err error) {
     err = database.QueryRow(`
         SELECT username, avatar
         FROM "avatar"
         WHERE username=TRIM($1)
-        `, identifier).Scan(&avatar.Username, &avatar.Avatar    )
+        `, username).Scan(&avatar.Username, &avatar.Avatar)
+    return
+}
 
-        if err != nil {
-            switch err {
-            case sql.ErrNoRows:
-                err = fmt.Errorf(`avatar for user:  "%s" does not exist`, identifier)
-            default:
-                log.Println(err)
-                err = erros.New("failed to execute your request")
-            }
-        }
+func randomGender() govatar.Gender {
+    r := rand.Intn(1)
+    if r == 0 {
+        return govatar.MALE
+    }
+    return govatar.FEMALE
+}
 
-        return
+func init() {
+    rand.Seed(time.Now().UnixNano())
 }
