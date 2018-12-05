@@ -48,7 +48,7 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roast := model.Roast{}
+	roast := model.RoastResult{}
 
 	switch snippet.Language {
 	case "python3":
@@ -62,26 +62,27 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 
 		roast.Code = snippet.Code
 		roast.Language = snippet.Language
+		roast.Username = username
+		roast.Score = 100
+
 	default:
 		http.Error(w, unsupportedLanguageErr, http.StatusBadRequest)
 		return
 	}
 
-	/*
-		err = model.PutRoast(snippet)
-		if err != nil {
-			// TODO: Implement better error handling.
-			log.Println(err)
-			http.Error(w, internalServerErr, http.StatusInternalServerError)
-			return
-		}
+	err = model.PutRoast(roast)
+	if err != nil {
+		// TODO: Implement better error handling.
+		log.Println(err)
+		http.Error(w, internalServerErr, http.StatusInternalServerError)
+		return
+	}
 
-		err = json.NewEncoder(w).Encode(roast)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	*/
+	err = json.NewEncoder(w).Encode(roast)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // Init adds the handlers for the Roast [/roast] endpoint.

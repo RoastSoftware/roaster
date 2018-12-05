@@ -26,6 +26,9 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 	// User [/user].
 	user.Init(router.PathPrefix("/user").Subrouter())
 
+	// Roast [/roast].
+	user.Init(router.PathPrefix("/roast").Subrouter())
+
 	// Session [/session].
 	session.Init(router.PathPrefix("/session").Subrouter())
 
