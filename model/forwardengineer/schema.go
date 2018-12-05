@@ -1,4 +1,4 @@
-// Package forwardengineer was generated automatically by inlinesql at 2018-11-23 16:00:52.858279614 +0100 CET m=+0.001206693.
+// Package forwardengineer was generated automatically by inlinesql at 2018-12-05 13:39:51.6108381 +0100 CET m=+0.012690801.
 package forwardengineer
 // GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
@@ -15,5 +15,7 @@ func GetQueries() []string {
 		"create unique index if not exists error_hash_idx on error (hash)",
 		"create table if not exists roast_has_errors ( roast integer not null constraint roast_fk references roast (id), error integer not null constraint error_fk references error (id) )",
 		"create table if not exists roast_has_warnings ( roast integer not null constraint roast_fk references roast (id), warning integer not null constraint warning_fk references warning (id) )",
+		"create table if not exists avatar ( avatar bytea not null, username text not null, constraint username_uq unique (username), constraint username_fk foreign key (username) references \"user\" (username) match simple on update no action on delete no action )",
+		"create index if not exists username_idx on avatar using btree (username)",
 	}
 }

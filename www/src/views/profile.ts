@@ -20,11 +20,11 @@ export default class Profile implements ξ.ClassComponent {
     };
 
     clickImg() {
-        document.getElementById('upload').click();
+      document.getElementById('upload').click();
     }
 
     view(vnode: ξ.CVnode) {
-        return ξ(base,
+      return ξ(base,
           ξ('.ui.main.text.container[style=margin-top: 2em;]',
               ξ('input#upload[type=file][style=display: none;]',
                   {onchange: this.upload}),
