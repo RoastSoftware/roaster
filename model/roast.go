@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// Message represents a general Roast message.
-type Message struct {
+// RoastMessage represents a general Roast message.
+type RoastMessage struct {
 	Hash        []byte `json:"hash"`
 	Row         uint   `json:"row"`
 	Column      uint   `json:"column"`
@@ -17,29 +17,55 @@ type Message struct {
 	Description string `json:"description"`
 }
 
-// Error represents a Roast error message.
-type Error struct {
-	Message
+// RoastError represents a Roast error message.
+type RoastError struct {
+	RoastMessage
 }
 
-// Warning represents a Roast error message.
-type Warning struct {
-	Message
+// RoastWarning represents a Roast error message.
+type RoastWarning struct {
+	RoastMessage
 }
 
-// Roast represent a Roast result.
-type Roast struct {
-	Username   string    `json:"username"`
-	Code       string    `json:"code"`
-	Score      uint      `json:"score"`
-	Language   string    `json:"language"`
-	Errors     []Error   `json:"errors"`
-	Warnings   []Warning `json:"warnings"`
-	CreateTime time.Time `json:"create_time"`
+// RoastResult represent a Roast result.
+type RoastResult struct {
+	Username   string         `json:"username"`
+	Code       string         `json:"code"`
+	Score      uint           `json:"score"`
+	Language   string         `json:"language"`
+	Errors     []RoastError   `json:"errors"`
+	Warnings   []RoastWarning `json:"warnings"`
+	CreateTime time.Time      `json:"create_time"`
 }
 
-// PutRoast adds a Roast result to the database.
-func PutRoast(roast Roast) (err error) {
+func (r *RoastResult) AddError(hash []byte, row, column uint, engine, name, description string) {
+	r.Errors = append(r.Errors, RoastError{
+		RoastMessage{
+			Hash:        hash,
+			Row:         row,
+			Column:      column,
+			Engine:      engine,
+			Name:        name,
+			Description: description,
+		},
+	})
+}
+
+func (r *RoastResult) AddWarning(hash []byte, row, column uint, engine, name, description string) {
+	r.Warnings = append(r.Warnings, RoastWarning{
+		RoastMessage{
+			Hash:        hash,
+			Row:         row,
+			Column:      column,
+			Engine:      engine,
+			Name:        name,
+			Description: description,
+		},
+	})
+}
+
+// PutRoast adds a RoastResult to the database.
+func PutRoast(roast RoastResult) (err error) {
 	tx, err := database.Begin()
 	if err != nil {
 		return
@@ -52,7 +78,7 @@ func PutRoast(roast Roast) (err error) {
 		err = tx.Commit()
 	}()
 
-	roastInsertResult, err := database.Exec(`
+	roastInsertResult, err := tx.Exec(`
 		INSERT INTO "roast"
 		(username, code, score, language, create_time)
 		VALUES
