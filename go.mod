@@ -12,8 +12,6 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869
-	golang.org/x/lint v0.0.0-20181026193005-c67002cb31c3 // indirect
-	golang.org/x/tools v0.0.0-20181205014116-22934f0fdb62 // indirect
 	gopkg.in/boj/redistore.v1 v1.0.0-20160128113310-fc113767cd6b
 	gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 // indirect
 )
