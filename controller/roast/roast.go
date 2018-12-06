@@ -1,4 +1,4 @@
-// Package user implement the roast API endpoint.
+// Package roast implement the roast API endpoint.
 package roast
 
 import (
@@ -21,13 +21,13 @@ const (
 	unsupportedLanguageErr   = "unsupported language error"
 )
 
-type Snippet struct {
+type snippet struct {
 	Language string `json:"type"`
 	Code     string `json:"code"`
 }
 
 func analyzeCode(w http.ResponseWriter, r *http.Request) {
-	var snippet Snippet
+	var in snippet
 
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
@@ -41,7 +41,7 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, notAuthorizedErr, http.StatusUnauthorized)
 	}
 
-	err = json.NewDecoder(r.Body).Decode(&snippet)
+	err = json.NewDecoder(r.Body).Decode(&in)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, cannotDecodeRoastDataErr, http.StatusBadRequest)
@@ -50,9 +50,9 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 
 	roast := model.RoastResult{}
 
-	switch snippet.Language {
+	switch in.Language {
 	case "python3":
-		result, err := analyze.WithFlake8(strings.NewReader(snippet.Code))
+		result, err := analyze.WithFlake8(strings.NewReader(in.Code))
 		if err != nil {
 			log.Println(err)
 			http.Error(w, internalServerErr, http.StatusInternalServerError)
@@ -60,8 +60,8 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(result)
 
-		roast.Code = snippet.Code
-		roast.Language = snippet.Language
+		roast.Code = in.Code
+		roast.Language = in.Language
 		roast.Username = username
 		roast.Score = 100
 

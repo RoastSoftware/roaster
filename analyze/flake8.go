@@ -1,3 +1,4 @@
+// Package analyze implements the Flake8 runner and parser.
 package analyze
 
 import (
@@ -55,6 +56,7 @@ func (f flake8Result) toRoast() (roast model.RoastResult) {
 	return
 }
 
+// WithFlake8 statically analyzes the code with Flake8 and parses the result.
 func WithFlake8(code io.Reader) (result model.RoastResult, err error) {
 	var r flake8Result
 

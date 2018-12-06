@@ -38,6 +38,7 @@ type RoastResult struct {
 	CreateTime time.Time      `json:"create_time"`
 }
 
+// AddError adds an error to the RoastResult.
 func (r *RoastResult) AddError(hash []byte, row, column uint, engine, name, description string) {
 	r.Errors = append(r.Errors, RoastError{
 		RoastMessage{
@@ -51,6 +52,7 @@ func (r *RoastResult) AddError(hash []byte, row, column uint, engine, name, desc
 	})
 }
 
+// AddWarning adds an warning to the RoastResult.
 func (r *RoastResult) AddWarning(hash []byte, row, column uint, engine, name, description string) {
 	r.Warnings = append(r.Warnings, RoastWarning{
 		RoastMessage{
