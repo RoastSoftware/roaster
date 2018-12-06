@@ -34,7 +34,7 @@ export default class Network {
   public static async request<T>(
       method: string,
       url: string,
-      data?: any): T {
+      data?: any): Promise<T> {
     if (Network.nextCSRFToken == '') {
       await Network.initCSRFToken();
     }
