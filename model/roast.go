@@ -87,6 +87,7 @@ const (
 	warningCost = 0.2
 )
 
+// CalculateScore calculates the score according to a not-so-smart algorithm.
 func (r RoastResult) CalculateScore() float64 {
 	sloc := float64(r.sloc())
 	numErrors := float64(len(r.Errors))
@@ -96,6 +97,8 @@ func (r RoastResult) CalculateScore() float64 {
 		(((errorCost * numErrors) + (warningCost * numWarnings)) + 1))
 }
 
+// NewRoastResult creates a new RoastResult with username, language and code but
+// without warning/error messages and score.
 func NewRoastResult(username, language, code string) RoastResult {
 	return RoastResult{
 		Username: username,
