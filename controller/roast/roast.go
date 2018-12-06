@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -53,25 +52,17 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 
 	switch in.Language {
 	case "python3":
-		roast, err = analyze.WithFlake8(strings.NewReader(in.Code))
+		roast, err = analyze.WithFlake8(username, in.Code)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, internalServerErr, http.StatusInternalServerError)
 			return
 		}
-
-		roast.Code = in.Code
-		roast.Language = in.Language
-		roast.Username = username
-		roast.Score = 1
-
 	default:
 		http.Error(w, unsupportedLanguageErr, http.StatusBadRequest)
 		return
 	}
 
-	roast.Username = username
-	log.Println(roast)
 	err = model.PutRoast(roast)
 	if err != nil {
 		// TODO: Implement better error handling.

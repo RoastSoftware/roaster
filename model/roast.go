@@ -2,7 +2,9 @@
 package model
 
 import (
+	"bufio"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/satori/go.uuid"
@@ -67,6 +69,41 @@ func (r *RoastResult) AddWarning(hash uuid.UUID, row, column uint, engine, name,
 	})
 }
 
+// sloc implements a naĩve line counter for code.
+// All newlines are counted, so even empty rows and comments are counted.
+func (r RoastResult) sloc() int {
+	c := strings.NewReader(r.Code)
+
+	lineCount := 0
+	for bufio.NewScanner(c).Scan() {
+		lineCount++
+	}
+
+	return lineCount
+}
+
+const (
+	errorCost   = 0.8
+	warningCost = 0.2
+)
+
+func (r RoastResult) CalculateScore() float64 {
+	sloc := float64(r.sloc())
+	numErrors := float64(len(r.Errors))
+	numWarnings := float64(len(r.Warnings))
+
+	return (sloc /
+		(((errorCost * numErrors) + (warningCost * numWarnings)) + 1))
+}
+
+func NewRoastResult(username, language, code string) RoastResult {
+	return RoastResult{
+		Username: username,
+		Language: language,
+		Code:     code,
+	}
+}
+
 // PutRoast adds a RoastResult to the database.
 func PutRoast(roast RoastResult) (err error) {
 	tx, err := database.Begin()
@@ -104,10 +141,10 @@ func PutRoast(roast RoastResult) (err error) {
 
 	errorInsertStmt, err := tx.Prepare(`
 		INSERT INTO "error"
-		(hash, row, "column", engine, name, description)
+		(id, row, "column", engine, name, description)
 		VALUES
 		($1, $2, $3, $4, $5, $6)
-		RETURNING id`)
+		ON CONFLICT DO NOTHING`)
 	if err != nil {
 		return
 	}
@@ -124,20 +161,18 @@ func PutRoast(roast RoastResult) (err error) {
 	defer roastHasErrorsInsertStmt.Close()
 
 	for _, errorMessage := range roast.Errors {
-		var errorID int
-
-		err := errorInsertStmt.QueryRow(
+		_, err := errorInsertStmt.Exec(
 			errorMessage.Hash,
 			errorMessage.Row,
 			errorMessage.Column,
 			errorMessage.Engine,
 			errorMessage.Name,
-			errorMessage.Description).Scan(&errorID)
+			errorMessage.Description)
 		if err != nil {
 			return err
 		}
 
-		_, err = roastHasErrorsInsertStmt.Exec(roastID, errorID)
+		_, err = roastHasErrorsInsertStmt.Exec(roastID, errorMessage.Hash)
 		if err != nil {
 			return err
 		}
@@ -145,10 +180,10 @@ func PutRoast(roast RoastResult) (err error) {
 
 	warningInsertStmt, err := tx.Prepare(`
 		INSERT INTO "warning"
-		(hash, row, "column", engine, name, description)
+		(id, row, "column", engine, name, description)
 		VALUES
 		($1, $2, $3, $4, $5, $6)
-		RETURNING id`)
+		ON CONFLICT DO NOTHING`)
 	if err != nil {
 		return
 	}
@@ -165,20 +200,18 @@ func PutRoast(roast RoastResult) (err error) {
 	defer roastHasWarningsInsertStmt.Close()
 
 	for _, warningMessage := range roast.Warnings {
-		var warningID int
-
-		err := warningInsertStmt.QueryRow(
+		_, err := warningInsertStmt.Exec(
 			warningMessage.Hash,
 			warningMessage.Row,
 			warningMessage.Column,
 			warningMessage.Engine,
 			warningMessage.Name,
-			warningMessage.Description).Scan(&warningID)
+			warningMessage.Description)
 		if err != nil {
 			return err
 		}
 
-		_, err = roastHasWarningsInsertStmt.Exec(roastID, warningID)
+		_, err = roastHasWarningsInsertStmt.Exec(roastID, warningMessage.Hash)
 		if err != nil {
 			return err
 		}

@@ -3,9 +3,9 @@ package analyze
 
 import (
 	"encoding/json"
-	"io"
 	"log"
 	"os/exec"
+	"strings"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/satori/go.uuid"
@@ -30,8 +30,10 @@ type flake8Message struct {
 
 type flake8Result map[string][]flake8Message
 
-func (f flake8Result) toRoast() (roast model.RoastResult) {
+func (f flake8Result) toRoast(username string, code string) (roast model.RoastResult) {
 	result := f["stdin"]
+
+	roast = model.NewRoastResult(username, languageName, code)
 
 	for _, message := range result {
 		hash := uuid.NewV5(domainUUID, message.Code)
@@ -56,11 +58,13 @@ func (f flake8Result) toRoast() (roast model.RoastResult) {
 		}
 	}
 
+	roast.CalculateScore()
+
 	return
 }
 
 // WithFlake8 statically analyzes the code with Flake8 and parses the result.
-func WithFlake8(code io.Reader) (result model.RoastResult, err error) {
+func WithFlake8(username, code string) (result model.RoastResult, err error) {
 	var r flake8Result
 
 	cmd := exec.Command("python3", "-m",
@@ -71,7 +75,7 @@ func WithFlake8(code io.Reader) (result model.RoastResult, err error) {
 		"--exit-zero",
 		"-")
 
-	cmd.Stdin = code
+	cmd.Stdin = strings.NewReader(code)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -90,5 +94,5 @@ func WithFlake8(code io.Reader) (result model.RoastResult, err error) {
 		return
 	}
 
-	return r.toRoast(), nil
+	return r.toRoast(username, code), nil
 }
