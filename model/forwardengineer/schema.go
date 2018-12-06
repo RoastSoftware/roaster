@@ -1,11 +1,11 @@
-// Package forwardengineer was generated automatically by inlinesql at 2018-12-06 21:15:34.323728493 +0100 CET m=+0.001734240.
+// Package forwardengineer was generated automatically by inlinesql at 2018-12-06 21:27:11.830585274 +0100 CET m=+0.001712682.
 package forwardengineer
 // GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
 	return []string{
 		"set search_path to roaster",
 		"create table if not exists \"user\" ( username text not null constraint user_pkey primary key constraint username_chk check (char_length(username) <= 30), hash bytea not null, create_time timestamp with time zone not null, fullname text constraint fullname_chk check (char_length(fullname) < 255), email text not null constraint email_chk check (char_length(email) < 255) )",
-		"create table if not exists \"roast\" ( id serial not null constraint roast_pk primary key, code text not null constraint code_chk check (char_length(code) <= 500000), username text not null constraint user_fk references \"user\" (username), score integer not null constraint score_chk check (score >= 0 AND score <= 65536), language text not null, create_time timestamp with time zone not null )",
+		"create table if not exists \"roast\" ( id serial not null constraint roast_pk primary key, code text not null constraint code_chk check (char_length(code) <= 500000), username text not null constraint user_fk references \"user\" (username), score integer not null constraint score_chk check (score >= 0), language text not null, create_time timestamp with time zone not null )",
 		"create table if not exists \"warning\" ( id uuid not null constraint warning_pk primary key, row integer not null, \"column\" integer not null, engine text not null, name text not null, description text not null )",
 		"create table if not exists \"error\" ( id uuid not null constraint error_pk primary key, row integer not null, \"column\" integer not null, engine text not null, name text not null, description text not null )",
 		"create table if not exists \"roast_has_errors\" ( roast integer not null constraint roast_fk references roast (id), error uuid not null constraint error_fk references error (id) )",

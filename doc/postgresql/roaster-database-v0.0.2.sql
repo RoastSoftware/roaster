@@ -30,7 +30,7 @@ create table if not exists "roast"
     references "user" (username),
   score    	integer 	not null
     constraint score_chk
-    check (score >= 0 AND score <= 65536),
+    check (score >= 0),
   language 	text          	not null,
   create_time	timestamp	with time zone not null
 );
