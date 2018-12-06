@@ -13,6 +13,6 @@ require (
 	github.com/urfave/cli v1.20.0 // indirect
 	golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869
 	golang.org/x/lint v0.0.0-20181026193005-c67002cb31c3 // indirect
-	golang.org/x/tools v0.0.0-20181122213734-04b5d21e00f1 // indirect
+	golang.org/x/tools v0.0.0-20181205224935-3576414c54a4 // indirect
 	gopkg.in/boj/redistore.v1 v1.0.0-20160128113310-fc113767cd6b
 )

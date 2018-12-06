@@ -4,10 +4,10 @@ package controller
 import (
 	"net/http"
 
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/avatar"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/session"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/static"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/user"
-	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/avatar"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/handlers"
@@ -30,8 +30,8 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 	// Session [/session].
 	session.Init(router.PathPrefix("/session").Subrouter())
 
-    // Avatar [/user/{username}/avatar].
-    avatar.Init(router.PathPrefix("/user/{username}/avatar").Subrouter())
+	// Avatar [/user/{username}/avatar].
+	avatar.Init(router.PathPrefix("/user/{username}/avatar").Subrouter())
 
 	// Retrieve the roast.software SPA [GET].
 	static.Init(router.PathPrefix("/").Subrouter(), "www/dist")

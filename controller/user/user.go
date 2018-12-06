@@ -3,11 +3,11 @@ package user
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
-    "log"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
-    "github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
 )
@@ -39,7 +39,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	err = model.PutUser(u.User, []byte(u.Password))
 	if err != nil {
 		// TODO: Implement better error handling.
-        log.Println(err)
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -52,7 +52,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(u.User)
 	if err != nil {
-        log.Println(err)
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -106,7 +106,7 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) {
 func Init(r *mux.Router) {
 	// All handlers are required to use application/json as their
 	// Content-Type.
-    r.Use(middleware.EnforceContentType("application/json"))
+	r.Use(middleware.EnforceContentType("application/json"))
 
 	// Create User [POST].
 	r.HandleFunc("", createUser).Methods(http.MethodPost)
@@ -115,6 +115,5 @@ func Init(r *mux.Router) {
 	r.HandleFunc("/{username}", changeUser).Methods(http.MethodPatch)
 	r.HandleFunc("/{username}", removeUser).Methods(http.MethodDelete)
 	r.HandleFunc("/{username}", retrieveUser).Methods(http.MethodGet)
-
 
 }
