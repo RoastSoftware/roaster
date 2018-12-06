@@ -61,7 +61,8 @@ func WithFlake8(code io.Reader) (result model.RoastResult, err error) {
 	cmd := exec.Command("python3", "-m",
 		"flake8",
 		"--format=json",
-		"--max-complexity=1",
+		"--max-complexity=10",
+		"--isolated",
 		"--exit-zero",
 		"-")
 
