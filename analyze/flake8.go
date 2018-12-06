@@ -4,6 +4,7 @@ package analyze
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"os/exec"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
@@ -33,23 +34,25 @@ func (f flake8Result) toRoast() (roast model.RoastResult) {
 	result := f["stdin"]
 
 	for _, message := range result {
-		id := uuid.NewV5(domainUUID, message.Code)
+		hash := uuid.NewV5(domainUUID, message.Code)
 
 		switch []rune(message.Code)[0] {
 		case 'W', 'C':
-			roast.AddWarning(id.Bytes(),
+			roast.AddWarning(hash,
 				message.LineNumber,
 				message.ColumnNumber,
 				engineName,
 				message.Code,
 				message.Text)
 		case 'F', 'I', 'R', 'E':
-			roast.AddError(id.Bytes(),
+			roast.AddError(hash,
 				message.LineNumber,
 				message.ColumnNumber,
 				engineName,
 				message.Code,
 				message.Text)
+		default:
+			log.Printf("unhandled message code: %s", message.Code)
 		}
 	}
 

@@ -5,16 +5,18 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	"github.com/satori/go.uuid"
 )
 
 // RoastMessage represents a general Roast message.
 type RoastMessage struct {
-	Hash        []byte `json:"hash"`
-	Row         uint   `json:"row"`
-	Column      uint   `json:"column"`
-	Engine      string `json:"engine"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Hash        uuid.UUID `json:"hash"`
+	Row         uint      `json:"row"`
+	Column      uint      `json:"column"`
+	Engine      string    `json:"engine"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
 }
 
 // RoastError represents a Roast error message.
@@ -39,7 +41,7 @@ type RoastResult struct {
 }
 
 // AddError adds an error to the RoastResult.
-func (r *RoastResult) AddError(hash []byte, row, column uint, engine, name, description string) {
+func (r *RoastResult) AddError(hash uuid.UUID, row, column uint, engine, name, description string) {
 	r.Errors = append(r.Errors, RoastError{
 		RoastMessage{
 			Hash:        hash,
@@ -53,7 +55,7 @@ func (r *RoastResult) AddError(hash []byte, row, column uint, engine, name, desc
 }
 
 // AddWarning adds an warning to the RoastResult.
-func (r *RoastResult) AddWarning(hash []byte, row, column uint, engine, name, description string) {
+func (r *RoastResult) AddWarning(hash uuid.UUID, row, column uint, engine, name, description string) {
 	r.Warnings = append(r.Warnings, RoastWarning{
 		RoastMessage{
 			Hash:        hash,

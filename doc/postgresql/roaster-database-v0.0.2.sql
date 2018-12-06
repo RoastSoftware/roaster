@@ -48,7 +48,7 @@ create table if not exists roast
 
 create table if not exists warning
 (
-  hash        bytea   not null,
+  hash        uuid    not null,
   row         integer not null,
   "column"    integer not null,
   engine      text    not null,
@@ -64,7 +64,7 @@ create unique index if not exists warning_hash_idx
 
 create table if not exists error
 (
-  hash        bytea   not null,
+  hash        uuid    not null,
   row         integer not null,
   "column"    integer not null,
   engine      text    not null,

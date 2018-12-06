@@ -1,6 +1,7 @@
 /www/node_modules
 /www/dist
 /roasterd
+/build
 venv
 profile.cov
 travis-*.zip
