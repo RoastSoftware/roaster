@@ -95,4 +95,7 @@ def too_complex():
 	for i, message := range result.Warnings {
 		assert.Exactly(t, warningTests[i], message)
 	}
+
+	assert.Equal(t, "bot", result.Username)
+	assert.Equal(t, uint(4), result.Score)
 }

@@ -28,9 +28,9 @@ create table if not exists "roast"
   username 	text          	not null
     constraint user_fk
     references "user" (username),
-  score    	numeric(5, 4) 	not null
+  score    	integer 	not null
     constraint score_chk
-    check ((score >= (0) :: numeric) AND (score <= (1) :: numeric)),
+    check (score >= 0 AND score <= 65536),
   language 	text          	not null,
   create_time	timestamp	with time zone not null
 );

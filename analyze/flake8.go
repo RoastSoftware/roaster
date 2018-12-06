@@ -30,7 +30,7 @@ type flake8Message struct {
 
 type flake8Result map[string][]flake8Message
 
-func (f flake8Result) toRoast(username string, code string) (roast model.RoastResult) {
+func (f flake8Result) toRoast(username string, code string) (roast *model.RoastResult) {
 	result := f["stdin"]
 
 	roast = model.NewRoastResult(username, languageName, code)
@@ -64,7 +64,7 @@ func (f flake8Result) toRoast(username string, code string) (roast model.RoastRe
 }
 
 // WithFlake8 statically analyzes the code with Flake8 and parses the result.
-func WithFlake8(username, code string) (result model.RoastResult, err error) {
+func WithFlake8(username, code string) (result *model.RoastResult, err error) {
 	var r flake8Result
 
 	cmd := exec.Command("python3", "-m",

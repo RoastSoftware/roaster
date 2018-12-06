@@ -2,8 +2,8 @@
 package model
 
 import (
-	"bufio"
 	"log"
+	"math"
 	"strings"
 	"time"
 
@@ -71,15 +71,12 @@ func (r *RoastResult) AddWarning(hash uuid.UUID, row, column uint, engine, name,
 
 // sloc implements a naĩve line counter for code.
 // All newlines are counted, so even empty rows and comments are counted.
-func (r RoastResult) sloc() int {
-	c := strings.NewReader(r.Code)
-
-	lineCount := 0
-	for bufio.NewScanner(c).Scan() {
-		lineCount++
+func (r *RoastResult) sloc() int {
+	n := strings.Count(r.Code, "\n")
+	if len(r.Code) > 0 && !strings.HasSuffix(r.Code, "\n") {
+		n++
 	}
-
-	return lineCount
+	return n
 }
 
 const (
@@ -88,19 +85,19 @@ const (
 )
 
 // CalculateScore calculates the score according to a not-so-smart algorithm.
-func (r RoastResult) CalculateScore() float64 {
+func (r *RoastResult) CalculateScore() {
 	sloc := float64(r.sloc())
 	numErrors := float64(len(r.Errors))
 	numWarnings := float64(len(r.Warnings))
 
-	return (sloc /
-		(((errorCost * numErrors) + (warningCost * numWarnings)) + 1))
+	r.Score = uint(math.Round(sloc /
+		(((errorCost * numErrors) + (warningCost * numWarnings)) + 1)))
 }
 
 // NewRoastResult creates a new RoastResult with username, language and code but
 // without warning/error messages and score.
-func NewRoastResult(username, language, code string) RoastResult {
-	return RoastResult{
+func NewRoastResult(username, language, code string) *RoastResult {
+	return &RoastResult{
 		Username: username,
 		Language: language,
 		Code:     code,
@@ -108,7 +105,7 @@ func NewRoastResult(username, language, code string) RoastResult {
 }
 
 // PutRoast adds a RoastResult to the database.
-func PutRoast(roast RoastResult) (err error) {
+func PutRoast(roast *RoastResult) (err error) {
 	tx, err := database.Begin()
 	if err != nil {
 		return

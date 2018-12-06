@@ -48,7 +48,7 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var roast model.RoastResult
+	var roast *model.RoastResult
 
 	switch in.Language {
 	case "python3":
