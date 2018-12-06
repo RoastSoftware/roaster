@@ -1,7 +1,6 @@
 package analyze_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze"
@@ -28,7 +27,7 @@ def too_complex():
     b()
 `
 
-	result, err := analyze.WithFlake8(strings.NewReader(code))
+	result, err := analyze.WithFlake8("bot", code)
 	if err != nil {
 		t.Error(err)
 	}
