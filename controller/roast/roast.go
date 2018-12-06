@@ -22,7 +22,7 @@ const (
 )
 
 type snippet struct {
-	Language string `json:"type"`
+	Language string `json:"language"`
 	Code     string `json:"code"`
 }
 
@@ -39,6 +39,7 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 	username, ok := s.Values["username"].(string)
 	if !ok || username == "" {
 		http.Error(w, notAuthorizedErr, http.StatusUnauthorized)
+		return
 	}
 
 	err = json.NewDecoder(r.Body).Decode(&in)
@@ -48,28 +49,29 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	roast := model.RoastResult{}
+	var roast model.RoastResult
 
 	switch in.Language {
 	case "python3":
-		result, err := analyze.WithFlake8(strings.NewReader(in.Code))
+		roast, err = analyze.WithFlake8(strings.NewReader(in.Code))
 		if err != nil {
 			log.Println(err)
 			http.Error(w, internalServerErr, http.StatusInternalServerError)
 			return
 		}
-		log.Println(result)
 
 		roast.Code = in.Code
 		roast.Language = in.Language
 		roast.Username = username
-		roast.Score = 100
+		roast.Score = 1
 
 	default:
 		http.Error(w, unsupportedLanguageErr, http.StatusBadRequest)
 		return
 	}
 
+	roast.Username = username
+	log.Println(roast)
 	err = model.PutRoast(roast)
 	if err != nil {
 		// TODO: Implement better error handling.

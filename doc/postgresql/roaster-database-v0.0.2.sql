@@ -1,14 +1,14 @@
 set search_path to roaster;
 
-create sequence if not exists roast_id_seq
+create sequence if not exists "roast_id_seq"
   as integer
   maxvalue 2147483647;
 
-create sequence if not exists error_id_seq
+create sequence if not exists "error_id_seq"
   as integer
   maxvalue 2147483647;
 
-create sequence if not exists warning_id_seq
+create sequence if not exists "warning_id_seq"
   as integer
   maxvalue 2147483647;
 
@@ -29,24 +29,25 @@ create table if not exists "user"
     check (char_length(email) < 255)
 );
 
-create table if not exists roast
+create table if not exists "roast"
 (
-  id       serial        not null
+  id       	serial        	not null
     constraint roast_pk
     primary key,
-  code     text          not null
+  code     	text          	not null
     constraint code_chk
     check (char_length(code) <= 500000),
-  username text          not null
+  username 	text          	not null
     constraint user_fk
     references "user" (username),
-  score    numeric(5, 4) not null
+  score    	numeric(5, 4) 	not null
     constraint score_chk
     check ((score >= (0) :: numeric) AND (score <= (1) :: numeric)),
-  language text          not null
+  language 	text          	not null,
+  create_time	timestamp	with time zone not null
 );
 
-create table if not exists warning
+create table if not exists "warning"
 (
   hash        uuid    not null,
   row         integer not null,
@@ -59,10 +60,10 @@ create table if not exists warning
     primary key
 );
 
-create unique index if not exists warning_hash_idx
+create unique index if not exists "warning_hash_idx"
   on warning (hash);
 
-create table if not exists error
+create table if not exists "error"
 (
   hash        uuid    not null,
   row         integer not null,
@@ -75,10 +76,10 @@ create table if not exists error
     primary key
 );
 
-create unique index if not exists error_hash_idx
+create unique index if not exists "error_hash_idx"
   on error (hash);
 
-create table if not exists roast_has_errors
+create table if not exists "roast_has_errors"
 (
   roast integer not null
     constraint roast_fk
@@ -88,7 +89,7 @@ create table if not exists roast_has_errors
     references error (id)
 );
 
-create table if not exists roast_has_warnings
+create table if not exists "roast_has_warnings"
 (
   roast   integer not null
     constraint roast_fk

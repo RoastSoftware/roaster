@@ -2,7 +2,6 @@
 package model
 
 import (
-	"database/sql"
 	"log"
 	"time"
 
@@ -76,35 +75,39 @@ func PutRoast(roast RoastResult) (err error) {
 	}
 	defer func() { // Rollback transaction on error.
 		if err != nil {
-			log.Println(tx.Rollback())
+			rollBackErr := tx.Rollback()
+			if rollBackErr != nil {
+				log.Println(rollBackErr)
+			}
+
 			return
 		}
 		err = tx.Commit()
 	}()
 
-	roastInsertResult, err := tx.Exec(`
+	var roastID int
+	err = tx.QueryRow(`
 		INSERT INTO "roast"
 		(username, code, score, language, create_time)
 		VALUES
-		(@username, @code, @score, @language, @create_time)`,
-		sql.Named("username", roast.Username),
-		sql.Named("code", roast.Code),
-		sql.Named("score", roast.Score),
-		sql.Named("language", roast.Language),
-		sql.Named("create_time", roast.CreateTime))
-	if err != nil {
-		return
-	}
-
-	roastID, err := roastInsertResult.LastInsertId()
+		(TRIM($1), $2, $3, $4, $5)
+ 		RETURNING id
+		`,
+		roast.Username,
+		roast.Code,
+		roast.Score,
+		roast.Language,
+		time.Now()).Scan(&roastID)
 	if err != nil {
 		return
 	}
 
 	errorInsertStmt, err := tx.Prepare(`
 		INSERT INTO "error"
+		(hash, row, "column", engine, name, description)
 		VALUES
-		(@hash, @row, @column, @engine, @name, @description)`)
+		($1, $2, $3, $4, $5, $6)
+		RETURNING id`)
 	if err != nil {
 		return
 	}
@@ -112,33 +115,29 @@ func PutRoast(roast RoastResult) (err error) {
 
 	roastHasErrorsInsertStmt, err := tx.Prepare(`
 		INSERT INTO "roast_has_errors"
+		(roast, error)
 		VALUES
-		(@roast, @error)`)
+		($1, $2)`)
 	if err != nil {
 		return
 	}
 	defer roastHasErrorsInsertStmt.Close()
 
 	for _, errorMessage := range roast.Errors {
-		errorInsertResult, err := errorInsertStmt.Exec(
-			sql.Named("hash", errorMessage.Hash),
-			sql.Named("row", errorMessage.Row),
-			sql.Named("column", errorMessage.Column),
-			sql.Named("engine", errorMessage.Engine),
-			sql.Named("name", errorMessage.Name),
-			sql.Named("description", errorMessage.Description))
+		var errorID int
+
+		err := errorInsertStmt.QueryRow(
+			errorMessage.Hash,
+			errorMessage.Row,
+			errorMessage.Column,
+			errorMessage.Engine,
+			errorMessage.Name,
+			errorMessage.Description).Scan(&errorID)
 		if err != nil {
 			return err
 		}
 
-		errorID, err := errorInsertResult.LastInsertId()
-		if err != nil {
-			return err
-		}
-
-		_, err = roastHasErrorsInsertStmt.Exec(
-			sql.Named("roast", roastID),
-			sql.Named("error", errorID))
+		_, err = roastHasErrorsInsertStmt.Exec(roastID, errorID)
 		if err != nil {
 			return err
 		}
@@ -146,8 +145,10 @@ func PutRoast(roast RoastResult) (err error) {
 
 	warningInsertStmt, err := tx.Prepare(`
 		INSERT INTO "warning"
+		(hash, row, "column", engine, name, description)
 		VALUES
-		(@hash, @row, @column, @engine, @name, @description)`)
+		($1, $2, $3, $4, $5, $6)
+		RETURNING id`)
 	if err != nil {
 		return
 	}
@@ -155,33 +156,29 @@ func PutRoast(roast RoastResult) (err error) {
 
 	roastHasWarningsInsertStmt, err := tx.Prepare(`
 		INSERT INTO "roast_has_warnings"
+		(roast, warning)
 		VALUES
-		(@roast, @warning)`)
+		($1, $2)`)
 	if err != nil {
 		return
 	}
 	defer roastHasWarningsInsertStmt.Close()
 
 	for _, warningMessage := range roast.Warnings {
-		warningInsertResult, err := warningInsertStmt.Exec(
-			sql.Named("hash", warningMessage.Hash),
-			sql.Named("row", warningMessage.Row),
-			sql.Named("column", warningMessage.Column),
-			sql.Named("engine", warningMessage.Engine),
-			sql.Named("name", warningMessage.Name),
-			sql.Named("description", warningMessage.Description))
+		var warningID int
+
+		err := warningInsertStmt.QueryRow(
+			warningMessage.Hash,
+			warningMessage.Row,
+			warningMessage.Column,
+			warningMessage.Engine,
+			warningMessage.Name,
+			warningMessage.Description).Scan(&warningID)
 		if err != nil {
 			return err
 		}
 
-		warningID, err := warningInsertResult.LastInsertId()
-		if err != nil {
-			return err
-		}
-
-		_, err = roastHasWarningsInsertStmt.Exec(
-			sql.Named("roast", roastID),
-			sql.Named("warning", warningID))
+		_, err = roastHasWarningsInsertStmt.Exec(roastID, warningID)
 		if err != nil {
 			return err
 		}
