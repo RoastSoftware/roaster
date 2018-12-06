@@ -3,6 +3,7 @@ package user
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -38,6 +39,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	err = model.PutUser(u.User, []byte(u.Password))
 	if err != nil {
 		// TODO: Implement better error handling.
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -50,6 +52,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(u.User)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -112,4 +115,5 @@ func Init(r *mux.Router) {
 	r.HandleFunc("/{username}", changeUser).Methods(http.MethodPatch)
 	r.HandleFunc("/{username}", removeUser).Methods(http.MethodDelete)
 	r.HandleFunc("/{username}", retrieveUser).Methods(http.MethodGet)
+
 }

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Warning: no test specified.\"",
-    "start": "webpack --config webpack.dev.js -d --watch",
-    "build": "webpack --config webpack.prod.js",
+    "start": "webpack --config webpack.dev.ts -d --watch",
+    "build": "webpack --config webpack.prod.ts",
     "lint": "node node_modules/eslint/bin/eslint.js --ext .ts .",
     "fix": "node node_modules/eslint/bin/eslint.js --ext .ts . --fix"
   },
@@ -55,7 +55,8 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime": "^7.1.5",
-    "d3": "^5.7.0",
+    "@types/chart.js": "^2.7.40",
+    "chart.js": "^2.7.3",
     "mithril": "^1.1.6",
     "monaco-editor": "^0.15.5",
     "monaco-editor-webpack-plugin": "^1.6.0",

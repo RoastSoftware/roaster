@@ -1,12 +1,12 @@
 import ξ from 'mithril';
 
-export class User {
+export interface User {
   username: string;
   fullname: string;
   email: string;
 }
 
-export class UserModel implements User {
+export class UserModel {
     static loggedIn: boolean = false;
 
     static username: string = '';
