@@ -13,6 +13,7 @@ export default class Register implements ξ.ClassComponent {
           Object.assign({}, UserModel), // TODO: Implement encode/decode funcs.
           UserModel.getPassword()) // TODO: Password isn't separated yet.
           .then((user) => {
+            console.log(user);
             if (user) {
               Object.assign(UserModel, user);
               UserModel.setLoggedIn(true);
