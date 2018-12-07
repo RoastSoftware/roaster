@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/avatar"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/roast"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/session"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/static"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller/user"
@@ -26,6 +27,9 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 
 	// User [/user].
 	user.Init(router.PathPrefix("/user").Subrouter())
+
+	// Roast [/roast].
+	roast.Init(router.PathPrefix("/roast").Subrouter())
 
 	// Session [/session].
 	session.Init(router.PathPrefix("/session").Subrouter())

@@ -60,7 +60,7 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 func retrieveSession(w http.ResponseWriter, r *http.Request) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		log.Println(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
 	username, ok := s.Values["username"].(string)

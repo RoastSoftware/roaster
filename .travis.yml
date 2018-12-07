@@ -14,7 +14,12 @@ jobs:
 
   - stage: Roaster
     language: go
-    sudo: false
+    before_install:
+    - sudo apt-get install -y python3 python3-pip
+    - sudo pip3 install -r requirements.freeze.txt
+    addons:
+      apt:
+        update: true
     go:
     - 1.11.x
     env:
@@ -32,13 +37,8 @@ jobs:
     sudo: required
     services:
     - docker
-    before_install:
-    - mkdir -p build/www
     script:
-    - docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www/dist ./build/www/
-    - docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/build/roasterd
-    - du -h -d1 build/*
-    - docker build -t roaster .
+    - tool/build-production.sh
     before_deploy:
     - git add --force build Dockerfile
     deploy:
