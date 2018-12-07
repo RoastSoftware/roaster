@@ -128,6 +128,9 @@ func PutUser(user User, password []byte) (err error) {
 // Note: That the password parameter will be emptied.
 func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 	var hash []byte
+	defer func() {
+		hash = []byte{} // Empty hash on function return.
+	}()
 
 	err := database.QueryRow(`
 		SELECT username, email, fullname, hash

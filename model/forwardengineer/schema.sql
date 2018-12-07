@@ -1,1 +1,1 @@
-../../doc/postgresql/roaster-database-v0.0.1.sql
+../../doc/postgresql/roaster-database-v0.0.2.sql
