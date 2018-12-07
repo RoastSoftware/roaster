@@ -7,9 +7,8 @@ COPY ./build /roaster
 
 RUN du -h -d1 /roaster
 
-WORKDIR /roaster/analyze/python3
-RUN pip3 install --no-cache-dir -r requirements.txt
-
 WORKDIR /roaster
+RUN pip3 install --no-cache-dir -r requirements.freeze.txt
+
 EXPOSE 5000
 CMD ["/roaster/roasterd"]

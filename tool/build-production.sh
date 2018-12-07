@@ -5,8 +5,8 @@ set -ev
 # Creating build folder
 mkdir -p build/www
 
-# Build analyze
-cp -r analyze/tool ./build/analyze/
+# Copying dependency lists
+cp requirements.freeze.txt build/
 
 # Build roasterc
 docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bash -c "npm install && npm run build" && cp -r ./www/dist ./build/www/
