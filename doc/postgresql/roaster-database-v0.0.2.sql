@@ -17,6 +17,8 @@ create table if not exists "user"
     check (char_length(email) < 255)
 );
 
+create unique index username_user_idx on "user" (lower(username));
+
 create table if not exists "roast"
 (
   id       	serial        	not null
@@ -96,5 +98,5 @@ create table if not exists avatar
     on delete cascade
 );
 
-create index if not exists username_idx
+create index if not exists username_avatar_idx
   on avatar using btree (username);
