@@ -10,6 +10,11 @@ import (
 	"github.com/satori/go.uuid"
 )
 
+const (
+	errorCost   = 0.8 // Errors accounts for 80 % of points penalty.
+	warningCost = 0.2 // Warnings accounts for 20 % of points penalty.
+)
+
 // RoastMessage represents a general Roast message.
 type RoastMessage struct {
 	Hash        uuid.UUID `json:"hash"`
@@ -71,6 +76,11 @@ func (r *RoastResult) AddWarning(hash uuid.UUID, row, column uint, engine, name,
 
 // sloc implements a naĩve line counter for code.
 // All newlines are counted, so even empty rows and comments are counted.
+//
+// Note: Yes this will toast the CPU and fill the RAM for large code snippets -
+// it should have been implemented using streams and stuff. But this would
+// require some refactoring so the code is passed as a stream through out the
+// system.
 func (r *RoastResult) sloc() int {
 	n := strings.Count(r.Code, "\n")
 	if len(r.Code) > 0 && !strings.HasSuffix(r.Code, "\n") {
@@ -78,11 +88,6 @@ func (r *RoastResult) sloc() int {
 	}
 	return n
 }
-
-const (
-	errorCost   = 0.8
-	warningCost = 0.2
-)
 
 // CalculateScore calculates the score according to a not-so-smart algorithm.
 func (r *RoastResult) CalculateScore() {
