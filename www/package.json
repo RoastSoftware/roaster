@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Warning: no test specified.\"",
-    "start": "webpack --config webpack.dev.js -d --watch",
-    "build": "webpack --config webpack.prod.js",
+    "start": "webpack --config webpack.dev.ts -d --watch",
+    "build": "webpack --config webpack.prod.ts",
     "lint": "node node_modules/eslint/bin/eslint.js --ext .ts .",
     "fix": "node node_modules/eslint/bin/eslint.js --ext .ts . --fix"
   },

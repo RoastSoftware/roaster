@@ -8,6 +8,7 @@ require (
 	github.com/gorilla/mux v1.6.2
 	github.com/gorilla/sessions v1.1.3
 	github.com/lib/pq v1.0.0
+	github.com/o1egl/govatar v0.0.0-20180413000757-b1a8b0be7dc1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.2.2

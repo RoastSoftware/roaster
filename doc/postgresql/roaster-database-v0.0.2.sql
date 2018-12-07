@@ -27,7 +27,9 @@ create table if not exists "roast"
     check (char_length(code) <= 500000),
   username 	text          	not null
     constraint user_fk
-    references "user" (username),
+    references "user" (username)
+    on update cascade
+    on delete cascade,
   score    	integer 	not null
     constraint score_chk
     check (score >= 0),
@@ -63,7 +65,9 @@ create table if not exists "roast_has_errors"
 (
   roast integer not null
     constraint roast_fk
-    references roast (id),
+    references roast (id)
+    on update cascade
+    on delete cascade,
   error uuid not null
     constraint error_fk
     references error (id)
@@ -73,8 +77,24 @@ create table if not exists "roast_has_warnings"
 (
   roast   integer not null
     constraint roast_fk
-    references roast (id),
+    references roast (id)
+    on update cascade
+    on delete cascade,
   warning uuid not null
     constraint warning_fk
     references warning (id)
 );
+
+create table if not exists avatar
+(
+  avatar bytea not null,
+  username text not null,
+  constraint username_uq unique (username),
+  constraint username_fk foreign key (username)
+    references "user" (username) match simple
+    on update cascade
+    on delete cascade
+);
+
+create index if not exists username_idx
+  on avatar using btree (username);
