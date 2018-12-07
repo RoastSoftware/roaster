@@ -135,7 +135,7 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 	err := database.QueryRow(`
 		SELECT username, email, fullname, hash
 		FROM "user"
-		WHERE (username=TRIM($1) OR email=LOWER(TRIM($1)))
+		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname, &hash)
 	if err != nil {
 		ok = false
@@ -156,7 +156,7 @@ func GetUser(identifier string) (user User, err error) {
 	err = database.QueryRow(`
 		SELECT username, email, fullname
 		FROM "user"
-		WHERE (username=TRIM($1) OR email=LOWER(TRIM($1)))
+		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
 
 	if err != nil {
