@@ -5,6 +5,7 @@ import register from './views/register';
 import profile from './views/profile';
 import statistics from './views/statistics';
 import login from './views/login';
+import user from './views/user';
 
 import Auth from './services/auth';
 import {UserModel} from './models/user';
@@ -47,6 +48,7 @@ class Roaster {
       '/login': {onmatch: redirectMatcher(login, (): boolean => {
         return !UserModel.isLoggedIn();
       }, '/')},
+        '/user/:username': user,
     });
   };
 }

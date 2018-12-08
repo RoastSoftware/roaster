@@ -1,21 +1,24 @@
 import ξ from 'mithril';
 import base from './base';
-import {UserModel} from '../models/user';
+import {UserModel, User} from '../models/user';
 import Auth from '../services/auth';
 
 export default class Login implements ξ.ClassComponent {
   loginError: APIError;
 
-  authenticate(): Promise {
+    authenticate(): Promise<User> {
     if (UserModel.validLogin()) {
-      return Auth.login(UserModel.getUsername(), UserModel.getPassword())
+        return Auth.login<User>(UserModel.getUsername(), UserModel.getPassword())
           .then((user) => {
             UserModel.setLoggedIn(true);
             Object.assign(UserModel, user);
-            ξ.route.set('/');
+              ξ.route.set('/');
+
+              return user;
           })
           .catch((err: APIError) => {
             this.loginError = err;
+            return {} as User;
           });
     }
   };
