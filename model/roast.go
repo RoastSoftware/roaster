@@ -43,7 +43,7 @@ type RoastResult struct {
 	Language   string         `json:"language"`
 	Errors     []RoastError   `json:"errors"`
 	Warnings   []RoastWarning `json:"warnings"`
-	CreateTime time.Time      `json:"create_time"`
+	CreateTime time.Time      `json:"createTime"`
 }
 
 // AddError adds an error to the RoastResult.

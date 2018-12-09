@@ -86,7 +86,7 @@ interface RoastResult {
   language: string
   errors: Array<RoastError>
   warnings: Array<RoastWarning>
-  create_time: string // TODO: Fix camelCase in backend.
+  createTime: string
 };
 
 class RoastMessageList implements ξ.ClassComponent {
