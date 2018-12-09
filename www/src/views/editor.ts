@@ -1,5 +1,7 @@
 import ξ from 'mithril';
 
+import {EditorModel} from '../models/editor';
+
 declare global {
   interface Window {
     MonacoEnvironment: any;
@@ -61,10 +63,7 @@ border-radius: 0;\
  * Editor component wraps a Monaco Editor.
  */
 export default class Editor implements ClassComponent {
-  ready: boolean = false;
-  minimap: boolean = false;
   editor: monaco.editor.IStandaloneEditor;
-  language: string = 'python';
 
   /**
    * Loads and adds a Monaco Editor to the empty div#editor created by view.
@@ -72,24 +71,42 @@ export default class Editor implements ClassComponent {
    */
   oncreate(vnode: ξ.CVnodeDOM) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
-      this.ready = true;
-      ξ.redraw();
-
-      this.editor = monaco.editor.create(vnode.dom as HTMLElement, {
-        value: `\
+      EditorModel.setCode(`\
 """
 Roaster roasts your code with static code analysis, for free!
 """
 def welcome(ξ):
-    print('Please write your fabulous code here!')`,
-        language: this.language,
+    print('Please write your fabulous code here!')
+`);
+
+      EditorModel.createModel();
+      EditorModel.setLanguage('python3');
+
+      this.editor = monaco.editor.create(vnode.dom as HTMLElement, {
+        value: EditorModel.getCode(),
         minimap: {
-          enabled: this.minimap,
+          enabled: false,
         },
+        language: 'python',
         scrollBeyondLastLine: false, // Display scrollbar only on overflow.
+        // TODO: For some reason the language isn't set correctly.
+        //       In the mean time the language is hardcoded above.
+        //        - Probably because the local `monaco` parameter should be used
+        //          instead of the global `monaco` that is used in the model (?)
+        // model: EditorModel.getModel(),
       });
 
+      // Update the EditorModel with the new code when the user writes in the
+      // editor.
+      this.editor.onDidChangeModelContent((_: Event) => {
+        EditorModel.setCode(this.editor.getValue());
+      });
+
+      // Update the size of the editor on resize events.
       window.addEventListener('resize', () => this.editor.layout());
+
+      EditorModel.setReady();
+      ξ.redraw();
     });
   };
 
@@ -99,7 +116,7 @@ def welcome(ξ):
    * @return {CVnode}
    */
   view(vnode: ξ.CVnode) {
-    return this.ready ?
+    return EditorModel.ready ?
           ξ('#editor', {style: fillAreaStyle})
           :
           ξ('.ui.segment', {style: fillAreaStyle},

@@ -17,7 +17,7 @@ create table if not exists "user"
     check (char_length(email) < 255)
 );
 
-create unique index username_user_idx on "user" (lower(username));
+create unique index if not exists username_user_idx on "user" (lower(username));
 
 create table if not exists "roast"
 (
