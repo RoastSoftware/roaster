@@ -51,7 +51,7 @@ var result = model.RoastResult{
 }
 
 func TestCacheSimpleGetAndSet(t *testing.T) {
-	c := cache.New(1*time.Minute, 1*time.Second)
+	c := cache.New(1*time.Hour, 1*time.Hour)
 
 	r, ok := c.Get(code)
 	assert.Equal(t, false, ok)
@@ -60,6 +60,18 @@ func TestCacheSimpleGetAndSet(t *testing.T) {
 	r, ok = c.Get(code)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, r, result)
+}
+
+func TestCacheCleanUp(t *testing.T) {
+	// Set a _very_ low cache retention and clean up interval.
+	c := cache.New(10*time.Millisecond, 1*time.Millisecond)
+	c.Set(code, result)
+
+	// Allow the clean routine to remove the object.
+	time.Sleep(15 * time.Millisecond)
+
+	_, ok := c.Get(code)
+	assert.Equal(t, false, ok) // Expect no object in the cache.
 }
 
 func BenchmarkCacheGet(b *testing.B) {
