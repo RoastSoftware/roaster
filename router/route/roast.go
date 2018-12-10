@@ -25,10 +25,8 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 
-	username, ok := s.Values["username"].(string)
-	if !ok || username == "" {
-		return http.StatusUnauthorized, nil
-	}
+	// Empty user is handled as an anonymous user (not logged in).
+	username, _ := s.Values["username"].(string)
 
 	err = json.NewDecoder(r.Body).Decode(&in)
 	if err != nil {
@@ -47,9 +45,11 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusBadRequest, err
 	}
 
-	err = model.PutRoast(roast)
-	if err != nil {
-		return http.StatusInternalServerError, err
+	if username != "" {
+		err = model.PutRoast(roast)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
 	}
 
 	err = json.NewEncoder(w).Encode(roast)

@@ -74,9 +74,8 @@ func retrieveAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code.Name() == "foreign_key_violation" {
 			return http.StatusNotFound, nil
-		} else {
-			return http.StatusInternalServerError, err
 		}
+		return http.StatusInternalServerError, err
 	}
 	_, err = w.Write(avatar.Avatar)
 	if err != nil {
