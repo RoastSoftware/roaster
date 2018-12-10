@@ -21,13 +21,13 @@ type Avatar struct {
 // PutAvatar adds a avatar to a user in the database.
 func PutAvatar(avatar Avatar) (err error) {
 	_, err = database.Exec(`
-        INSERT INTO "avatar"
+        INSERT INTO "roaster"."avatar"
         (username, avatar)
         VALUES
         (TRIM($1), $2)
         ON CONFLICT
         (username)
-        DO UPDATE SET 
+        DO UPDATE SET
         avatar = EXCLUDED.avatar
     `, avatar.Username, avatar.Avatar)
 	return
@@ -70,7 +70,7 @@ func GetAvatar(username string) (avatar Avatar, err error) {
 func getAvatar(username string) (avatar Avatar, err error) {
 	err = database.QueryRow(`
         SELECT username, avatar
-        FROM "avatar"
+        FROM "roaster"."avatar"
         WHERE username=TRIM($1)
         `, username).Scan(&avatar.Username, &avatar.Avatar)
 	return

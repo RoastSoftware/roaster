@@ -108,7 +108,7 @@ func PutUser(user User, password []byte) (err error) {
 	}
 
 	_, err = database.Exec(`
-		INSERT INTO "user"
+		INSERT INTO "roaster"."user"
 		(username, email, fullname, create_time, hash)
 		VALUES
 		(TRIM($1), LOWER(TRIM($2)), $3, $4, $5)
@@ -134,7 +134,7 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 
 	err := database.QueryRow(`
 		SELECT username, email, fullname, hash
-		FROM "user"
+		FROM "roaster"."user"
 		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname, &hash)
 	if err != nil {
@@ -155,7 +155,7 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 func GetUser(identifier string) (user User, err error) {
 	err = database.QueryRow(`
 		SELECT username, email, fullname
-		FROM "user"
+		FROM "roaster"."user"
 		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
 
