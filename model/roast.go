@@ -43,7 +43,7 @@ type RoastResult struct {
 	Language   string         `json:"language"`
 	Errors     []RoastError   `json:"errors"`
 	Warnings   []RoastWarning `json:"warnings"`
-	CreateTime time.Time      `json:"create_time"`
+	CreateTime time.Time      `json:"createTime"`
 }
 
 // AddError adds an error to the RoastResult.
@@ -129,7 +129,7 @@ func PutRoast(roast *RoastResult) (err error) {
 
 	var roastID int
 	err = tx.QueryRow(`
-		INSERT INTO "roast"
+		INSERT INTO "roaster"."roast"
 		(username, code, score, language, create_time)
 		VALUES
 		(TRIM($1), $2, $3, $4, $5)
@@ -145,7 +145,7 @@ func PutRoast(roast *RoastResult) (err error) {
 	}
 
 	errorInsertStmt, err := tx.Prepare(`
-		INSERT INTO "error"
+		INSERT INTO "roaster"."error"
 		(id, row, "column", engine, name, description)
 		VALUES
 		($1, $2, $3, $4, $5, $6)
@@ -156,7 +156,7 @@ func PutRoast(roast *RoastResult) (err error) {
 	defer errorInsertStmt.Close()
 
 	roastHasErrorsInsertStmt, err := tx.Prepare(`
-		INSERT INTO "roast_has_errors"
+		INSERT INTO "roaster"."roast_has_errors"
 		(roast, error)
 		VALUES
 		($1, $2)`)
@@ -184,7 +184,7 @@ func PutRoast(roast *RoastResult) (err error) {
 	}
 
 	warningInsertStmt, err := tx.Prepare(`
-		INSERT INTO "warning"
+		INSERT INTO "roaster"."warning"
 		(id, row, "column", engine, name, description)
 		VALUES
 		($1, $2, $3, $4, $5, $6)
@@ -195,7 +195,7 @@ func PutRoast(roast *RoastResult) (err error) {
 	defer warningInsertStmt.Close()
 
 	roastHasWarningsInsertStmt, err := tx.Prepare(`
-		INSERT INTO "roast_has_warnings"
+		INSERT INTO "roaster"."roast_has_warnings"
 		(roast, warning)
 		VALUES
 		($1, $2)`)

@@ -6,7 +6,9 @@ import (
 	"log"
 	"os/exec"
 	"strings"
+	"time"
 
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze/cache"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/satori/go.uuid"
 )
@@ -18,6 +20,7 @@ const (
 
 var domainUUID = uuid.Must(
 	uuid.FromString("badefdd6-8997-425d-9d9e-ae31a01daf0c"))
+var flake8Cache = cache.New(30*time.Minute, 5*time.Minute)
 
 type flake8Message struct {
 	Code         string `json:"code"`
@@ -65,6 +68,12 @@ func (f flake8Result) toRoast(username string, code string) (roast *model.RoastR
 
 // WithFlake8 statically analyzes the code with Flake8 and parses the result.
 func WithFlake8(username, code string) (result *model.RoastResult, err error) {
+	if r, ok := flake8Cache.Get(code); ok {
+		if result, ok := r.(model.RoastResult); ok {
+			return &result, err
+		}
+	}
+
 	var r flake8Result
 
 	cmd := exec.Command("python3", "-m",
@@ -94,5 +103,8 @@ func WithFlake8(username, code string) (result *model.RoastResult, err error) {
 		return
 	}
 
-	return r.toRoast(username, code), nil
+	result = r.toRoast(username, code)
+	flake8Cache.Set(code, *result)
+
+	return
 }
