@@ -1,6 +1,7 @@
 module github.com/LuleaUniversityOfTechnology/2018-project-roaster
 
 require (
+	github.com/cespare/xxhash v1.1.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/garyburd/redigo v1.6.0 // indirect
 	github.com/gorilla/csrf v1.5.1

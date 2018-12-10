@@ -9,12 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newUUID(b []uint8) uuid.UUID {
-	return uuid.Must(uuid.FromBytes(b))
-}
-
-func TestWithFlake8(t *testing.T) {
-	code := `
+const code = `
 def test(ξ):
     ξ is None 
     thisfunctiondoesnotexist("Expect an error.")
@@ -27,6 +22,11 @@ def too_complex():
     b()
 `
 
+func newUUID(b []uint8) uuid.UUID {
+	return uuid.Must(uuid.FromBytes(b))
+}
+
+func TestWithFlake8(t *testing.T) {
 	result, err := analyze.WithFlake8("bot", code)
 	if err != nil {
 		t.Error(err)
@@ -98,4 +98,13 @@ def too_complex():
 
 	assert.Equal(t, "bot", result.Username)
 	assert.Equal(t, uint(4), result.Score)
+}
+
+func BenchmarkWithFlake8(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		_, err := analyze.WithFlake8("bot", code)
+		if err != nil {
+			b.Error(err)
+		}
+	}
 }
