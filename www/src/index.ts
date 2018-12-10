@@ -5,10 +5,10 @@ import register from './views/register';
 import profile from './views/profile';
 import statistics from './views/statistics';
 import login from './views/login';
-import user from './views/user';
+import userView from './views/user';
 
 import Auth from './services/auth';
-import {UserModel} from './models/user';
+import {UserModel, User} from './models/user';
 
 function redirectMatcher(
     view: ξ.ClassComponent,
@@ -48,7 +48,7 @@ class Roaster {
       '/login': {onmatch: redirectMatcher(login, (): boolean => {
         return !UserModel.isLoggedIn();
       }, '/')},
-        '/user/:username': user,
+        '/user/:username': userView,
     });
   };
 }
