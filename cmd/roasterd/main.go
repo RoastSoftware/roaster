@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/controller"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
+	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/router"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/csrf"
 )
@@ -128,10 +128,9 @@ func main() {
 	// Do not require secure verification for CSRF middleware if in
 	// dev-mode, such as verifying that the connection goes over HTTPS.
 	csrfOpt := csrf.Secure(!context.devMode)
-	controller := controller.New([]byte(context.csrfKey), csrfOpt)
 
 	server := &http.Server{
-		Handler:      controller,
+		Handler:      router.New([]byte(context.csrfKey), csrfOpt),
 		Addr:         context.address,
 		WriteTimeout: context.writeTimeout * time.Second,
 		ReadTimeout:  context.readTimeout * time.Second,

@@ -1,9 +1,9 @@
-// Package session implement the session API endpoint.
-package session
+// Package route implements the session API endpoint.
+package route
 
 import (
 	"encoding/json"
-	"log"
+	"errors"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func createSession(w http.ResponseWriter, r *http.Request) {
+func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	u := struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -23,28 +23,23 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		http.Error(w, "cannot decode data as user", http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, err
 	}
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Password == "" {
-		http.Error(w, "missing fields", http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, errors.New("missing fields")
 	}
 
 	user, ok := model.AuthenticateUser(u.Username, []byte(u.Password))
 	if !ok {
-		http.Error(w, "", http.StatusUnauthorized)
-		return
+		return http.StatusUnauthorized, nil
 	}
 
 	// TODO: Implement auth middleware instead.
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return http.StatusInternalServerError, err
 	}
 	s.Values["username"] = u.Username
 
@@ -52,60 +47,59 @@ func createSession(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return http.StatusInternalServerError, err
 	}
+
+	return http.StatusOK, nil
 }
 
-func retrieveSession(w http.ResponseWriter, r *http.Request) {
+func retrieveSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return http.StatusInternalServerError, err
 	}
 
 	username, ok := s.Values["username"].(string)
 	if !ok || username == "" {
-		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
-		return
+		return http.StatusNoContent, nil
 	}
 
 	user, err := model.GetUser(username)
 	if err != nil {
-		log.Println(err)
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
+		return http.StatusBadRequest, err
 	}
 
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return http.StatusInternalServerError, err
 	}
+
+	return http.StatusOK, nil
 }
 
-func removeSession(w http.ResponseWriter, r *http.Request) {
+func removeSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "", http.StatusInternalServerError)
-		return
+		return http.StatusInternalServerError, err
 	}
 
 	session.Invalidate(r, w, s)
+
+	return http.StatusOK, nil
 }
 
-// Init adds the handlers for the Session [/session] endpoint.
-func Init(r *mux.Router) {
+// Session adds the handlers for the Session [/session] endpoint.
+func Session(r *mux.Router) {
 	// All handlers are required to use application/json as their
 	// Content-Type.
 	r.Use(middleware.EnforceContentType("application/json"))
 
 	// Authenticate for New Session (sign in) [POST]
-	r.HandleFunc("", createSession).Methods(http.MethodPost)
+	r.Handle("", handler(createSession)).Methods(http.MethodPost)
 
 	// Get Existing Authenticated Session [GET].
-	r.HandleFunc("", retrieveSession).Methods(http.MethodGet)
+	r.Handle("", handler(retrieveSession)).Methods(http.MethodGet)
 
 	// Remove Current Session (sign out) [DELETE]
-	r.HandleFunc("", removeSession).Methods(http.MethodDelete)
+	r.Handle("", handler(removeSession)).Methods(http.MethodDelete)
 }
