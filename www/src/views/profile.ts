@@ -33,42 +33,45 @@ export default class Profile implements ξ.ClassComponent {
     };
 
     getUserStat() {
-        console.log('getting user statistics');
-        // TODO: Network.request statistics
+      console.log('getting user statistics');
+      // TODO: Network.request statistics
     }
 
     view(vnode: ξ.CVnode) {
       return ξ(base,
-          ξ('.ui.main.text.container.two.column.stackable.grid[style=margin-top: 2em;]',
-              ξ('.ui.column', 
-                  ξ('input#upload[type=file][style=display: none;]',
-                      {onchange: this.upload}),
-                  ξ('img.ui.image.rounded.medium#picture[style=cursor: pointer;]',
-                      {src: '/user/' + UserModel.getUsername() + '/avatar',
-                          onclick: this.clickImg},
-                      'User profile picture.'),
-                  ξ('h2',
-                      UserModel.getFullname()),
-                  ξ('p',
-                      ξ('i.user.icon'),
-                      UserModel.getUsername()),
-                  ξ('p',
-                      ξ('i.mail.icon'),
-                      UserModel.getEmail()),
-              ),
-              ξ('.ui.column[minheight=10em]',
-                  ξ('canvas#chart-area', {
-                      oncreate: ({dom}) => {
-                          const ctx = (document.getElementById(
-                              'chart-area')as HTMLCanvasElement)
-                              .getContext('2d');
-                          new Chart(ctx, {
-                              type: 'doughnut',
-                              data: Model.dataDonut,
-                              options: Model.optionsDonut
-                          })
-                      }})
-              )
+          ξ('.ui.main.text.container.two.column.stackable.grid', {
+            style: 'margin-top: 2em;',
+          },
+          ξ('.ui.column',
+              ξ('input#upload[type=file][style=display: none;]',
+                  {onchange: this.upload}),
+              ξ('img.ui.image.rounded.medium#picture',
+                  {src: '/user/' + UserModel.getUsername() + '/avatar',
+                    onclick: this.clickImg,
+                    style: 'cursor: pointer;'},
+                  'User profile picture.'),
+              ξ('h2',
+                  UserModel.getFullname()),
+              ξ('p',
+                  ξ('i.user.icon'),
+                  UserModel.getUsername()),
+              ξ('p',
+                  ξ('i.mail.icon'),
+                  UserModel.getEmail()),
+          ),
+          ξ('.ui.column[minheight=10em]',
+              ξ('canvas#chart-area', {
+                oncreate: ({dom}) => {
+                  const ctx = (document.getElementById(
+                      'chart-area')as HTMLCanvasElement)
+                      .getContext('2d');
+                  new Chart(ctx, {
+                    type: 'doughnut',
+                    data: Model.dataDonut,
+                    options: Model.optionsDonut,
+                  });
+                }})
+          )
           )
       );
     }

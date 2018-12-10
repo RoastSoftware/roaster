@@ -13,9 +13,9 @@ export default {
                   syntactic errors, formatting that does not conform with the\
                   set code style etc. This information is then used to show\
                   you messages about where your code can improve and is also\
-                  the foundation for calculating your roast score.`),
-              ξ('h2', `Roast score`),
-              ξ('p', `The roast score is your way of showing your coding \
+                  the foundation for calculating your Roast® Score™.`),
+              ξ('h2', `Roast® Score™`),
+              ξ('p', `The Roast® Score™ is your way of showing your coding \
                   skill and progress to yourself and your friends!
                   It's a quality metric based on a formula, considering your\
                   warnings (low impact on score), \
@@ -27,15 +27,15 @@ export default {
               tracking. To analyze your first line, you will want to check \
                   that the correct version of python is selected to the bottom\
                   right of the right column in the editor view, otherwise you \
-                  will get in correct results.\
+                  will get incorrect results.\
                   Next, click the "ROAST ME" button! Now, if you ran our\
                   prefilled example snippet you should see one warning and\
                   one error in the result section of the editor view.\
                  `),
               ξ('h3', ` Congratulations, you've made your first tiny steps to\
-                  writing better python code!\ We hope that you will find joy\
-                  in using roast.software.`),
-              ξ('p', `// The roast team.`)
+                  writing better code!\ We hope that you will find joy\
+                  in using Roast® Inc.`),
+              ξ('p', `// Roast® Inc. Team.`)
 
           ),
       ),

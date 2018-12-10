@@ -51,18 +51,19 @@ export default class StatisticsModel {
     };
 
     static dataDonut = {
-        datasets: [{
-            borderColor: 'rgba(0, 0, 0, 0.0)',
-            backgroundColor: [
-                StatisticsModel.chartColors.yellow,
-                StatisticsModel.chartColors.cyan,
-                StatisticsModel.chartColors.green
-            ],            
-        data: [10, 20, 30]
-        }],
+      datasets: [{
+        borderColor: 'rgba(0, 0, 0, 0.0)',
+        backgroundColor: [
+          StatisticsModel.chartColors.yellow,
+          StatisticsModel.chartColors.cyan,
+          StatisticsModel.chartColors.green,
+        ],
+        data: [10, 20, 30],
+      }],
 
-        // These labels appear in the legend and in the tooltips when hovering different arcs
-        /* labels: [
+      // These labels appear in the legend and in the
+      // tooltips when hovering different arcs
+      /* labels: [
             'ERR',
             'WARN',
             'Blue'
@@ -71,14 +72,14 @@ export default class StatisticsModel {
 
 
     static optionsDonut = {
-        aspectRatio: 1,
-            title: {
-                display: true,
-                    text: 'ROAST SCORE',
-                    position: 'bottom',
-                    fontStyle: 'bold',
-                    fontSize: 16
-            }
+      aspectRatio: 1,
+      title: {
+        display: true,
+        text: 'ROAST SCORE',
+        position: 'bottom',
+        fontStyle: 'bold',
+        fontSize: 16,
+      },
     }
 
     static options = {
