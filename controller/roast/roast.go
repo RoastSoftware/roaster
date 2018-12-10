@@ -35,11 +35,9 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, internalServerErr, http.StatusInternalServerError)
 		return
 	}
-	username, ok := s.Values["username"].(string)
-	if !ok || username == "" {
-		http.Error(w, notAuthorizedErr, http.StatusUnauthorized)
-		return
-	}
+
+	// Empty user is handled as an anonymous user (not logged in).
+	username, _ := s.Values["username"].(string)
 
 	err = json.NewDecoder(r.Body).Decode(&in)
 	if err != nil {
@@ -63,17 +61,21 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = model.PutRoast(roast)
-	if err != nil {
-		// TODO: Implement better error handling.
-		log.Println(err)
-		http.Error(w, internalServerErr, http.StatusInternalServerError)
-		return
+	// If the user isn't anonymous, add the result to the database.
+	if username != "" {
+		err = model.PutRoast(roast)
+		if err != nil {
+			// TODO: Implement better error handling.
+			log.Println(err)
+			http.Error(w, internalServerErr, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	err = json.NewEncoder(w).Encode(roast)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err)
+		http.Error(w, internalServerErr, http.StatusInternalServerError)
 		return
 	}
 }
