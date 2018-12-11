@@ -3,7 +3,7 @@
 set -ev
 
 # Creating build folder
-mkdir -p build/www
+mkdir -p build/{www,doc}
 
 # Copying dependency lists
 cp requirements.freeze.txt build/
@@ -13,6 +13,9 @@ docker run --rm -v "$PWD/www":/usr/src/roaster -w /usr/src/roaster node /bin/bas
 
 # Build roasterd
 docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd golang:1.11 go build -o /usr/src/roaster/build/roasterd
+
+# Build API docs
+docker run --rm -v $PWD/doc/restapi:/doc quay.io/bukalapak/snowboard html -o index.html Roaster-REST-API.md && cp -r ./doc/restapi ./build/doc/
 
 # Current build folder content
 du -h -d1 build/*

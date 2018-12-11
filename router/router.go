@@ -33,8 +33,11 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 	// Avatar [/user/{username}/avatar].
 	route.Avatar(router.PathPrefix("/user/{username}/avatar").Subrouter())
 
+	// Documentation [/doc].
+	route.Static(router.PathPrefix("/doc/").Subrouter(), "/doc/", "./doc")
+
 	// Retrieve the roast.software SPA [GET].
-	route.Static(router.PathPrefix("/").Subrouter(), "www/dist")
+	route.Static(router.PathPrefix("/").Subrouter(), "/", "./www/dist")
 
 	// Redirect HTTP to HTTPS if X-Forward-Proto is set.
 	h = middleware.Redirect(router)
