@@ -4,12 +4,14 @@ package route
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
+	"github.com/willeponken/causerr"
 )
 
 func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -26,17 +28,18 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		return http.StatusBadRequest, err
+		return http.StatusBadRequest, causerr.New(err,
+			"Unable to decode request")
 	}
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Email == "" || u.Password == "" {
-		return http.StatusBadRequest, errors.New("missing fields")
+		return http.StatusBadRequest, causerr.New(nil, "Missing field in request")
 	}
 
 	err = model.PutUser(u.User, []byte(u.Password))
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	// TODO: Implement auth middleware instead.
@@ -47,7 +50,7 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	err = json.NewEncoder(w).Encode(u.User)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	return http.StatusOK, nil
@@ -80,18 +83,20 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
 	username := vars["username"]
 
 	if username == "" {
-		return http.StatusBadRequest,
-			errors.New("must provide username field")
+		return http.StatusBadRequest, causerr.New(
+			errors.New("must provide username field"),
+			"Missing username parameter in URI")
 	}
 
 	user, err := model.GetUser(username)
 	if err != nil {
-		return http.StatusNotFound, err
+		return http.StatusNotFound, causerr.New(err,
+			fmt.Sprintf("User: '%s' doesn't exist", username))
 	}
 
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	return http.StatusOK, nil

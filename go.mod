@@ -10,10 +10,11 @@ require (
 	github.com/gorilla/sessions v1.1.3
 	github.com/lib/pq v1.0.0
 	github.com/o1egl/govatar v0.0.0-20180413000757-b1a8b0be7dc1
+	github.com/onsi/gomega v1.4.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.2.2
+	github.com/willeponken/causerr v0.0.0-20181211110434-93d217bab74a
 	golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869
 	gopkg.in/boj/redistore.v1 v1.0.0-20160128113310-fc113767cd6b
-	gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 // indirect
 )

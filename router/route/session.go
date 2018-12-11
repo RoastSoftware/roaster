@@ -3,13 +3,14 @@ package route
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
+	"github.com/willeponken/causerr"
 )
 
 func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -23,23 +24,25 @@ func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		return http.StatusBadRequest, err
+		return http.StatusBadRequest, causerr.New(err, "")
 	}
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Password == "" {
-		return http.StatusBadRequest, errors.New("missing fields")
+		return http.StatusBadRequest, causerr.New(nil,
+			"Empty username or password")
 	}
 
 	user, ok := model.AuthenticateUser(u.Username, []byte(u.Password))
 	if !ok {
-		return http.StatusUnauthorized, nil
+		return http.StatusUnauthorized, causerr.New(nil,
+			"Invalid username or password")
 	}
 
 	// TODO: Implement auth middleware instead.
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 	s.Values["username"] = u.Username
 
@@ -47,7 +50,7 @@ func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	return http.StatusOK, nil
@@ -56,7 +59,7 @@ func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 func retrieveSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	username, ok := s.Values["username"].(string)
@@ -66,12 +69,13 @@ func retrieveSession(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	user, err := model.GetUser(username)
 	if err != nil {
-		return http.StatusBadRequest, err
+		return http.StatusBadRequest, causerr.New(err,
+			fmt.Sprintf("User: '%s' doesn't exist", username))
 	}
 
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	return http.StatusOK, nil
@@ -80,7 +84,7 @@ func retrieveSession(w http.ResponseWriter, r *http.Request) (int, error) {
 func removeSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	session.Invalidate(r, w, s)

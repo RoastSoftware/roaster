@@ -3,6 +3,7 @@ package route
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze"
@@ -10,6 +11,7 @@ import (
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
+	"github.com/willeponken/causerr"
 )
 
 type snippet struct {
@@ -22,7 +24,7 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	// Empty user is handled as an anonymous user (not logged in).
@@ -30,7 +32,8 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	err = json.NewDecoder(r.Body).Decode(&in)
 	if err != nil {
-		return http.StatusBadRequest, err
+		return http.StatusBadRequest,
+			causerr.New(err, "Invalid Roast data sent")
 	}
 
 	var roast *model.RoastResult
@@ -39,22 +42,24 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
 	case "python3":
 		roast, err = analyze.WithFlake8(username, in.Code)
 		if err != nil {
-			return http.StatusInternalServerError, err
+			return http.StatusInternalServerError, causerr.New(err, "")
 		}
 	default:
-		return http.StatusBadRequest, err
+		return http.StatusBadRequest,
+			causerr.New(err,
+				fmt.Sprintf("Language: '%s' is not supported", in.Language))
 	}
 
 	if username != "" {
 		err = model.PutRoast(roast)
 		if err != nil {
-			return http.StatusInternalServerError, err
+			return http.StatusInternalServerError, causerr.New(err, "")
 		}
 	}
 
 	err = json.NewEncoder(w).Encode(roast)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	return http.StatusOK, nil

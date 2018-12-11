@@ -3,6 +3,7 @@ package route
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime"
@@ -15,6 +16,7 @@ import (
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
 	"github.com/lib/pq"
+	"github.com/willeponken/causerr"
 )
 
 func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -22,17 +24,22 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
-		return http.StatusUnauthorized, nil
+		return http.StatusUnauthorized, causerr.New(
+			nil,
+			"Missing or unreadable cookie sent")
 	}
 
 	username, ok := s.Values["username"].(string)
 	if !ok || username == "" {
-		return http.StatusUnauthorized, errors.New("not authorized")
+		return http.StatusUnauthorized,
+			causerr.New(nil, "Unable to authenticate user")
 	}
 	mediaType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
-		return http.StatusBadRequest, err
+		return http.StatusBadRequest,
+			causerr.New(err, "Missing Content-Type header in request")
 	}
+
 	if strings.HasPrefix(mediaType, "multipart/") {
 		mr := multipart.NewReader(r.Body, params["boundary"])
 		for {
@@ -41,25 +48,32 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 				break
 			}
 			if err != nil {
-				return http.StatusBadRequest, err
+				return http.StatusBadRequest,
+					causerr.New(err, "Unable to read data in request")
 			}
 			a.Avatar, err = ioutil.ReadAll(p)
 			if err != nil {
-				return http.StatusBadRequest, err
+				return http.StatusBadRequest,
+					causerr.New(err, "Unable to read data in request")
 			}
 			a.Username = username
 			if len(a.Avatar) >= 10*1000*1000 {
 				return http.StatusRequestEntityTooLarge,
-					errors.New("too large file (greater than 10MB)")
+					causerr.New(
+						errors.New("too large file (greater than 10MB)"),
+						"Avatar picture must be less or equal to 10 MB")
 			}
 			err = model.PutAvatar(a)
 			if err != nil {
-				return http.StatusInternalServerError, err
+				return http.StatusInternalServerError,
+					causerr.New(err, "")
 			}
 		}
 	} else {
 		return http.StatusBadRequest,
-			errors.New("received wrong Content-Type, expected multipart/*")
+			causerr.New(
+				errors.New("received wrong Content-Type, expected multipart/*"),
+				"Invalid Content-Type, expected multipart/*")
 	}
 
 	return http.StatusOK, nil
@@ -73,13 +87,14 @@ func retrieveAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 	avatar, err := model.GetAvatar(u)
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code.Name() == "foreign_key_violation" {
-			return http.StatusNotFound, nil
+			return http.StatusNotFound,
+				causerr.New(nil, fmt.Sprintf("No avatar found for '%s'", u))
 		}
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 	_, err = w.Write(avatar.Avatar)
 	if err != nil {
-		return http.StatusInternalServerError, err
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	return http.StatusOK, nil
