@@ -77,6 +77,37 @@ Roaster roasts your code with static code analysis, for free!
 """
 def welcome(ξ):
     print('Please write your fabulous code here!')
+
+
+def too_complex():
+    """
+    Example of a too complex function!
+    """
+    def b(z, x, c, v, b, n, p, o, i, u, y, t):
+        if z == x:
+            pass
+        if x == c:
+            pass
+        if c == v:
+            pass
+        if b == n:
+            pass
+        if n == p:
+            pass
+        if p == o:
+            pass
+        if o == i:
+            pass
+        if i == u:
+            pass
+        if u == y:
+            pass
+        if y == t:
+            pass
+        if z == t:
+            pass
+
+    b(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 `);
 
       EditorModel.createModel();
@@ -103,6 +134,7 @@ def welcome(ξ):
       });
 
       // Update the size of the editor on resize events.
+      // Example of a too complex function!
       window.addEventListener('resize', () => this.editor.layout());
 
       EditorModel.setReady();
