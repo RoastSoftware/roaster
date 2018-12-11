@@ -134,7 +134,6 @@ def too_complex():
       });
 
       // Update the size of the editor on resize events.
-      // Example of a too complex function!
       window.addEventListener('resize', () => this.editor.layout());
 
       EditorModel.setReady();
