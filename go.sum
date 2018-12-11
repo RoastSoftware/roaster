@@ -43,8 +43,8 @@ github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 h1:qLC7fQah7D6K1
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
-github.com/willeponken/causerr v0.0.0-20181211110434-93d217bab74a h1:27FqOQOuS5sp8FLTWVtzzJiq3o9vHprcO9/3cmrbIdk=
-github.com/willeponken/causerr v0.0.0-20181211110434-93d217bab74a/go.mod h1:qvjzZOMeiJ7EsJvM7yNueTYTFz+TIKWKI1gZjWHYzOE=
+github.com/willeponken/causerr v0.0.0-20181211111524-d6ebaef15707 h1:MxoBL3/toZswsMLcnZS6erUsV1TYPD2VGi6cF/jEa2Y=
+github.com/willeponken/causerr v0.0.0-20181211111524-d6ebaef15707/go.mod h1:qvjzZOMeiJ7EsJvM7yNueTYTFz+TIKWKI1gZjWHYzOE=
 golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869 h1:kkXA53yGe04D0adEYJwEVQjeBppL01Exg+fnMjfUraU=
 golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869 h1:kkXA53yGe04D0adEYJwEVQjeBppL01Exg+fnMjfUraU=
 golang.org/x/crypto v0.0.0-20181112202954-3d3f9f413869/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
