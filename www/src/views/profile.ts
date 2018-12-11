@@ -2,6 +2,8 @@ import ξ from 'mithril';
 import base from './base';
 import {UserModel} from '../models/user';
 import Network from '../services/network';
+import Model from '../models/statistics';
+import Chart from 'chart.js';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: APIError;
@@ -9,6 +11,9 @@ export default class Profile implements ξ.ClassComponent {
 
     upload(e: Any) {
       const avatar = e.target.files[0];
+      if (avatar == undefined || avatar.length == 0) {
+        return;
+      }
       console.log('SUCCESS');
       const data = new FormData();
       data.append('file', avatar);
@@ -30,14 +35,23 @@ export default class Profile implements ξ.ClassComponent {
       document.getElementById('upload').click();
     };
 
+    getUserStat() {
+      console.log('getting user statistics');
+      // TODO: Network.request statistics
+    }
+
     view(vnode: ξ.CVnode) {
       return ξ(base,
-          ξ('.ui.main.text.container[style=margin-top: 2em;]',
+          ξ('.ui.main.text.container.two.column.stackable.grid', {
+            style: 'margin-top: 2em;',
+          },
+          ξ('.ui.column',
               ξ('input#upload[type=file][style=display: none;]',
                   {onchange: this.upload}),
-              ξ('img.ui.image.rounded.medium#picture[style=cursor: pointer;]',
+              ξ('img.ui.image.rounded.medium#picture',
                   {src: '/user/' + UserModel.getUsername() + '/avatar',
-                    onclick: this.clickImg},
+                    onclick: this.clickImg,
+                    style: 'cursor: pointer;'},
                   'User profile picture.'),
               ξ('h2',
                   UserModel.getFullname()),
@@ -46,7 +60,21 @@ export default class Profile implements ξ.ClassComponent {
                   UserModel.getUsername()),
               ξ('p',
                   ξ('i.mail.icon'),
-                  UserModel.getEmail())
+                  UserModel.getEmail()),
+          ),
+          ξ('.ui.column[minheight=10em]',
+              ξ('canvas#chart-area', {
+                oncreate: ({dom}) => {
+                  const ctx = (document.getElementById(
+                      'chart-area') as HTMLCanvasElement)
+                      .getContext('2d');
+                  new Chart(ctx, {
+                    type: 'doughnut',
+                    data: Model.dataDonut,
+                    options: Model.optionsDonut,
+                  });
+                }})
+          )
           )
       );
     }
