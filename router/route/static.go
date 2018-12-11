@@ -8,6 +8,8 @@ import (
 )
 
 // Static sets up a file server that serves files in a specified directory.
-func Static(router *mux.Router, dir string) {
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir(dir)))
+func Static(router *mux.Router, strip, dir string) {
+	router.PathPrefix("/").Handler(
+		http.StripPrefix(strip,
+			http.FileServer(http.Dir(dir))))
 }
