@@ -6,16 +6,19 @@ import Auth from '../services/auth';
 export default class Login implements ξ.ClassComponent {
   loginError: APIError;
 
-  authenticate(): Promise {
+  authenticate(): Promise<User> {
     if (UserModel.validLogin()) {
-      return Auth.login(UserModel.getUsername(), UserModel.getPassword())
+      return Auth.login<User>(UserModel.getUsername(), UserModel.getPassword())
           .then((user) => {
             UserModel.setLoggedIn(true);
             Object.assign(UserModel, user);
             ξ.route.set('/');
+
+            return user;
           })
           .catch((err: APIError) => {
             this.loginError = err;
+            return {} as User;
           });
     }
   };
