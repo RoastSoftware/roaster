@@ -11,6 +11,9 @@ export default class Profile implements ξ.ClassComponent {
 
     upload(e: Any) {
       const avatar = e.target.files[0];
+      if (avatar.length == 0) {
+        return;
+      }
       console.log('SUCCESS');
       const data = new FormData();
       data.append('file', avatar);
@@ -63,7 +66,7 @@ export default class Profile implements ξ.ClassComponent {
               ξ('canvas#chart-area', {
                 oncreate: ({dom}) => {
                   const ctx = (document.getElementById(
-                      'chart-area')as HTMLCanvasElement)
+                      'chart-area') as HTMLCanvasElement)
                       .getContext('2d');
                   new Chart(ctx, {
                     type: 'doughnut',

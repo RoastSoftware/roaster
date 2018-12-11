@@ -35,7 +35,7 @@ class UserProfile implements ξ.ClassComponent {
             ξ('canvas#chart-area', {
               oncreate: ({dom}) => {
                 const ctx = (document.getElementById(
-                    'chart-area')as HTMLCanvasElement)
+                    'chart-area') as HTMLCanvasElement)
                     .getContext('2d');
                 new Chart(ctx, {
                   type: 'doughnut',
@@ -64,7 +64,6 @@ export default class UserView implements ξ.ClassComponent {
           .then((user: User) => {
             this.user = user;
             this.ready = true;
-            console.log('the user objectsent: ' + this.user);
             ξ.redraw();
           });
     }
