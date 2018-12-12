@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -64,7 +63,6 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 			}
 			a, err := model.NewAvatar(avatar, username)
 			if err != nil {
-				log.Println(err)
 				return http.StatusUnsupportedMediaType,
 					causerr.New(err, "Supported image formats are jpeg, png, gif")
 			}

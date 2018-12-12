@@ -17,7 +17,7 @@ import (
 	"github.com/o1egl/govatar"
 )
 
-// NewAvater creates, converts and resizes the avatar, returns Avatar struct.
+// NewAvatar creates, converts and resizes the avatar, returns Avatar struct.
 func NewAvatar(raw []byte, username string) (a Avatar, err error) {
 	a.Username = username
 	decoded, err := decodeImage(raw)
