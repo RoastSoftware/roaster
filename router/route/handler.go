@@ -9,23 +9,57 @@ import (
 
 type handler func(w http.ResponseWriter, r *http.Request) (int, error)
 
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	code, err := h(w, r)
+type httpWriter struct {
+	http.ResponseWriter
+	headerWritten bool
+}
 
-	if code >= http.StatusBadRequest {
-		if err != nil {
-			log.Printf("handler error (%d: %s): %s\n",
+func (w *httpWriter) WriteHeader(status int) {
+	w.headerWritten = true
+	w.ResponseWriter.WriteHeader(status)
+}
+
+func (w *httpWriter) Write(b []byte) (int, error) {
+	w.headerWritten = true
+	return w.ResponseWriter.Write(b)
+}
+
+func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	hw := &httpWriter{ResponseWriter: w}
+
+	code, err := h(hw, r)
+
+	if err != nil {
+		switch {
+		case code >= http.StatusInternalServerError:
+			log.Printf(
+				"handler error (%d: %s): %+v\n",
+				code, http.StatusText(code), err)
+
+		case code >= http.StatusBadRequest:
+			log.Printf(
+				"handler error (%d: %s): %v\n",
 				code, http.StatusText(code), err)
 		}
 
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
+		hw.Header().Set("Content-Type", "application/json; charset=utf-8")
+		hw.Header().Set("X-Content-Type-Options", "nosniff")
 
-		w.WriteHeader(code)
+		// Must be run before json.NewEncoder as writing to the body
+		// automatically sets the header to 200 if it's not set yet.
+		if !hw.headerWritten {
+			hw.WriteHeader(code)
+		}
 
-		jsonErr := json.NewEncoder(w).Encode(err)
+		jsonErr := json.NewEncoder(hw).Encode(err)
 		if jsonErr != nil {
 			panic(err)
 		}
+
+		return
+	}
+
+	if !hw.headerWritten {
+		hw.WriteHeader(code)
 	}
 }

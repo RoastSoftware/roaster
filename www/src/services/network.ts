@@ -46,7 +46,6 @@ export default class Network {
       headers: {[xCsrfToken]: Network.nextCSRFToken},
       extract: Network.extractCSRFToken,
     }).then((result: T) => {
-      console.log(result);
       return result;
     });
   };
