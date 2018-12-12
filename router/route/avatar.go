@@ -81,9 +81,7 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 				"Invalid Content-Type, expected multipart/*")
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-
-	return -1, nil
+	return http.StatusNoContent, nil
 }
 
 func retrieveAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
