@@ -3,7 +3,6 @@ package analyze
 
 import (
 	"encoding/json"
-	"log"
 	"os/exec"
 	"strings"
 	"time"
@@ -17,6 +16,9 @@ const (
 	engineName   = "flake8"
 	languageName = "python3"
 )
+
+// ExecCommand allows for overwriting the exec.Command function.
+var ExecCommand = exec.Command
 
 var domainUUID = uuid.Must(
 	uuid.FromString("badefdd6-8997-425d-9d9e-ae31a01daf0c"))
@@ -56,8 +58,6 @@ func (f flake8Result) toRoast(username string, code string) (roast *model.RoastR
 				engineName,
 				message.Code,
 				message.Text)
-		default:
-			log.Printf("unhandled message code: %s", message.Code)
 		}
 	}
 
@@ -76,7 +76,7 @@ func WithFlake8(username, code string) (result *model.RoastResult, err error) {
 
 	var r flake8Result
 
-	cmd := exec.Command("python3", "-m",
+	cmd := ExecCommand("python3", "-m",
 		"flake8",
 		"--format=json",
 		"--max-complexity=10",
