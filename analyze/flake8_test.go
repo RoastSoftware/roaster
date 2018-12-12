@@ -1,6 +1,8 @@
 package analyze_test
 
 import (
+	"io"
+	"os/exec"
 	"testing"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze"
@@ -45,7 +47,62 @@ func newUUID(s string) uuid.UUID {
 	return uuid.Must(uuid.FromString(s))
 }
 
-func TestWithFlake8(t *testing.T) {
+func resetExecCommand() {
+	analyze.ExecCommand = exec.Command
+}
+
+func TestWithFlake8CmdStdoutPipeError(t *testing.T) {
+	analyze.ExecCommand = func(command string, args ...string) *exec.Cmd {
+		cmd := &exec.Cmd{}
+		cmd.Stdout = &io.PipeWriter{}
+		return cmd
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "exec: Stdout already set")
+}
+
+func TestWithFlake8CmdStart(t *testing.T) {
+	analyze.ExecCommand = func(_ string, args ...string) *exec.Cmd {
+		return exec.Command("", args...) // non-existing command
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "fork/exec : no such file or directory")
+}
+
+func TestWithFlake8CmdStdoutInvalidFormat(t *testing.T) {
+	analyze.ExecCommand = func(command string, args ...string) *exec.Cmd {
+		args[2] = "--format=none"
+		return exec.Command(command, args...)
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "invalid character 'o' in literal null (expecting 'u')")
+}
+
+func TestWithFlake8CmdErrorExitStatus(t *testing.T) {
+	analyze.ExecCommand = func(command string, args ...string) *exec.Cmd {
+		args = append(args[:5], args[6:]...) // remove `--exit-zero`
+		return exec.Command(command, args...)
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "exit status 1")
+}
+
+func TestWithFlake8HitCache(t *testing.T) {
+	first_result, _ := analyze.WithFlake8("bot", code)
+	second_result, _ := analyze.WithFlake8("bot", code)
+
+	assert.Equal(t, first_result, second_result)
+}
+
+func TestWithFlake8Simple(t *testing.T) {
 	result, err := analyze.WithFlake8("bot", code)
 	if err != nil {
 		t.Error(err)
