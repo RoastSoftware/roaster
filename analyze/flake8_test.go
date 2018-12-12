@@ -1,6 +1,8 @@
 package analyze_test
 
 import (
+	"io"
+	"os/exec"
 	"testing"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze"
@@ -11,22 +13,96 @@ import (
 
 const code = `
 def test(ξ):
-    ξ is None 
-    thisfunctiondoesnotexist("Expect an error.")
+    thisfunctiondoesnotexist("Expect an error.") 
 
 def too_complex():
-    def b():
-        def c():
+    def b(z, x, c, v, b, n, p, o, i, u, y, t):
+        if z == x:
             pass
-        c()
-    b()
+        if x == c:
+            pass
+        if c == v:
+            pass
+        if b == n:
+            pass
+        if n == p:
+            pass
+        if p == o:
+            pass
+        if o == i:
+            pass
+        if i == u:
+            pass
+        if u == y:
+            pass
+        if y == t:
+            pass
+        if z == t:
+            pass
+
+    b(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 `
 
-func newUUID(b []uint8) uuid.UUID {
-	return uuid.Must(uuid.FromBytes(b))
+func newUUID(s string) uuid.UUID {
+	return uuid.Must(uuid.FromString(s))
 }
 
-func TestWithFlake8(t *testing.T) {
+func resetExecCommand() {
+	analyze.ExecCommand = exec.Command
+}
+
+func TestWithFlake8CmdStdoutPipeError(t *testing.T) {
+	analyze.ExecCommand = func(command string, args ...string) *exec.Cmd {
+		cmd := &exec.Cmd{}
+		cmd.Stdout = &io.PipeWriter{}
+		return cmd
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "exec: Stdout already set")
+}
+
+func TestWithFlake8CmdStart(t *testing.T) {
+	analyze.ExecCommand = func(_ string, args ...string) *exec.Cmd {
+		return exec.Command("", args...) // non-existing command
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "fork/exec : no such file or directory")
+}
+
+func TestWithFlake8CmdStdoutInvalidFormat(t *testing.T) {
+	analyze.ExecCommand = func(command string, args ...string) *exec.Cmd {
+		args[2] = "--format=none"
+		return exec.Command(command, args...)
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "invalid character 'o' in literal null (expecting 'u')")
+}
+
+func TestWithFlake8CmdErrorExitStatus(t *testing.T) {
+	analyze.ExecCommand = func(command string, args ...string) *exec.Cmd {
+		args = append(args[:5], args[6:]...) // remove `--exit-zero`
+		return exec.Command(command, args...)
+	}
+	defer resetExecCommand()
+
+	_, err := analyze.WithFlake8("bot", code)
+	assert.EqualError(t, err, "exit status 1")
+}
+
+func TestWithFlake8HitCache(t *testing.T) {
+	first_result, _ := analyze.WithFlake8("bot", code)
+	second_result, _ := analyze.WithFlake8("bot", code)
+
+	assert.Equal(t, first_result, second_result)
+}
+
+func TestWithFlake8Simple(t *testing.T) {
 	result, err := analyze.WithFlake8("bot", code)
 	if err != nil {
 		t.Error(err)
@@ -35,9 +111,9 @@ func TestWithFlake8(t *testing.T) {
 	errorTests := []model.RoastError{
 		{
 			RoastMessage: model.RoastMessage{
-				Hash:        newUUID([]uint8{0x23, 0xc2, 0x48, 0x54, 0xd3, 0x6d, 0x59, 0xa1, 0x97, 0x9, 0x6a, 0x66, 0x49, 0xe0, 0x79, 0x3}),
-				Row:         0x4,
-				Column:      0x5,
+				Hash:        newUUID("23c24854-d36d-59a1-9709-6a6649e07903"),
+				Row:         3,
+				Column:      5,
 				Engine:      "flake8",
 				Name:        "F821",
 				Description: "undefined name 'thisfunctiondoesnotexist'",
@@ -45,22 +121,12 @@ func TestWithFlake8(t *testing.T) {
 		},
 		{
 			RoastMessage: model.RoastMessage{
-				Hash:        newUUID([]uint8{0x7f, 0x28, 0xcf, 0x1f, 0x79, 0x2, 0x53, 0x5a, 0xbf, 0xe, 0x13, 0xde, 0x24, 0x66, 0xe7, 0x1b}),
-				Row:         0x6,
-				Column:      0x1,
+				Hash:        newUUID("7f28cf1f-7902-535a-bf0e-13de2466e71b"),
+				Row:         5,
+				Column:      1,
 				Engine:      "flake8",
 				Name:        "E302",
 				Description: "expected 2 blank lines, found 1",
-			},
-		},
-		{
-			RoastMessage: model.RoastMessage{
-				Hash:        newUUID([]uint8{0x72, 0xd0, 0xc6, 0xd0, 0xe4, 0x73, 0x50, 0xd0, 0x93, 0x2a, 0xb3, 0x75, 0xc9, 0x8e, 0xd4, 0x5c}),
-				Row:         0x3,
-				Column:      0xe,
-				Engine:      "flake8",
-				Name:        "W291",
-				Description: "trailing whitespace",
 			},
 		},
 	}
@@ -68,9 +134,9 @@ func TestWithFlake8(t *testing.T) {
 	warningTests := []model.RoastWarning{
 		{
 			RoastMessage: model.RoastMessage{
-				Hash:        newUUID([]uint8{0x72, 0xd0, 0xc6, 0xd0, 0xe4, 0x73, 0x50, 0xd0, 0x93, 0x2a, 0xb3, 0x75, 0xc9, 0x8e, 0xd4, 0x5c}),
-				Row:         0x3,
-				Column:      0xe,
+				Hash:        newUUID("72d0c6d0-e473-50d0-932a-b375c98ed45c"),
+				Row:         3,
+				Column:      49,
 				Engine:      "flake8",
 				Name:        "W291",
 				Description: "trailing whitespace",
@@ -78,26 +144,26 @@ func TestWithFlake8(t *testing.T) {
 		},
 		{
 			RoastMessage: model.RoastMessage{
-				Hash:        newUUID([]uint8{0xcd, 0xb7, 0xea, 0x70, 0xa7, 0x5d, 0x55, 0x8, 0x80, 0x56, 0xb2, 0x66, 0x92, 0x9e, 0xf8, 0x8}),
-				Row:         0x6,
-				Column:      0x1,
+				Hash:        newUUID("cdb7ea70-a75d-5508-8056-b266929ef808"),
+				Row:         5,
+				Column:      1,
 				Engine:      "flake8",
 				Name:        "C901",
-				Description: "'too_complex' is too complex (3)",
+				Description: "'too_complex' is too complex (13)",
 			},
 		},
 	}
 
-	for i, message := range result.Errors {
-		assert.Exactly(t, errorTests[i], message)
+	for i, expected := range errorTests {
+		assert.Exactly(t, expected, result.Errors[i])
 	}
 
-	for i, message := range result.Warnings {
-		assert.Exactly(t, warningTests[i], message)
+	for i, expected := range warningTests {
+		assert.Exactly(t, expected, result.Warnings[i])
 	}
 
 	assert.Equal(t, "bot", result.Username)
-	assert.Equal(t, uint(4), result.Score)
+	assert.Equal(t, uint(10), result.Score)
 }
 
 func BenchmarkWithFlake8(b *testing.B) {

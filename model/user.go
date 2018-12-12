@@ -3,10 +3,6 @@ package model
 
 import (
 	"crypto/sha512"
-	"database/sql"
-	"errors"
-	"fmt"
-	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -158,16 +154,5 @@ func GetUser(identifier string) (user User, err error) {
 		FROM "roaster"."user"
 		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
-
-	if err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			err = fmt.Errorf(`user: "%s" does not exist`, identifier)
-		default:
-			log.Println(err)
-			err = errors.New("failed to execute your request")
-		}
-	}
-
 	return
 }

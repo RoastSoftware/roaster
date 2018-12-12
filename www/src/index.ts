@@ -25,35 +25,44 @@ class Roaster {
 
   constructor(private body: HTMLBodyElement) {};
 
-  start() {
-    Auth.resume<User>().then((user) => {
+  async resumeSession() {
+    try {
+      const user: User = await Auth.resume<User>();
       if (user) {
         Object.assign(UserModel, user);
         UserModel.setLoggedIn(true);
-      } else {
-        UserModel.setLoggedIn(false);
+
+        return;
       }
-    }).then(() => {
-      ξ.route(document.body, '/', {
-        '/': home,
-        '/about': about,
-        '/statistics': statistics,
-        '/profile': {onmatch: redirectMatcher(profile, (): boolean => {
-          return UserModel.isLoggedIn();
-        }, '/')},
-        '/register': {onmatch: redirectMatcher(register, (): boolean => {
+    } catch (e) {
+      console.log('Unhandled response: ' + e);
+    }
+
+    UserModel.setLoggedIn(false);
+  }
+
+  async start() {
+    await this.resumeSession();
+
+    ξ.route(document.body, '/', {
+      '/': home,
+      '/about': about,
+      '/statistics': statistics,
+      '/profile': {onmatch: redirectMatcher(profile, (): boolean => {
+        return UserModel.isLoggedIn();
+      }, '/')},
+      '/register': {onmatch: redirectMatcher(register, (): boolean => {
+        return !UserModel.isLoggedIn();
+      }, '/')},
+      '/login': {
+        onmatch: redirectMatcher(login, (): boolean => {
           return !UserModel.isLoggedIn();
         }, '/')},
-        '/login': {
-          onmatch: redirectMatcher(login, (): boolean => {
-            return !UserModel.isLoggedIn();
-          }, '/')},
-        '/user/:username': {
-          onmatch: redirectMatcher(user, (args: any[]): boolean => {
-            return args[0].username != UserModel.getUsername();
-          }, '/profile'),
-        },
-      });
+      '/user/:username': {
+        onmatch: redirectMatcher(user, (args: any[]): boolean => {
+          return args[0].username != UserModel.getUsername();
+        }, '/profile'),
+      },
     });
   };
 }
