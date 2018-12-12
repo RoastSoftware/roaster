@@ -69,10 +69,12 @@ func resumeSession(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	user, err := model.GetUser(username)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		switch err {
+		case sql.ErrNoRows:
 			return http.StatusNoContent, nil
+		default:
+			return http.StatusInternalServerError, causerr.New(err, "")
 		}
-		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	err = json.NewEncoder(w).Encode(user)

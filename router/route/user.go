@@ -2,6 +2,7 @@
 package route
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -90,8 +91,13 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	user, err := model.GetUser(username)
 	if err != nil {
-		return http.StatusNotFound, causerr.New(err,
-			fmt.Sprintf("User: '%s' doesn't exist", username))
+		switch err {
+		case sql.ErrNoRows:
+			return http.StatusNotFound, causerr.New(err,
+				fmt.Sprintf("User: '%s' doesn't exist", username))
+		default:
+			return http.StatusInternalServerError, causerr.New(err, "")
+		}
 	}
 
 	err = json.NewEncoder(w).Encode(user)
