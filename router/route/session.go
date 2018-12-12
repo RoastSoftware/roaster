@@ -2,8 +2,8 @@
 package route
 
 import (
+	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -56,7 +56,7 @@ func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	return http.StatusOK, nil
 }
 
-func retrieveSession(w http.ResponseWriter, r *http.Request) (int, error) {
+func resumeSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
@@ -69,8 +69,10 @@ func retrieveSession(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	user, err := model.GetUser(username)
 	if err != nil {
-		return http.StatusBadRequest, causerr.New(err,
-			fmt.Sprintf("User: '%s' doesn't exist", username))
+		if err == sql.ErrNoRows {
+			return http.StatusNoContent, nil
+		}
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	err = json.NewEncoder(w).Encode(user)
@@ -102,7 +104,7 @@ func Session(r *mux.Router) {
 	r.Handle("", handler(createSession)).Methods(http.MethodPost)
 
 	// Get Existing Authenticated Session [GET].
-	r.Handle("", handler(retrieveSession)).Methods(http.MethodGet)
+	r.Handle("", handler(resumeSession)).Methods(http.MethodGet)
 
 	// Remove Current Session (sign out) [DELETE]
 	r.Handle("", handler(removeSession)).Methods(http.MethodDelete)
