@@ -5,16 +5,17 @@ import register from './views/register';
 import profile from './views/profile';
 import statistics from './views/statistics';
 import login from './views/login';
+import user from './views/user';
 
 import Auth from './services/auth';
 import {UserModel} from './models/user';
 
 function redirectMatcher(
     view: ξ.ClassComponent,
-    policy: () => boolean,
+    policy: (args: any[]) => boolean,
     redirect: string): () => ξ.ClassComponent {
-  return () => {
-    if (!policy()) ξ.route.set(redirect);
+  return (...args: any[]) => {
+    if (!policy(args)) ξ.route.set(redirect);
     else return view;
   };
 };
@@ -22,7 +23,9 @@ function redirectMatcher(
 class Roaster {
   private body: HTMLBodyElement;
 
-  constructor(private body: HTMLBodyElement) {
+  constructor(private body: HTMLBodyElement) {};
+
+  start() {
     Auth.resume<User>().then((user) => {
       if (user) {
         Object.assign(UserModel, user);
@@ -30,23 +33,27 @@ class Roaster {
       } else {
         UserModel.setLoggedIn(false);
       }
-    });
-  };
-
-  start() {
-    ξ.route(document.body, '/', {
-      '/': home,
-      '/about': about,
-      '/statistics': statistics,
-      '/profile': {onmatch: redirectMatcher(profile, (): boolean => {
-        return UserModel.isLoggedIn();
-      }, '/')},
-      '/register': {onmatch: redirectMatcher(register, (): boolean => {
-        return !UserModel.isLoggedIn();
-      }, '/')},
-      '/login': {onmatch: redirectMatcher(login, (): boolean => {
-        return !UserModel.isLoggedIn();
-      }, '/')},
+    }).then(() => {
+      ξ.route(document.body, '/', {
+        '/': home,
+        '/about': about,
+        '/statistics': statistics,
+        '/profile': {onmatch: redirectMatcher(profile, (): boolean => {
+          return UserModel.isLoggedIn();
+        }, '/')},
+        '/register': {onmatch: redirectMatcher(register, (): boolean => {
+          return !UserModel.isLoggedIn();
+        }, '/')},
+        '/login': {
+          onmatch: redirectMatcher(login, (): boolean => {
+            return !UserModel.isLoggedIn();
+          }, '/')},
+        '/user/:username': {
+          onmatch: redirectMatcher(user, (args: any[]): boolean => {
+            return args[0].username != UserModel.getUsername();
+          }, '/profile'),
+        },
+      });
     });
   };
 }

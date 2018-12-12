@@ -19,7 +19,7 @@ export default class StatisticsModel {
         labels: ['January', 'February', 'March', 'April',
           'May', 'June', 'July'],
         datasets: [{
-          label: 'My first dataset!',
+          label: 'Active users.',
           backgroundColor: StatisticsModel.chartColors.magenta,
           borderColor: StatisticsModel.chartColors.magenta,
           data: [
@@ -33,7 +33,7 @@ export default class StatisticsModel {
           ],
           fill: false,
         }, {
-          label: 'My first dataset!',
+          label: 'Lines analyzed.',
           backgroundColor: StatisticsModel.chartColors.blue,
           borderColor: StatisticsModel.chartColors.blue,
           data: [
@@ -50,6 +50,37 @@ export default class StatisticsModel {
       },
     };
 
+    static dataDonut = {
+      datasets: [{
+        borderColor: 'rgba(0, 0, 0, 0.0)',
+        backgroundColor: [
+          StatisticsModel.chartColors.yellow,
+          StatisticsModel.chartColors.cyan,
+          StatisticsModel.chartColors.green,
+        ],
+        data: [10, 20, 30],
+      }],
+
+      // These labels appear in the legend and in the
+      // tooltips when hovering different arcs
+      /* labels: [
+            'ERR',
+            'WARN',
+            'Blue'
+        ] */
+    };
+
+
+    static optionsDonut = {
+      aspectRatio: 1,
+      title: {
+        display: true,
+        text: 'ROAST SCORE',
+        position: 'bottom',
+        fontStyle: 'bold',
+        fontSize: 16,
+      },
+    }
 
     static options = {
       responsive: true,

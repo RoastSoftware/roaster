@@ -6,11 +6,25 @@ import (
 	"database/sql"
 	"image"
 	"image/png"
+    "image/gif"
+    "image/jpeg"
 	"math/rand"
 	"time"
+    "net/http"
 
 	"github.com/o1egl/govatar"
+    "github.com/disintegration/imaging"
 )
+
+func NewAvatar(raw []byte, username string) (a Avatar, err error){
+    a.Username = username
+    decoded, err := decodeImage(raw)
+    if err != nil {
+        return
+    }
+    a.Avatar, err = encodeToPNG(decoded)
+    return
+}
 
 // Avatar holds a avatar.
 type Avatar struct {
@@ -41,6 +55,25 @@ func encodeToPNG(img image.Image) (raw []byte, err error) {
 	return
 }
 
+func decodeImage(raw []byte) (img image.Image, err error) {
+    format := http.DetectContentType(raw)
+    reader:= bytes.NewReader(raw)
+
+    switch format {
+    case "image/gif":
+        img, err = gif.Decode(reader)
+    case "image/jpeg":
+        img, err = jpeg.Decode(reader)
+    case "image/png":
+        img, err = png.Decode(reader)
+    }
+    if err != nil {
+        return
+    }
+
+    img = imaging.Fill(img, 400, 400, imaging.Center, imaging.Lanczos)
+    return
+}
 // GetAvatar return a avatar by their username.
 // Note: Username will be trimmed for whitespace before quering the database.
 func GetAvatar(username string) (avatar Avatar, err error) {
