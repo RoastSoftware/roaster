@@ -44,7 +44,7 @@ func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
-	s.Values["username"] = u.Username
+	s.Values["username"] = user.Username
 
 	session.Save(r, w, s)
 

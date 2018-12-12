@@ -4,13 +4,29 @@ package model
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	"image"
+	"image/gif"
+	"image/jpeg"
 	"image/png"
 	"math/rand"
+	"net/http"
 	"time"
 
+	"github.com/disintegration/imaging"
 	"github.com/o1egl/govatar"
 )
+
+// NewAvatar creates, converts and resizes the avatar, returns Avatar struct.
+func NewAvatar(raw []byte, username string) (a Avatar, err error) {
+	a.Username = username
+	decoded, err := decodeImage(raw)
+	if err != nil {
+		return
+	}
+	a.Avatar, err = encodeToPNG(decoded)
+	return
+}
 
 // Avatar holds a avatar.
 type Avatar struct {
@@ -38,6 +54,28 @@ func encodeToPNG(img image.Image) (raw []byte, err error) {
 	buf := new(bytes.Buffer)
 	err = png.Encode(buf, img)
 	raw = buf.Bytes()
+	return
+}
+
+func decodeImage(raw []byte) (img image.Image, err error) {
+	format := http.DetectContentType(raw)
+	reader := bytes.NewReader(raw)
+
+	switch format {
+	case "image/gif":
+		img, err = gif.Decode(reader)
+	case "image/jpeg":
+		img, err = jpeg.Decode(reader)
+	case "image/png":
+		img, err = png.Decode(reader)
+	default:
+		err = fmt.Errorf("unsupported format: '%s'", format)
+	}
+	if err != nil {
+		return
+	}
+
+	img = imaging.Fill(img, 400, 400, imaging.Center, imaging.Lanczos)
 	return
 }
 

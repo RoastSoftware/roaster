@@ -20,7 +20,6 @@ import (
 )
 
 func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
-	var a model.Avatar
 
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
@@ -51,17 +50,21 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 				return http.StatusBadRequest,
 					causerr.New(err, "Unable to read data in request")
 			}
-			a.Avatar, err = ioutil.ReadAll(p)
+			avatar, err := ioutil.ReadAll(p)
 			if err != nil {
 				return http.StatusBadRequest,
 					causerr.New(err, "Unable to read data in request")
 			}
-			a.Username = username
-			if len(a.Avatar) >= 10*1000*1000 {
+			if len(avatar) >= 10*1000*1000 {
 				return http.StatusRequestEntityTooLarge,
 					causerr.New(
 						errors.New("too large file (greater than 10MB)"),
 						"Avatar picture must be less or equal to 10 MB")
+			}
+			a, err := model.NewAvatar(avatar, username)
+			if err != nil {
+				return http.StatusUnsupportedMediaType,
+					causerr.New(err, "Supported image formats are jpeg, png, gif")
 			}
 			err = model.PutAvatar(a)
 			if err != nil {
@@ -76,7 +79,7 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 				"Invalid Content-Type, expected multipart/*")
 	}
 
-	return http.StatusOK, nil
+	return http.StatusNoContent, nil
 }
 
 func retrieveAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -107,6 +110,8 @@ func Avatar(s *mux.Router) {
 	// Create avatar for user [PUT].
 	s.Handle("", handler(createAvatar)).Methods(http.MethodPut)
 
+	// TODO: implement ability to set GET -
+	// content type to image instead of multipart
 	// Retrieve avatar for user [GET].
 	s.Handle("", handler(retrieveAvatar)).Methods(http.MethodGet)
 }
