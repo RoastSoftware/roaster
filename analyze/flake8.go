@@ -17,7 +17,7 @@ const (
 	languageName = "python3"
 )
 
-// Allow overwriting of the exec.Command function.
+// ExecCommand allows for overwriting the exec.Command function.
 var ExecCommand = exec.Command
 
 var domainUUID = uuid.Must(
