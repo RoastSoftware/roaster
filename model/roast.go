@@ -109,6 +109,53 @@ func NewRoastResult(username, language, code string) *RoastResult {
 	}
 }
 
+func GetRoast(id int) (roast *RoastResult, err error) {
+	err = database.QueryRow(`
+		SELECT username, score, language, create_time
+		FROM "roaster"."roast"
+		WHERE id=$1
+	`, id).Scan(&roast.Username, &roast.Score, &roast.Language, &roast.CreateTime)
+	if err != nil {
+		return
+	}
+
+	errorRows, err := database.Query(`
+		SELECT e.name, e.description
+		FROM "roaster"."roast_has_errors" rhe
+		INNER JOIN "roaster"."error" e
+			ON rhe.error = e.id
+		WHERE rhe.roast = $1
+	`, id)
+	if err != nil {
+		return
+	}
+
+	for errorRows.Next() {
+		msg := RoastError{}
+		err = errorRows.Scan(&msg.Hash, &msg.Row, &msg.Column, &msg.Engine, &msg.Name, &msg.Description)
+		roast.Errors = append(roast.Errors, msg)
+	}
+
+	warningRows, err := database.Query(`
+		SELECT w.name, w.description
+		FROM "roaster"."roast_has_warnings" rhw
+		INNER JOIN "roaster"."warning" w
+			ON rhw.warning = w.id
+		WHERE rhw.roast = $1
+	`, id)
+	if err != nil {
+		return
+	}
+
+	for warningRows.Next() {
+		msg := RoastWarning{}
+		err = warningRows.Scan(&msg.Hash, &msg.Row, &msg.Column, &msg.Engine, &msg.Name, &msg.Description)
+		roast.Warnings = append(roast.Warnings, msg)
+	}
+
+	return
+}
+
 // PutRoast adds a RoastResult to the database.
 func PutRoast(roast *RoastResult) (err error) {
 	tx, err := database.Begin()
