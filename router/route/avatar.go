@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime"
 	"mime/multipart"
 	"net/http"
 	"strings"
-    "log"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
@@ -51,7 +51,7 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 				return http.StatusBadRequest,
 					causerr.New(err, "Unable to read data in request")
 			}
-            avatar, err := ioutil.ReadAll(p)
+			avatar, err := ioutil.ReadAll(p)
 			if err != nil {
 				return http.StatusBadRequest,
 					causerr.New(err, "Unable to read data in request")
@@ -62,15 +62,14 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 						errors.New("too large file (greater than 10MB)"),
 						"Avatar picture must be less or equal to 10 MB")
 			}
-            a, err := model.NewAvatar(avatar, username)
-            if err != nil {
-                log.Println(err)
-                return http.StatusInternalServerError,
-                    causerr.New(err,"")
-            }
+			a, err := model.NewAvatar(avatar, username)
+			if err != nil {
+				log.Println(err)
+				return http.StatusUnsupportedMediaType,
+					causerr.New(err, "Supported image formats are jpeg, png, gif")
+			}
 			err = model.PutAvatar(a)
 			if err != nil {
-                    log.Println(username)
 				return http.StatusInternalServerError,
 					causerr.New(err, "")
 			}
@@ -82,7 +81,7 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 				"Invalid Content-Type, expected multipart/*")
 	}
 
-    w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusNoContent)
 
 	return -1, nil
 }
@@ -115,8 +114,8 @@ func Avatar(s *mux.Router) {
 	// Create avatar for user [PUT].
 	s.Handle("", handler(createAvatar)).Methods(http.MethodPut)
 
-    // TODO: implement ability to set GET - 
-    // content type to image instead of multipart
+	// TODO: implement ability to set GET -
+	// content type to image instead of multipart
 	// Retrieve avatar for user [GET].
 	s.Handle("", handler(retrieveAvatar)).Methods(http.MethodGet)
 }

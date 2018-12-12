@@ -10,7 +10,7 @@ import (
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze/cache"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 const (
