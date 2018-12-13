@@ -16,11 +16,11 @@ export default class Network {
     Network.nextCSRFToken = token;
 
     if (xhr.responseText.length > 0
-      && xhr.getResponseHeader(contentType) == 'application/json') {
+      && xhr.getResponseHeader(contentType).includes('application/json')) {
       return JSON.parse(xhr.responseText);
     }
 
-    return '';
+    return xhr.responseText; // Return unparsed data.
   };
 
   private static async initCSRFToken() {
@@ -45,8 +45,6 @@ export default class Network {
       data: data,
       headers: {[xCsrfToken]: Network.nextCSRFToken},
       extract: Network.extractCSRFToken,
-    }).then((result: T) => {
-      return result;
     });
   };
 }
