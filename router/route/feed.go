@@ -3,6 +3,7 @@ package route
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -12,21 +13,30 @@ import (
 	"github.com/willeponken/causerr"
 )
 
-func retrieveGlobal(w http.ResponseWriter, r *http.Request) (int, error) {
-	keys, ok := r.URL.Query()["page"]
-	if !ok || len(keys) != 1 {
-		return http.StatusBadRequest, causerr.New(nil,
+func retrieveFeed(w http.ResponseWriter, r *http.Request) (int, error) {
+	pageStr := r.URL.Query().Get("page")
+	if pageStr == "" {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("invalid query parameters"),
 			"Must provide '?page=' query parameter with a single number value")
 	}
 
-	page, err := strconv.ParseUint(keys[0], 10, 64)
+	page, err := strconv.ParseUint(pageStr, 10, 64)
 	if err != nil {
 		// Internal server error because the router should have
 		// made sure the `page` query is a number.
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
-	feed, err := model.GetGlobalFeed(page)
+	vars := mux.Vars(r)
+	username := vars["username"]
+
+	var feed model.Feed
+	if username == "" {
+		feed, err = model.GetGlobalFeed(page)
+	} else {
+		feed, err = model.GetUserFeed(username, page)
+	}
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -45,11 +55,13 @@ func Feed(r *mux.Router) {
 	// Content-Type.
 	r.Use(middleware.EnforceContentType("application/json"))
 
-	r.Handle("", handler(retrieveGlobal)).
-		Queries("page", "page:{[0-9]+}").
+	// Global Feed [GET].
+	r.Handle("", handler(retrieveFeed)).
+		Queries("page", "{[0-9]+}").
 		Methods(http.MethodGet)
 
-	r.Handle("/{username}", handler(retrieveUser)).
-		Queries("page", "page:{[0-9]+}").
+	// User Feed [/feed/{username}].
+	r.Handle("/{username}", handler(retrieveFeed)).
+		Queries("page", "{[0-9]+}").
 		Methods(http.MethodGet)
 }

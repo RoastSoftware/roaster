@@ -129,6 +129,7 @@ func GetRoast(id int) (roast *RoastResult, err error) {
 	if err != nil {
 		return
 	}
+	defer errorRows.Close()
 
 	for errorRows.Next() {
 		msg := RoastError{}
@@ -146,6 +147,7 @@ func GetRoast(id int) (roast *RoastResult, err error) {
 	if err != nil {
 		return
 	}
+	defer warningRows.Close()
 
 	for warningRows.Next() {
 		msg := RoastWarning{}
