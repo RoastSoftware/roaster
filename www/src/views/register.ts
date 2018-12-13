@@ -8,20 +8,23 @@ export default class Register implements ξ.ClassComponent {
   registerError: APIError;
 
   registerUser() {
-    if (UserModel.validUsername()) {
-      Auth.register<User>(
+      if (UserModel.validUsername()) {
+          console.log('JAJAJAJAAJAJAA');
+        Auth.register<User>(
           Object.assign({}, UserModel), // TODO: Implement encode/decode funcs.
           UserModel.getPassword()) // TODO: Password isn't separated yet.
           .then((user) => {
-            console.log(user);
+              console.log(user);
+              console.log("HEHEJHEJHEJHEJHEJ");
             if (user) {
               Object.assign(UserModel, user);
               UserModel.setLoggedIn(true);
               ξ.route.set('/');
             }
           })
-          .catch((err: APIError) => {
-            this.registerError = err;
+          .catch((err: Error) => {
+              this.registerError = JSON.parse(err.message) as APIError;
+              ξ.redraw();
           });
     }
   };
@@ -40,7 +43,7 @@ export default class Register implements ξ.ClassComponent {
                                   ξ('i.close.icon'),
                                   ξ('.header',
                                       'Oh noeh!'),
-                                  ξ('p', this.registerError)))),
+                                  ξ('p', this.registerError.message)))),
 
                         ξ('.ui.segment',
                             ξ('form.ui.form', {onsubmit: () => {

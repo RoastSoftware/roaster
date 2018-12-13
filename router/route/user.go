@@ -40,7 +40,7 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	err = model.PutUser(u.User, []byte(u.Password))
 	if err != nil {
-		return http.StatusInternalServerError, causerr.New(err, "")
+		return http.StatusConflict, causerr.New(err, "Username already in use")
 	}
 
 	// TODO: Implement auth middleware instead.
