@@ -1,3 +1,4 @@
+// Package middleware CORS implementation.
 package middleware
 
 import (

@@ -109,6 +109,7 @@ func NewRoastResult(username, language, code string) *RoastResult {
 	}
 }
 
+// GetRoast returns the RoastResult for the specific ID.
 func GetRoast(id int) (roast *RoastResult, err error) {
 	err = database.QueryRow(`
 		SELECT username, score, language, create_time

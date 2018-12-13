@@ -1,15 +1,17 @@
+// Package model feed implementation.
 package model
 
 import (
 	"time"
 )
 
-const PageSize = 25
+const pageSize = 25
 
 const (
-	RoastCategory = iota
+	roastCategory = iota
 )
 
+// FeedItem represents a item in a feed.
 type FeedItem struct {
 	Category    int       `json:"category"`
 	Username    string    `json:"username"`
@@ -18,17 +20,18 @@ type FeedItem struct {
 	CreateTime  time.Time `json:"createTime"`
 }
 
+// Feed holds a list of FeedItems.
 type Feed struct {
 	Items []FeedItem `json:"items"`
 }
 
-// GetGlobalFeed collects the latest N (N = PageSize) feed items for all users.
+// GetGlobalFeed collects the latest N (N = pageSize) feed items for all users.
 // Pagination is supported where page = 0 is the first (latest) page.
 func GetGlobalFeed(page uint64) (feed Feed, err error) {
 	return getFeed("", page)
 }
 
-// GetUserFeed collects the latest N (N = PageSize) feed items for an user.
+// GetUserFeed collects the latest N (N = pageSize) feed items for an user.
 // Pagination is supported where page = 0 is the first (latest) page.
 func GetUserFeed(username string, page uint64) (feed Feed, err error) {
 	return getFeed(username, page)
@@ -40,14 +43,17 @@ func getFeed(username string, page uint64) (feed Feed, err error) {
 	FROM "roaster"."roast"
 	WHERE coalesce(TRIM($1), '')='' OR LOWER(username)=LOWER(TRIM($1))
 	ORDER BY create_time DESC LIMIT $2 OFFSET $3
-	`, username, PageSize, PageSize*page)
+	`, username, pageSize, pageSize*page)
 	if err != nil {
 		return
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		item := FeedItem{}
+		// NOTE: Hardcoded category as only the Roast category is
+		// supported.
+		item := FeedItem{Category: roastCategory}
+
 		err = rows.Scan(&item.Username, &item.Title, &item.Description, &item.CreateTime)
 		if err != nil {
 			return Feed{}, err
