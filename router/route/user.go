@@ -35,7 +35,7 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Email == "" || u.Password == "" {
-		return http.StatusBadRequest, causerr.New(nil, "Missing field in request")
+		return http.StatusBadRequest, causerr.New("Missing field in request", "Missing field in request")
 	}
 
 	err = model.PutUser(u.User, []byte(u.Password))

@@ -17,6 +17,9 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 
 	router := mux.NewRouter()
 
+	// Apply CORS policy.
+	router.Use(middleware.CORS())
+
 	// Protect all methods except GET, HEAD, OPTIONS and TRACE with CSRF
 	// tokens.
 	router.Use(middleware.CSRF(csrfKey, csrfOpts...))
@@ -29,6 +32,9 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 
 	// Session [/session].
 	route.Session(router.PathPrefix("/session").Subrouter())
+
+	// Feed [/feed].
+	route.Feed(router.PathPrefix("/feed").Subrouter())
 
 	// Avatar [/user/{username}/avatar].
 	route.Avatar(router.PathPrefix("/user/{username}/avatar").Subrouter())
