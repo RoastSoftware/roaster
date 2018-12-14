@@ -3,7 +3,6 @@ package model
 
 import (
 	"crypto/sha512"
-	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -143,9 +142,6 @@ func AuthenticateUser(identifier string, password []byte) (user User, ok bool) {
 
 	// The parameters hash and password are replaced with an empty slice by
 	// the validPassword function.
-	log.Println(string(hash))
-	log.Println(string(password))
-
 	ok = validPassword(hash, password)
 	return
 }
