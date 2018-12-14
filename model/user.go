@@ -67,19 +67,21 @@ func generateHash(password []byte) (hash []byte, err error) {
 //
 // Note: The function will also zero out any variables that is passed (except
 // for the actual output).
-func sha512Sum(in []byte) (out []byte) {
+func sha512Sum(in []byte) []byte {
 	sum := sha512.Sum512(in)
-	in = []byte{}              // Empty the password variable.
-	out = sum[:]               // Convert to byte slice of variadic length.
-	sum = [sha512.Size]byte{0} // Empty the sum variable.
-
-	return out
+	in = []byte{} // Empty the password variable.
+	return sum[:]
 }
 
 // validPassword validates a hash against a provided password.
 // See the generateHash function for documentation about the algorithms used.
 func validPassword(hash, password []byte) bool {
-	err := bcrypt.CompareHashAndPassword(hash, sha512Sum(password))
+	sum := sha512Sum(password)
+	defer func() {
+		sum = []byte{}
+	}()
+
+	err := bcrypt.CompareHashAndPassword(hash, sum)
 	if err != nil {
 		return false
 	}
