@@ -5,17 +5,15 @@ import Auth from '../services/auth';
 
 
 export default class Register implements ξ.ClassComponent {
-  registerError: APIError;
+  registerError: Error;
 
   registerUser() {
-      if (UserModel.validUsername()) {
-          console.log('JAJAJAJAAJAJAA');
-        Auth.register<User>(
+    if (UserModel.validUsername()) {
+      Auth.register<User>(
           Object.assign({}, UserModel), // TODO: Implement encode/decode funcs.
           UserModel.getPassword()) // TODO: Password isn't separated yet.
           .then((user) => {
-              console.log(user);
-              console.log("HEHEJHEJHEJHEJHEJ");
+            console.log(user);
             if (user) {
               Object.assign(UserModel, user);
               UserModel.setLoggedIn(true);
@@ -23,8 +21,8 @@ export default class Register implements ξ.ClassComponent {
             }
           })
           .catch((err: Error) => {
-              this.registerError = JSON.parse(err.message) as APIError;
-              ξ.redraw();
+            this.registerError = err;
+            ξ.redraw();
           });
     }
   };

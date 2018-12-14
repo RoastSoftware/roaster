@@ -1,11 +1,11 @@
-// Package forwardengineer was generated automatically by inlinesql at 2018-12-08 20:17:24.336110413 +0100 CET m=+0.001656687.
+// Package forwardengineer was generated automatically by inlinesql at 2018-12-14 13:21:14.8076142 +0100 CET m=+0.006830501.
 package forwardengineer
 
 // GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
 	return []string{
 		"set search_path to roaster",
-		"create table if not exists \"user\" ( username text not null constraint user_pkey primary key constraint username_chk check (char_length(username) <= 30), hash bytea not null, create_time timestamp with time zone not null, fullname text constraint fullname_chk check (char_length(fullname) < 255), email text not null constraint email_chk check (char_length(email) < 255) )",
+		"create table if not exists \"user\" ( username text not null constraint user_pkey primary key constraint username_chk check (char_length(username) <= 30), hash bytea not null, create_time timestamp with time zone not null, fullname text constraint fullname_chk check (char_length(fullname) < 255), email text not null unique constraint email_chk check (char_length(email) < 255) )",
 		"create unique index if not exists username_user_idx on \"user\" (lower(username))",
 		"create table if not exists \"roast\" ( id serial not null constraint roast_pk primary key, code text not null constraint code_chk check (char_length(code) <= 500000), username text not null constraint user_fk references \"user\" (username) on update cascade on delete cascade, score integer not null constraint score_chk check (score >= 0), language text not null, create_time timestamp with time zone not null )",
 		"create table if not exists \"warning\" ( id uuid not null constraint warning_pk primary key, row integer not null, \"column\" integer not null, engine text not null, name text not null, description text not null )",
