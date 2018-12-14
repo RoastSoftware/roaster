@@ -1,4 +1,4 @@
-// Package forwardengineer was generated automatically by inlinesql at 2018-12-08 20:17:24.336110413 +0100 CET m=+0.001656687.
+// Package forwardengineer was generated automatically by inlinesql at 2018-12-14 13:26:21.329284115 +0100 CET m=+0.001988645.
 package forwardengineer
 
 // GetQueries returns a pre-parsed slice of SQL queries.
@@ -10,6 +10,7 @@ func GetQueries() []string {
 		"create table if not exists \"roast\" ( id serial not null constraint roast_pk primary key, code text not null constraint code_chk check (char_length(code) <= 500000), username text not null constraint user_fk references \"user\" (username) on update cascade on delete cascade, score integer not null constraint score_chk check (score >= 0), language text not null, create_time timestamp with time zone not null )",
 		"create table if not exists \"warning\" ( id uuid not null constraint warning_pk primary key, row integer not null, \"column\" integer not null, engine text not null, name text not null, description text not null )",
 		"create table if not exists \"error\" ( id uuid not null constraint error_pk primary key, row integer not null, \"column\" integer not null, engine text not null, name text not null, description text not null )",
+		"create table if not exists \"roast_statistics\" ( roast integer not null constraint roast_fk references roast (id) on update cascade on delete cascade, lines_of_code integer not null, number_of_errors integer not null, number_of_warnings integer not null )",
 		"create table if not exists \"roast_has_errors\" ( roast integer not null constraint roast_fk references roast (id) on update cascade on delete cascade, error uuid not null constraint error_fk references error (id) )",
 		"create table if not exists \"roast_has_warnings\" ( roast integer not null constraint roast_fk references roast (id) on update cascade on delete cascade, warning uuid not null constraint warning_fk references warning (id) )",
 		"create table if not exists avatar ( avatar bytea not null, username text not null, constraint username_uq unique (username), constraint username_fk foreign key (username) references \"user\" (username) match simple on update cascade on delete cascade )",

@@ -89,6 +89,7 @@ func main() {
 var pkgTmpl = template.Must(template.New("").Parse(
 	`// Package {{ .Package }} was generated automatically by inlinesql at {{ .Timestamp }}.
 package {{ .Package }}
+
 // GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
 	return []string{

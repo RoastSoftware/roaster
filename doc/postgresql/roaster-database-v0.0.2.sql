@@ -63,6 +63,18 @@ create table if not exists "error"
   description text    not null
 );
 
+create table if not exists "roast_statistics"
+(
+  roast integer not null
+    constraint roast_fk
+    references roast (id)
+    on update cascade
+    on delete cascade,
+  lines_of_code integer not null,
+  number_of_errors integer not null,
+  number_of_warnings integer not null
+);
+
 create table if not exists "roast_has_errors"
 (
   roast integer not null
