@@ -19,37 +19,42 @@ type LanguageStatistics struct {
 	Datapoints []LanguageDatapoint `json:"items"`
 }
 
-// GetGlobalLinesOfCodeForLanguage
+// GetGlobalLinesOfCodeForLanguage returns the number of lines of code for all
+// users for a specific language.
 func GetGlobalLinesOfCodeForLanguage(language string) (lines uint64, err error) {
 	return getGlobalLinesOfCode(language)
 }
 
-// GetGlobalLinesOfCode
+// GetGlobalLinesOfCode returns the number of lines of code for all users for
+// all languages.
 func GetGlobalLinesOfCode() (lines uint64, err error) {
 	return getGlobalLinesOfCode("")
 }
 
-// GetUserLinesOfCodeForLanguage
+// GetUserLinesOfCodeForLanguage returns the number of lines of code for an user
+// for a specific language.
 func GetUserLinesOfCodeForLanguage(username, language string) (lines uint64, err error) {
 	return getUserLinesOfCode(username, language)
 }
 
-// GetUserLinesOfCode
+// GetUserLinesOfCode returns the number of lines of code for an user for all
+// languages.
 func GetUserLinesOfCode(username string) (lines uint64, err error) {
 	return getUserLinesOfCode(username, "")
 }
 
-// GetGlobalNumberOfRoasts
+// GetGlobalNumberOfRoasts returns the number of Roasts for all users and
+// languages.
 func GetGlobalNumberOfRoasts() (numberOfRoasts uint64, err error) {
 	return getNumberOfRoasts("")
 }
 
-// GetUserNumberOfRoasts
+// GetUserNumberOfRoasts returns the number of Roasts for a specific user.
 func GetUserNumberOfRoasts(username string) (numberOfRoasts uint64, err error) {
 	return getNumberOfRoasts(username)
 }
 
-// GetUserScore
+// GetUserScore returns the score for an user.
 func GetUserScore(username string) (score uint64, err error) {
 	err = database.QueryRow(`
 		SELECT SUM(score)
@@ -62,6 +67,20 @@ func GetUserScore(username string) (score uint64, err error) {
 
 	return
 }
+
+/* TODO: Time series of Roasts/(day/hour/w/e)
+select "create_time"::date, count(distinct "id")
+from "roaster"."roast"
+group by "create_time"::date;
+
+-- Or...
+
+select
+  date_trunc('minute', create_time), -- or hour, day, week, month, year
+  count(1)
+from roaster.roast
+group by 1
+*/
 
 func getGlobalLinesOfCode(language string) (lines uint64, err error) {
 	err = database.QueryRow(`
