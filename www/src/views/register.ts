@@ -5,7 +5,7 @@ import Auth from '../services/auth';
 
 
 export default class Register implements ξ.ClassComponent {
-  registerError: APIError;
+  registerError: Error;
 
   registerUser() {
     if (UserModel.validUsername()) {
@@ -20,8 +20,9 @@ export default class Register implements ξ.ClassComponent {
               ξ.route.set('/');
             }
           })
-          .catch((err: APIError) => {
+          .catch((err: Error) => {
             this.registerError = err;
+            ξ.redraw();
           });
     }
   };
@@ -40,7 +41,7 @@ export default class Register implements ξ.ClassComponent {
                                   ξ('i.close.icon'),
                                   ξ('.header',
                                       'Oh noeh!'),
-                                  ξ('p', this.registerError)))),
+                                  ξ('p', this.registerError.message)))),
 
                         ξ('.ui.segment',
                             ξ('form.ui.form', {onsubmit: () => {

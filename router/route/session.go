@@ -4,6 +4,7 @@ package route
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -29,13 +30,15 @@ func createSession(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Password == "" {
-		return http.StatusBadRequest, causerr.New(nil,
+		return http.StatusBadRequest, causerr.New(
+			errors.New("empty username or password field"),
 			"Empty username or password")
 	}
 
 	user, ok := model.AuthenticateUser(u.Username, []byte(u.Password))
 	if !ok {
-		return http.StatusUnauthorized, causerr.New(nil,
+		return http.StatusUnauthorized, causerr.New(
+			errors.New("invalid username or password"),
 			"Invalid username or password")
 	}
 

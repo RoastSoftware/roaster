@@ -12,6 +12,7 @@ import (
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/session"
 	"github.com/gorilla/mux"
+	"github.com/lib/pq"
 	"github.com/willeponken/causerr"
 )
 
@@ -35,11 +36,19 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Email == "" || u.Password == "" {
-		return http.StatusBadRequest, causerr.New(nil, "Missing field in request")
+		return http.StatusBadRequest, causerr.New("missing field in request", "Missing field in request")
 	}
 
 	err = model.PutUser(u.User, []byte(u.Password))
 	if err != nil {
+		if pgerr, ok := err.(*pq.Error); ok {
+			if pgerr.Constraint == "user_email_key" {
+				return http.StatusConflict, causerr.New(err, "Email already in use")
+			}
+			if pgerr.Constraint == "user_pkey" {
+				return http.StatusConflict, causerr.New(err, "Username already in use")
+			}
+		}
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
