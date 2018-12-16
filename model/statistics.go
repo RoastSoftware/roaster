@@ -158,7 +158,7 @@ func getRoastCountTimeseries(start, end time.Time, resolution time.Duration, use
 		LEFT JOIN "roaster"."roast" AS r
 			-- Truncate and compare per resolution.
 			ON date_trunc($4, r."create_time") = "time_series"."datapoint"
-			AND COALESCE(TRIM($4), '')='' OR LOWER(username)=LOWER(TRIM($4))
+			AND COALESCE(TRIM($5), '')='' OR LOWER(username)=LOWER(TRIM($5))
 		GROUP BY 1
 	`, sqlStart, sqlEnd, sqlInterval, sqlResolution, username)
 	if err != nil {
