@@ -167,6 +167,7 @@ func GetUser(identifier string) (user User, err error) {
 // GetUserScore returns the score for an user.
 func GetUserScore(username string) (score UserScore, err error) {
 	var s sql.NullInt64
+
 	err = database.QueryRow(`
 		SELECT SUM(score)
 		FROM roaster.roast AS r

@@ -2,6 +2,7 @@
 package model
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 )
@@ -28,28 +29,14 @@ type LinesOfCode struct {
 	Lines uint64 `json:"lines"`
 }
 
-// GetGlobalLinesOfCodeForLanguage returns the number of lines of code for all
-// users for a specific language.
-func GetGlobalLinesOfCodeForLanguage(language string) (lines LinesOfCode, err error) {
-	return getGlobalLinesOfCode(language)
-}
-
-// GetGlobalLinesOfCode returns the number of lines of code for all users for
-// all languages.
+// GetGlobalLinesOfCode returns the number of lines of code for all users.
 func GetGlobalLinesOfCode() (lines LinesOfCode, err error) {
-	return getGlobalLinesOfCode("")
+	return getLinesOfCode("")
 }
 
-// GetUserLinesOfCodeForLanguage returns the number of lines of code for an user
-// for a specific language.
-func GetUserLinesOfCodeForLanguage(username, language string) (lines LinesOfCode, err error) {
-	return getUserLinesOfCode(username, language)
-}
-
-// GetUserLinesOfCode returns the number of lines of code for an user for all
-// languages.
+// GetUserLinesOfCode returns the number of lines of code for an user.
 func GetUserLinesOfCode(username string) (lines LinesOfCode, err error) {
-	return getUserLinesOfCode(username, "")
+	return getLinesOfCode(username)
 }
 
 // GetGlobalNumberOfRoasts returns the number of Roasts for all users and
@@ -156,35 +143,22 @@ func getRoastTimeseries(start, end time.Time, interval time.Duration, username s
 	return
 }
 
-func getGlobalLinesOfCode(language string) (lines LinesOfCode, err error) {
+func getLinesOfCode(username string) (lines LinesOfCode, err error) {
+	var l sql.NullInt64
+
 	err = database.QueryRow(`
 		SELECT SUM(lines_of_code)
 		FROM roaster.roast_statistics AS s
 		JOIN roaster.roast AS r
 		ON r.id = s.roast
 		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(r.language)=LOWER(TRIM($1))
-	`, language).Scan(&lines.Lines)
+		      LOWER(r.username)=LOWER(TRIM($1))
+	`, username).Scan(&l)
 	if err != nil {
 		return
 	}
 
-	return
-}
-
-func getUserLinesOfCode(username, language string) (lines LinesOfCode, err error) {
-	err = database.QueryRow(`
-		SELECT SUM(lines_of_code)
-		FROM roaster.roast_statistics AS s
-		JOIN roaster.roast AS r
-		ON r.id = s.roast
-		WHERE LOWER(r.username)=LOWER(TRIM($1)) AND
-		      (COALESCE(TRIM($2), '')='' OR
-		       LOWER(r.language)=LOWER(TRIM($2)))
-	`, username, language).Scan(&lines.Lines)
-	if err != nil {
-		return
-	}
+	lines.Lines = uint64(l.Int64)
 
 	return
 }

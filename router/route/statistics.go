@@ -99,8 +99,8 @@ func retrieveLinesCount(w http.ResponseWriter, r *http.Request) (code int, err e
 	return http.StatusOK, nil
 }
 
-// Statistic adds the handlers for the Statistic [/statistic] endpoint.
-func Statistic(r *mux.Router) {
+// Statistics adds the handlers for the Statistics [/statistics] endpoint.
+func Statistics(r *mux.Router) {
 	// All handlers are required to use application/json as their
 	// Content-Type.
 	r.Use(middleware.EnforceContentType("application/json"))

@@ -17,8 +17,7 @@ docker run --rm -v "$PWD":/usr/src/roaster -w /usr/src/roaster/cmd/roasterd gola
 # Build API docs
 docker run --rm -v $PWD/doc/restapi:/doc quay.io/bukalapak/snowboard html \
 	-o index.html Roaster-REST-API.md && \
-	cp ./doc/restapi/index.html ./build/doc/ && \
-	rm -f ./doc/restapi/index.html
+	mv ./doc/restapi/index.html ./build/doc/restapi/
 
 # Current build folder content
 du -h -d1 build/*

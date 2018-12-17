@@ -595,8 +595,8 @@ API.
     }
     ```
 
-## Statistics [/statistic]
-### Roast Statistics Timeseries [/statistic/roast/timeseries{?start}{?end}{?interval}{?user}]
+## Statistics [/statistics]
+### Roast Statistics Timeseries [/statistics/roast/timeseries{?start}{?end}{?interval}{?user}]
 #### Get Statistics for Roasts as Time series [GET]
 + Request Roast count statistics as time series
     + Parameters
@@ -625,7 +625,7 @@ API.
     ]
     ```
 
-### Roast Statistics Count [/statistic/roast/count{?user}]
+### Roast Statistics Count [/statistics/roast/count{?user}]
 #### Get Number of Roasts [GET]
 + Request Number of Roasts
     + Parameters
@@ -638,7 +638,7 @@ API.
  }
     ```
 
-### Roast Statistics Lines of Code [/statistic/roast/lines{?user}]
+### Roast Statistics Lines of Code [/statistics/roast/lines{?user}]
 #### Get Lines of Code Analyzed [GET]
 + Request Lines of code analyzed
     + Parameters
