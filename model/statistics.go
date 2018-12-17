@@ -6,21 +6,6 @@ import (
 	"time"
 )
 
-const (
-	// SecondResolution represents a single second.
-	SecondResolution = time.Second
-	// MinuteResolution is exactly 60 seconds.
-	MinuteResolution = time.Minute
-	// HourResolution is exactly 60 minutes.
-	HourResolution = time.Hour
-	// DayResolution is exactly 24 hours.
-	DayResolution = time.Hour * 24
-	// MonthResolution is exactly 30 days.
-	MonthResolution = DayResolution * 30
-	// YearResolution is exactly 365 days.
-	YearResolution = DayResolution * 365
-)
-
 // LanguageDatapoint represents a datapoint for language statistics.
 type LanguageDatapoint struct {
 	Start    time.Time
@@ -95,18 +80,8 @@ func GetUserScore(username string) (score uint64, err error) {
 }
 
 // GetGlobalRoastCountTimeseries returns a timeseries between a start and end
-// timestamp, the resolution parameters should be any of:
-//  * SecondResolution,
-//  * MinuteResolution,
-//  * HourResolution,
-//  * DayResolution   - exactly 24 hours,
-//  * MonthResolution - exactly 30 days,
-//  * YearResolution  - exactly 365 days.
-//
-// If the resolution doesn't match any of the supported resolutions above, it'll
-// default to the YearResolution.
-//
-// The resolutions are exact and does not take into account leap seconds etc.
+// timestamp, the interval parameter should be any duration above 1 minute,
+// anything less will default to 1 minute.
 func GetGlobalRoastCountTimeseries(start, end time.Time, resolution time.Duration) (
 	timeseries RoastCountTimeseries, err error) {
 
@@ -114,19 +89,8 @@ func GetGlobalRoastCountTimeseries(start, end time.Time, resolution time.Duratio
 }
 
 // GetUserRoastCountTimeseries returns a timeseries between a start and end
-// timestamp for the provided username, the resolution parameters should be any
-// of:
-//  * SecondResolution,
-//  * MinuteResolution,
-//  * HourResolution,
-//  * DayResolution   - exactly 24 hours,
-//  * MonthResolution - exactly 30 days,
-//  * YearResolution  - exactly 365 days.
-//
-// If the resolution doesn't match any of the supported resolutions above, it'll
-// default to the YearResolution.
-//
-// The resolutions are exact and does not take into account leap seconds etc.
+// timestamp for the provided username, the interval parameter should be any
+// duration above 1 minute, anything less will default to 1 minute.
 func GetUserRoastCountTimeseries(start, end time.Time, resolution time.Duration, username string) (
 	timeseries RoastCountTimeseries, err error) {
 
@@ -135,11 +99,18 @@ func GetUserRoastCountTimeseries(start, end time.Time, resolution time.Duration,
 
 // getRoastCountTimeseries returns a timeseries of number of Roasts per time
 // unit. See: GetGlobalRoastCountTimeseries or GetUserRoastCountTimeseries.
+//
+// The minimum interval is 1 minute, anything less will be set to 1 minute per
+// default.
 func getRoastCountTimeseries(start, end time.Time, interval time.Duration, username string) (
 	timeseries RoastCountTimeseries, err error) {
 
 	// Round the interval to the closest minute.
 	interval = interval.Round(time.Minute)
+	if interval < 1 { // 1 minute is the minimum interval.
+		// Just enforce 1 minute interval instead of erroring.
+		interval = 1 * time.Minute
+	}
 
 	// Round both the start and end time to the nearest multiple of the
 	// interval.
