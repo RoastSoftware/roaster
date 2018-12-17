@@ -30,48 +30,63 @@ type RoastCountDatapoint struct {
 // RoastCountTimeseries holds a slice of RoastCountDatapoints.
 type RoastCountTimeseries []RoastCountDatapoint
 
+// NumberOfRoasts holds a named uint64 that represents the number of Roasts.
+type NumberOfRoasts struct {
+	Count uint64 `json:"count"`
+}
+
+// RoastScore holds a nmed uint64 that represents a score.
+type RoastScore struct {
+	Score uint64 `json:"score"`
+}
+
+// LinesOfCode holds a named uint64 that represents the number of lines.
+type LinesOfCode struct {
+	Lines uint64 `json:"lines"`
+}
+
 // GetGlobalLinesOfCodeForLanguage returns the number of lines of code for all
 // users for a specific language.
-func GetGlobalLinesOfCodeForLanguage(language string) (lines uint64, err error) {
+func GetGlobalLinesOfCodeForLanguage(language string) (lines LinesOfCode, err error) {
 	return getGlobalLinesOfCode(language)
 }
 
 // GetGlobalLinesOfCode returns the number of lines of code for all users for
 // all languages.
-func GetGlobalLinesOfCode() (lines uint64, err error) {
+func GetGlobalLinesOfCode() (lines LinesOfCode, err error) {
 	return getGlobalLinesOfCode("")
 }
 
 // GetUserLinesOfCodeForLanguage returns the number of lines of code for an user
 // for a specific language.
-func GetUserLinesOfCodeForLanguage(username, language string) (lines uint64, err error) {
+func GetUserLinesOfCodeForLanguage(username, language string) (lines LinesOfCode, err error) {
 	return getUserLinesOfCode(username, language)
 }
 
 // GetUserLinesOfCode returns the number of lines of code for an user for all
 // languages.
-func GetUserLinesOfCode(username string) (lines uint64, err error) {
+func GetUserLinesOfCode(username string) (lines LinesOfCode, err error) {
 	return getUserLinesOfCode(username, "")
 }
 
 // GetGlobalNumberOfRoasts returns the number of Roasts for all users and
 // languages.
-func GetGlobalNumberOfRoasts() (numberOfRoasts uint64, err error) {
+func GetGlobalNumberOfRoasts() (numberOfRoasts NumberOfRoasts, err error) {
 	return getNumberOfRoasts("")
 }
 
 // GetUserNumberOfRoasts returns the number of Roasts for a specific user.
-func GetUserNumberOfRoasts(username string) (numberOfRoasts uint64, err error) {
+func GetUserNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
 	return getNumberOfRoasts(username)
 }
 
 // GetUserScore returns the score for an user.
-func GetUserScore(username string) (score uint64, err error) {
+func GetUserScore(username string) (score RoastScore, err error) {
 	err = database.QueryRow(`
 		SELECT SUM(score)
 		FROM roaster.roast AS r
 		WHERE LOWER(r.username)=LOWER(TRIM($1))
-	`, username).Scan(&score)
+	`, username).Scan(&score.Score)
 	if err != nil {
 		return
 	}
@@ -162,7 +177,7 @@ func getRoastCountTimeseries(start, end time.Time, interval time.Duration, usern
 	return
 }
 
-func getGlobalLinesOfCode(language string) (lines uint64, err error) {
+func getGlobalLinesOfCode(language string) (lines LinesOfCode, err error) {
 	err = database.QueryRow(`
 		SELECT SUM(lines_of_code)
 		FROM roaster.roast_statistics AS s
@@ -170,7 +185,7 @@ func getGlobalLinesOfCode(language string) (lines uint64, err error) {
 		ON r.id = s.roast
 		WHERE COALESCE(TRIM($2), '')='' OR
 		      LOWER(r.language)=LOWER(TRIM($2))
-	`, language).Scan(&lines)
+	`, language).Scan(&lines.Lines)
 	if err != nil {
 		return
 	}
@@ -178,7 +193,7 @@ func getGlobalLinesOfCode(language string) (lines uint64, err error) {
 	return
 }
 
-func getUserLinesOfCode(username, language string) (lines uint64, err error) {
+func getUserLinesOfCode(username, language string) (lines LinesOfCode, err error) {
 	err = database.QueryRow(`
 		SELECT SUM(lines_of_code)
 		FROM roaster.roast_statistics AS s
@@ -187,7 +202,7 @@ func getUserLinesOfCode(username, language string) (lines uint64, err error) {
 		WHERE LOWER(r.username)=LOWER(TRIM($1)) AND
 		      (COALESCE(TRIM($2), '')='' OR
 		       LOWER(r.language)=LOWER(TRIM($2)))
-	`, username, language).Scan(&lines)
+	`, username, language).Scan(&lines.Lines)
 	if err != nil {
 		return
 	}
@@ -195,13 +210,13 @@ func getUserLinesOfCode(username, language string) (lines uint64, err error) {
 	return
 }
 
-func getNumberOfRoasts(username string) (numberOfRoasts uint64, err error) {
+func getNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
 	err = database.QueryRow(`
 		SELECT COUNT(username)
 		FROM roaster.roast
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      LOWER(username)=LOWER(TRIM($1))
-	`, username).Scan(&numberOfRoasts)
+	`, username).Scan(&numberOfRoasts.Count)
 	if err != nil {
 		return
 	}
