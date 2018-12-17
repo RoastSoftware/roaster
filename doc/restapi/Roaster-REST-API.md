@@ -182,7 +182,7 @@ API.
     + Body
     ```json
     {
-        "score": 123,
+        "score": 123
     }
     ```
     + Schema
