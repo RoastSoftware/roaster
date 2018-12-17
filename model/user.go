@@ -3,6 +3,8 @@ package model
 
 import (
 	"crypto/sha512"
+	"database/sql"
+	"errors"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -16,6 +18,11 @@ type User struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Fullname string `json:"fullname"`
+}
+
+// UserScore holds a named uint64 that represents the users score.
+type UserScore struct {
+	Score uint64 `json:"score"`
 }
 
 // generateHash hashes the password as:
@@ -154,5 +161,27 @@ func GetUser(identifier string) (user User, err error) {
 		FROM "roaster"."user"
 		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
+	return
+}
+
+// GetUserScore returns the score for an user.
+func GetUserScore(username string) (score UserScore, err error) {
+	var s sql.NullInt64
+	err = database.QueryRow(`
+		SELECT SUM(score)
+		FROM roaster.roast AS r
+		WHERE LOWER(r.username)=LOWER(TRIM($1))
+	`, username).Scan(&s)
+	if err != nil {
+		return
+	}
+
+	if !s.Valid {
+		err = errors.New("no score sum for the provided user")
+		return
+	}
+
+	score.Score = uint64(s.Int64)
+
 	return
 }

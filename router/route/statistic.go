@@ -59,8 +59,7 @@ func retrieveRoastCountTimeseries(w http.ResponseWriter, r *http.Request) (int, 
 }
 
 func retrieveRoastCount(w http.ResponseWriter, r *http.Request) (code int, err error) {
-	vars := mux.Vars(r)
-	username := vars["username"]
+	username := r.URL.Query().Get("user")
 
 	var numberOfRoasts model.NumberOfRoasts
 	if username == "" {
@@ -80,31 +79,50 @@ func retrieveRoastCount(w http.ResponseWriter, r *http.Request) (code int, err e
 	return http.StatusOK, nil
 }
 
+func retrieveLinesCount(w http.ResponseWriter, r *http.Request) (code int, err error) {
+	username := r.URL.Query().Get("user")
+
+	var linesOfCode model.LinesOfCode
+	if username == "" {
+		linesOfCode, err = model.GetGlobalLinesOfCode()
+	} else {
+		linesOfCode, err = model.GetUserLinesOfCode(username)
+	}
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	err = json.NewEncoder(w).Encode(linesOfCode)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	return http.StatusOK, nil
+}
+
 // Statistic adds the handlers for the Statistic [/statistic] endpoint.
 func Statistic(r *mux.Router) {
 	// All handlers are required to use application/json as their
 	// Content-Type.
 	r.Use(middleware.EnforceContentType("application/json"))
 
-	// Global Roast Count Timeseries [GET].
+	// Roast Count Timeseries [GET].
 	r.Handle("/roast/timeseries", handler(retrieveRoastCountTimeseries)).
 		Queries("start", "",
 			"end", "",
 			"interval", "").
 		Methods(http.MethodGet)
 
-	// User Specific Roast Count Timeseries [GET].
-	r.Handle("/{username}/roast/timeseries", handler(retrieveRoastCountTimeseries)).
-		Queries("start", "",
-			"end", "",
-			"interval", "").
-		Methods(http.MethodGet)
-
-	// Global Roast Count [GET].
+	// Roast Count Simple [GET].
 	r.Handle("/roast/count", handler(retrieveRoastCount)).
 		Methods(http.MethodGet)
 
-	// User Specific Roast Count Timeseries [GET].
-	r.Handle("/{username}/roast/count", handler(retrieveRoastCount)).
+	// Lines of Code [GET].
+	r.Handle("/lines/count", handler(retrieveLinesCount)).
+		Methods(http.MethodGet)
+
+	// Score [GET].
+	r.Handle("/score", handler(retrieveLinesCount)).
+		Queries("user", "").
 		Methods(http.MethodGet)
 }

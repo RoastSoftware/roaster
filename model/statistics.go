@@ -35,11 +35,6 @@ type NumberOfRoasts struct {
 	Count uint64 `json:"count"`
 }
 
-// RoastScore holds a nmed uint64 that represents a score.
-type RoastScore struct {
-	Score uint64 `json:"score"`
-}
-
 // LinesOfCode holds a named uint64 that represents the number of lines.
 type LinesOfCode struct {
 	Lines uint64 `json:"lines"`
@@ -78,20 +73,6 @@ func GetGlobalNumberOfRoasts() (numberOfRoasts NumberOfRoasts, err error) {
 // GetUserNumberOfRoasts returns the number of Roasts for a specific user.
 func GetUserNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
 	return getNumberOfRoasts(username)
-}
-
-// GetUserScore returns the score for an user.
-func GetUserScore(username string) (score RoastScore, err error) {
-	err = database.QueryRow(`
-		SELECT SUM(score)
-		FROM roaster.roast AS r
-		WHERE LOWER(r.username)=LOWER(TRIM($1))
-	`, username).Scan(&score.Score)
-	if err != nil {
-		return
-	}
-
-	return
 }
 
 // GetGlobalRoastCountTimeseries returns a timeseries between a start and end
@@ -183,8 +164,8 @@ func getGlobalLinesOfCode(language string) (lines LinesOfCode, err error) {
 		FROM roaster.roast_statistics AS s
 		JOIN roaster.roast AS r
 		ON r.id = s.roast
-		WHERE COALESCE(TRIM($2), '')='' OR
-		      LOWER(r.language)=LOWER(TRIM($2))
+		WHERE COALESCE(TRIM($1), '')='' OR
+		      LOWER(r.language)=LOWER(TRIM($1))
 	`, language).Scan(&lines.Lines)
 	if err != nil {
 		return
