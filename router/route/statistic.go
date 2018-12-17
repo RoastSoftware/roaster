@@ -14,31 +14,30 @@ import (
 	"github.com/willeponken/causerr"
 )
 
-func retrieveRoastCountTimeseries(w http.ResponseWriter, r *http.Request) (int, error) {
+func retrieveRoastTimeseries(w http.ResponseWriter, r *http.Request) (int, error) {
 	start, err := time.Parse(time.RFC3339, r.URL.Query().Get("start"))
 	if err != nil {
 		return http.StatusBadRequest, causerr.New(
-			errors.New("invalid ?start query parameter"),
-			"Missing or invalid '?start=' query parameter with timestamp formatted according to RFC3339")
+			errors.New("invalid 'start' query parameter"),
+			"Missing or invalid 'start' query parameter with timestamp formatted according to RFC3339")
 	}
 
 	end, err := time.Parse(time.RFC3339, r.URL.Query().Get("end"))
 	if err != nil {
 		return http.StatusBadRequest, causerr.New(
-			errors.New("invalid ?end query parameter"),
-			"Missing or invalid '?end=' query parameter with timestamp formatted according to RFC3339")
+			errors.New("invalid 'end' query parameter"),
+			"Missing or invalid 'end' query parameter with timestamp formatted according to RFC3339")
 	}
 
 	interval, err := time.ParseDuration(fmt.Sprintf("%s",
 		r.URL.Query().Get("interval")))
 	if err != nil {
 		return http.StatusBadRequest, causerr.New(
-			errors.New("invalid ?interval query parameters"),
-			"Missing '?end=' query parameter with a time duration formatted such as '300s', '1.5h' or '2h45m'. Valid time units are 'ns', 'us' (or 'µs'), 'ms', 's', 'm', 'h'")
+			errors.New("invalid interval query parameters"),
+			"Missing 'interval' query parameter with a time duration formatted such as '300s', '1.5h' or '2h45m'. Valid time units are 'ns', 'us' (or 'µs'), 'ms', 's', 'm', 'h'")
 	}
 
-	vars := mux.Vars(r)
-	username := vars["username"]
+	username := r.URL.Query().Get("user")
 
 	var timeseries model.RoastTimeseries
 	if username == "" {
@@ -106,8 +105,8 @@ func Statistic(r *mux.Router) {
 	// Content-Type.
 	r.Use(middleware.EnforceContentType("application/json"))
 
-	// Roast Count Timeseries [GET].
-	r.Handle("/roast/timeseries", handler(retrieveRoastCountTimeseries)).
+	// Roast Timeseries [GET].
+	r.Handle("/roast/timeseries", handler(retrieveRoastTimeseries)).
 		Queries("start", "",
 			"end", "",
 			"interval", "").
@@ -119,10 +118,5 @@ func Statistic(r *mux.Router) {
 
 	// Lines of Code [GET].
 	r.Handle("/lines/count", handler(retrieveLinesCount)).
-		Methods(http.MethodGet)
-
-	// Score [GET].
-	r.Handle("/score", handler(retrieveLinesCount)).
-		Queries("user", "").
 		Methods(http.MethodGet)
 }
