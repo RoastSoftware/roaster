@@ -4,7 +4,7 @@ import {UserModel} from '../models/user';
 import Auth from '../services/auth';
 
 export default class Login implements ξ.ClassComponent {
-  loginError: APIError;
+  loginError: Error;
 
   authenticate(): Promise<User> {
     if (UserModel.validLogin()) {
@@ -16,14 +16,15 @@ export default class Login implements ξ.ClassComponent {
 
             return user;
           })
-          .catch((err: APIError) => {
+          .catch((err: Error) => {
             this.loginError = err;
-            return {} as User;
+            console.log(this);
+            ξ.redraw();
           });
     }
   };
 
-  view(controller) {
+  view() {
     return ξ(base, ξ('.ui.main.text.container[style=margin-top: 2em;]',
         ξ('.ui.grid',
             ξ('.ui.container.six.wide.column.centered',
@@ -36,10 +37,12 @@ export default class Login implements ξ.ClassComponent {
                               ξ('i.close.icon'),
                               ξ('.header',
                                   'Oh noeh!'),
-                              ξ('p', this.loginError)))),
+                              ξ('p', this.loginError.message)))),
 
                     ξ('.ui.segment', ξ('form.ui.form', {
-                      onsubmit: this.authenticate},
+                      onsubmit: () => {
+                        this.authenticate();
+                      }},
                     [
                       ξ('.field', {
                         class: UserModel.validUsername() ? '' : 'error'}, [

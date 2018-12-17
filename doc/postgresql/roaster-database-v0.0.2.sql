@@ -12,7 +12,7 @@ create table if not exists "user"
   fullname text
     constraint fullname_chk
     check (char_length(fullname) < 255),
-  email    text  not null
+  email    text  not null unique
     constraint email_chk
     check (char_length(email) < 255)
 );
