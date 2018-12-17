@@ -480,7 +480,7 @@ API.
                 },
                 "numberOfWarnings": {
                     "type": "number"
-                }
+                },
                 "numberOfErrors": {
                     "type": "number"
                 }
