@@ -596,183 +596,57 @@ API.
     ```
 
 ## Statistics [/statistic]
-### Global Roast Count Statistics [/statistic/roast/count{?start}{?end}{?interval}]
-#### Get Count of Roasts as Time series [GET]
+### Roast Statistics Timeseries [/statistic/roast/timeseries{?start}{?end}{?interval}{?user}]
+#### Get Statistics for Roasts as Time series [GET]
 + Request Roast count statistics as time series
     + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+        + start: "2018-12-17T23:00:00Z" (string) - Start date according to RFC3339.
+        + end: "2018-12-17T23:10:00Z" (string) - End date according to RFC3339.
         + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
+	+ user: willeponken (string, optional) - Show statistics for specific user.
 + Response 200 (application/json)
     + Body
     ```json
     [
  {
   "timestamp": "2018-12-17T23:10:00Z",
-  "count": 123
+  "count": 123,
+  "errors": 231,
+  "warnings": 210,
+  "rows": 5901
  },
  {
   "timestamp": "2018-12-17T23:00:00Z",
-  "count": 32
+  "count": 32,
+  "errors": 5,
+  "warnings": 7,
+  "rows": 512
  }
     ]
     ```
 
-### User Specific Roast Count Statistics [/statistic/{username}/roast/count{?start}{?end}{?interval}]
-#### Get Count of Roasts as Time series for Specific User [GET]
-+ Request Roast count statistics as time series for specific user
+### Roast Statistics Count [/statistic/roast/count{?user}]
+#### Get Number of Roasts [GET]
++ Request Number of Roasts
     + Parameters
-        + start: "2018-12-17T23:00:00Z" (string) - Start date.
-        + end: "2018-12-17T23:10:00Z" (string) - End date.
-        + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
+	+ user: willeponken (string, optional) - Show count for specific user.
 + Response 200 (application/json)
     + Body
     ```json
-    [
  {
-  "timestamp": "2018-12-17T23:10:00Z",
-  "count": 123
- },
- {
-  "timestamp": "2018-12-17T23:00:00Z",
-  "count": 32
+  "count": 321
  }
-    ]
     ```
 
-### Global Language Statistics [/statistic/language{?start}{?end}{?interval}]
-#### Get For All Languages [GET]
-+ Request statistics for all languages
+### Roast Statistics Lines of Code [/statistic/roast/lines{?user}]
+#### Get Lines of Code Analyzed [GET]
++ Request Lines of code analyzed
     + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 600 (number) - Interval for each data point in seconds.
+	+ user: willeponken (string, optional) - Show lines of code for specific user.
 + Response 200 (application/json)
     + Body
     ```json
-    {
-        "python": [
-            {
-                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            },
-            {
-                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            }
-        ],
-        "fortran": [
-            {
-                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 1125,
-                "warnings": 127,
-                "rows": 5
-            },
-            {
-                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
-                "errors": 5943,
-                "warnings": 712,
-                "rows": 3
-            }
-        ]
-    }
-    ```
-
-
-### Global Language Specific Statistics [/statistic/language/{language}{?start}{?end}{?interval}]
-#### Get For Specific Languages [GET]
-+ Request statistics for specific languages
-    + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 600 (number) - Interval for each data point in seconds.
-+ Response 200 (application/json)
-    + Body
-    ```json
-    [
-        {
-            "timestamp": "Mon Dec  3 10:41:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        },
-        {
-            "timestamp": "Mon Dec  3 10:31:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        }
-    ]
-    ```
-
-### User Language Statistics [/statistic/{username}/language{?start}{?end}{?interval}]
-#### Get For All Languages For User [GET]
-+ Request statistics for all languages for user
-    + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + Interval: 600 (number) - Interval for each data point in seconds.
-+ Response 200 (application/json)
-    + Body
-    ```json
-    {
-        "python": [
-            {
-                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            },
-            {
-                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            }
-        ],
-        "fortran": [
-            {
-                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 1125,
-                "warnings": 127,
-                "rows": 5
-            },
-            {
-                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
-                "errors": 5943,
-                "warnings": 712,
-                "rows": 3
-            }
-        ]
-    }
-    ```
-
-### User Language Specific Statistics [/statistic/{username}/language/{language}{?start}{?end}{?interval}]
-#### Get For Specific Languages For User [GET]
-+ Request statistics for specific languages for user
-    + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 600 (number) - Interval for each data point in seconds.
-+ Response 200 (application/json)
-    + Body
-    ```json
-    [
-        {
-            "timestamp": "Mon Dec  3 10:31:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        },
-        {
-            "timestamp": "Mon Dec  3 10:41:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        }
-    ]
+ {
+  "lines": 321
+ }
     ```

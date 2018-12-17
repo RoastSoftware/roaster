@@ -117,6 +117,6 @@ func Statistic(r *mux.Router) {
 		Methods(http.MethodGet)
 
 	// Lines of Code [GET].
-	r.Handle("/lines/count", handler(retrieveLinesCount)).
+	r.Handle("/roast/lines", handler(retrieveLinesCount)).
 		Methods(http.MethodGet)
 }
