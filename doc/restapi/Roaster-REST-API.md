@@ -603,7 +603,7 @@ API.
         + start: "2018-12-17T23:00:00Z" (string) - Start date according to RFC3339.
         + end: "2018-12-17T23:10:00Z" (string) - End date according to RFC3339.
         + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
-	+ user: willeponken (string, optional) - Show statistics for specific user.
+        + user: willeponken (string, optional) - Show statistics for specific user.
 + Response 200 (application/json)
     + Body
     ```json
@@ -629,7 +629,7 @@ API.
 #### Get Number of Roasts [GET]
 + Request Number of Roasts
     + Parameters
-	+ user: willeponken (string, optional) - Show count for specific user.
+        + user: willeponken (string, optional) - Show count for specific user.
 + Response 200 (application/json)
     + Body
     ```json
@@ -642,7 +642,7 @@ API.
 #### Get Lines of Code Analyzed [GET]
 + Request Lines of code analyzed
     + Parameters
-	+ user: willeponken (string, optional) - Show lines of code for specific user.
+        + user: willeponken (string, optional) - Show lines of code for specific user.
 + Response 200 (application/json)
     + Body
     ```json
