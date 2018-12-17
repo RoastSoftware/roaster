@@ -135,13 +135,19 @@ func GetUserRoastCountTimeseries(start, end time.Time, resolution time.Duration,
 
 // getRoastCountTimeseries returns a timeseries of number of Roasts per time
 // unit. See: GetGlobalRoastCountTimeseries or GetUserRoastCountTimeseries.
-func getRoastCountTimeseries(start, end time.Time, resolution time.Duration, username string) (
+func getRoastCountTimeseries(start, end time.Time, interval time.Duration, username string) (
 	timeseries RoastCountTimeseries, err error) {
 
-	sqlInterval, sqlResolution := getSQLResolution(resolution)
-	sqlStart := formatSQLTime(start)
-	sqlEnd := formatSQLTime(end)
+	// Round the interval to the closest minute.
+	interval = interval.Round(time.Minute)
 
+	// Round both the start and end time to the nearest multiple of the
+	// interval.
+	start = start.Round(interval)
+	end = end.Round(interval)
+
+	// TODO(willeponken) For some reason it doesn't work with the username
+	// currently.................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
 	rows, err := database.Query(`
 		WITH "time_series" AS (
 			SELECT generate_series(
@@ -152,15 +158,21 @@ func getRoastCountTimeseries(start, end time.Time, resolution time.Duration, use
 		)
 
 		SELECT
-			"time_series"."datapoint",
-			count(distinct r."id")
+			"time_series"."datapoint" AS "timestamp",
+			COUNT(r."id") AS "count"
 		FROM "time_series"
 		LEFT JOIN "roaster"."roast" AS r
 			-- Truncate and compare per resolution.
-			ON date_trunc($4, r."create_time") = "time_series"."datapoint"
+			ON date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = "time_series"."datapoint"
 			AND COALESCE(TRIM($5), '')='' OR LOWER(username)=LOWER(TRIM($5))
 		GROUP BY 1
-	`, sqlStart, sqlEnd, sqlInterval, sqlResolution, username)
+		ORDER BY "timestamp" ASC
+	`,
+		start,
+		end,
+		fmt.Sprintf("%.0f minutes", interval.Minutes()),
+		int(interval.Minutes()),
+		username)
 	if err != nil {
 		return
 	}
@@ -178,43 +190,6 @@ func getRoastCountTimeseries(start, end time.Time, resolution time.Duration, use
 	}
 
 	return
-}
-
-// getSQLResolution returns the SQL interval and resolution for the provided
-// resolution.
-func getSQLResolution(resolution time.Duration) (sqlInterval, sqlResolution string) {
-
-	var interval float64
-
-	switch {
-	case resolution >= YearResolution:
-		interval = (resolution.Truncate(YearResolution).Hours() / 24) / 365
-		sqlResolution = "years"
-	case resolution >= MonthResolution:
-		interval = (resolution.Truncate(MonthResolution).Hours() / 24) / 30
-		sqlResolution = "months"
-	case resolution >= DayResolution:
-		interval = resolution.Truncate(DayResolution).Hours() / 24
-		sqlResolution = "days"
-	case resolution >= HourResolution:
-		interval = resolution.Truncate(HourResolution).Hours()
-		sqlResolution = "hours"
-	case resolution >= MinuteResolution:
-		interval = resolution.Truncate(MinuteResolution).Minutes()
-		sqlResolution = "minutes"
-	case resolution >= SecondResolution:
-		interval = resolution.Truncate(SecondResolution).Seconds()
-		sqlResolution = "seconds"
-	}
-
-	sqlInterval = fmt.Sprintf("%d %s", uint(interval), sqlResolution)
-
-	return
-}
-
-// formatSQLTime returns the time formatted as RFC3339 w/ decimals.
-func formatSQLTime(t time.Time) string {
-	return t.Format("2006-01-02T15:04:05.000000Z")
 }
 
 func getGlobalLinesOfCode(language string) (lines uint64, err error) {

@@ -1,4 +1,4 @@
-// Package forwardengineer was generated automatically by inlinesql at 2018-12-14 13:26:21.329284115 +0100 CET m=+0.001988645.
+// Package forwardengineer was generated automatically by inlinesql at 2018-12-17 13:47:57.209026561 +0100 CET m=+0.001461019.
 package forwardengineer
 
 // GetQueries returns a pre-parsed slice of SQL queries.
@@ -15,5 +15,9 @@ func GetQueries() []string {
 		"create table if not exists \"roast_has_warnings\" ( roast integer not null constraint roast_fk references roast (id) on update cascade on delete cascade, warning uuid not null constraint warning_fk references warning (id) )",
 		"create table if not exists avatar ( avatar bytea not null, username text not null, constraint username_uq unique (username), constraint username_fk foreign key (username) references \"user\" (username) match simple on update cascade on delete cascade )",
 		"create index if not exists username_avatar_idx on avatar using btree (username)",
+		"drop function if exists round_minutes(timestamp without time zone, integer)",
+		"drop function if exists round_minutes(timestamp without time zone, integer, text)",
+		"create function round_minutes(timestamp without time zone, integer) returns timestamp without time zone as $$ select date_trunc('hour', $1) + cast(($2::varchar||' min') as interval) * round( (date_part('minute',$1)::float + date_part('second',$1)/ 60.)::float / $2::float ) $$ language sql immutable",
+		"create function round_minutes(timestamp without time zone, integer, text) returns text as $$ select to_char(round_minutes($1,$2),$3) $$ language sql immutable",
 	}
 }
