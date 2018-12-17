@@ -175,6 +175,28 @@ API.
     }
     ```
 
+### User Score [/user/{username}/score]
+#### Retrieve User Score [GET]
++ Request user score
++ Response 200 (application/json)
+    + Body
+    ```json
+    {
+        "score": 123,
+    }
+    ```
+    + Schema
+    ```json
+    {
+        "type": "object",
+        "properties": {
+            "email": {
+                "type": "number"
+            }
+        }
+    }
+    ```
+
 #### Remove User [DELETE]
 + Request remove user
     + Headers
