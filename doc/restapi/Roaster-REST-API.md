@@ -611,16 +611,16 @@ API.
  {
   "timestamp": "2018-12-17T23:10:00Z",
   "count": 123,
-  "errors": 231,
-  "warnings": 210,
-  "rows": 5901
+  "numberOfErrors": 231,
+  "numberOfWarnings": 210,
+  "linesOfCode": 5901
  },
  {
   "timestamp": "2018-12-17T23:00:00Z",
   "count": 32,
-  "errors": 5,
-  "warnings": 7,
-  "rows": 512
+  "numberOfErrors": 5,
+  "numberOfWarnings": 7,
+  "linesOfCode": 512
  }
     ]
     ```
