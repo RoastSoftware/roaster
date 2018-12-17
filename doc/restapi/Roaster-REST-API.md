@@ -190,7 +190,7 @@ API.
     {
         "type": "object",
         "properties": {
-            "email": {
+            "score": {
                 "type": "number"
             }
         }
@@ -422,7 +422,11 @@ API.
     + Body
     ```json
     {
-        "grade": 12,
+        "username": "willeponken",
+        "language": "python3",
+        "code": "print('I´m Roastin´ Roger... Roger.', invalid = 'Bönor är ändå rätt gött'",
+        "createTime": "2018-12-17T23:00:00Z",
+        "score": 12,
         "warnings": [
             {
                 "row": 1,
@@ -440,7 +444,12 @@ API.
                 "name": "TypeError",
                 "description": "print() got an unexpected keyword argument 'invalid'"
             }
-        ]
+        ],
+        "statistics": {
+            "numberOfErrors": 1,
+            "numberOfWarnings": 1,
+            "linesOfCode": 1
+        }
     }
     ```
     + Schema
@@ -448,8 +457,34 @@ API.
     {
         "type": "object",
         "properties": {
-            "grade": {
+            "username": {
+                "type": "string"
+            },
+            "score": {
                 "type": "number"
+            },
+            "language": {
+                "type": "string"
+            },
+            "code": {
+                "type": "string"
+            },
+            "createTime": {
+                "type": "string"
+            },
+            "statistics": {
+            "type": "object",
+            "properties": {
+                "linesOfCode": {
+                    "type": "number"
+                },
+                "numberOfWarnings": {
+                    "type": "number"
+                }
+                "numberOfErrors": {
+                    "type": "number"
+                }
+            }
             },
             "warning": {
                 "type": "array",
