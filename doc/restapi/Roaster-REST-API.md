@@ -596,28 +596,70 @@ API.
     ```
 
 ## Statistics [/statistic]
-### Global Language Statistics [/statistic/language{?start}{?end}{?interval}]
+### Global Roast Count Statistics [/statistic/roast/count{?start}{?end}{?resolution}]
+#### Get Count of Roasts as Time series [GET]
++ Request Roast count statistics as time series
+    + Parameters
+        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
+        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+        + resolution: 600 (number) - Resolution for each data point in seconds.
++ Response 200 (application/json)
+    + Body
+    ```json
+    [
+ {
+  "timestamp": "Mon Dec  3 10:41:52 CET 2018",
+  "count": 123
+ },
+ {
+  "timestamp": "Mon Dec  3 10:51:52 CET 2018",
+  "count": 32
+ }
+    ]
+    ```
+
+### User Specific Roast Count Statistics [/statistic/{username}/roast/count{?start}{?end}{?resolution}]
+#### Get Count of Roasts as Time series for Specific User [GET]
++ Request Roast count statistics as time series for specific user
+    + Parameters
+        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
+        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
+        + resolution: 600 (number) - Resolution for each data point in seconds.
++ Response 200 (application/json)
+    + Body
+    ```json
+    [
+ {
+  "timestamp": "Mon Dec  3 10:41:52 CET 2018",
+  "count": 123
+ },
+ {
+  "timestamp": "Mon Dec  3 10:51:52 CET 2018",
+  "count": 32
+ }
+    ]
+    ```
+
+### Global Language Statistics [/statistic/language{?start}{?end}{?resolution}]
 #### Get For All Languages [GET]
 + Request statistics for all languages
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + resolution: 600 (number) - Resolution for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
     {
         "python": [
             {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
                 "errors": 5,
                 "warnings": 7,
                 "rows": 512
             },
             {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
                 "errors": 5,
                 "warnings": 7,
                 "rows": 512
@@ -625,15 +667,13 @@ API.
         ],
         "fortran": [
             {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
                 "errors": 1125,
                 "warnings": 127,
                 "rows": 5
             },
             {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
                 "errors": 5943,
                 "warnings": 712,
                 "rows": 3
@@ -642,27 +682,26 @@ API.
     }
     ```
 
-### Global Language Specific Statistics [/statistic/language/{language}{?start}{?end}{?interval}]
+
+### Global Language Specific Statistics [/statistic/language/{language}{?start}{?end}{?resolution}]
 #### Get For Specific Languages [GET]
 + Request statistics for specific languages
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + resolution: 600 (number) - Resolution for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
     [
         {
-            "start": "Mon Dec  3 10:41:52 CET 2018",
-            "end": "Mon Dec  3 10:51:52 CET 2018",
+            "timestamp": "Mon Dec  3 10:41:52 CET 2018",
             "errors": 5,
             "warnings": 7,
             "rows": 512
         },
         {
-            "start": "Mon Dec  3 10:31:52 CET 2018",
-            "end": "Mon Dec  3 10:41:52 CET 2018",
+            "timestamp": "Mon Dec  3 10:31:52 CET 2018",
             "errors": 5,
             "warnings": 7,
             "rows": 512
@@ -670,28 +709,26 @@ API.
     ]
     ```
 
-### User Language Statistics [/statistic/{username}/language{?start}{?end}{?interval}]
+### User Language Statistics [/statistic/{username}/language{?start}{?end}{?resolution}]
 #### Get For All Languages For User [GET]
 + Request statistics for all languages for user
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + Resolution: 600 (number) - Resolution for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
     {
         "python": [
             {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
                 "errors": 5,
                 "warnings": 7,
                 "rows": 512
             },
             {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
                 "errors": 5,
                 "warnings": 7,
                 "rows": 512
@@ -699,15 +736,13 @@ API.
         ],
         "fortran": [
             {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:41:52 CET 2018",
                 "errors": 1125,
                 "warnings": 127,
                 "rows": 5
             },
             {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
+                "timestamp": "Mon Dec  3 10:31:52 CET 2018",
                 "errors": 5943,
                 "warnings": 712,
                 "rows": 3
@@ -716,27 +751,25 @@ API.
     }
     ```
 
-### User Language Specific Statistics [/statistic/{username}/language/{language}{?start}{?end}{?interval}]
+### User Language Specific Statistics [/statistic/{username}/language/{language}{?start}{?end}{?resolution}]
 #### Get For Specific Languages For User [GET]
 + Request statistics for specific languages for user
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + resolution: 600 (number) - Resolution for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
     [
         {
-            "start": "Mon Dec  3 10:41:52 CET 2018",
-            "end": "Mon Dec  3 10:51:52 CET 2018",
+            "timestamp": "Mon Dec  3 10:41:52 CET 2018",
             "errors": 5,
             "warnings": 7,
             "rows": 512
         },
         {
-            "start": "Mon Dec  3 10:31:52 CET 2018",
-            "end": "Mon Dec  3 10:41:52 CET 2018",
+            "timestamp": "Mon Dec  3 10:31:52 CET 2018",
             "errors": 5,
             "warnings": 7,
             "rows": 512

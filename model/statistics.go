@@ -147,7 +147,7 @@ func getRoastCountTimeseries(start, end time.Time, resolution time.Duration, use
 			SELECT generate_series(
 				$1::timestamp, -- Start point date with time.
 				$2::timestamp, -- End point date with time.
-				$3::interval   -- Time series resolution.
+				$3::interval   -- Time series interval.
 			) AS "datapoint"
 		)
 
@@ -183,23 +183,31 @@ func getRoastCountTimeseries(start, end time.Time, resolution time.Duration, use
 // getSQLResolution returns the SQL interval and resolution for the provided
 // resolution.
 func getSQLResolution(resolution time.Duration) (sqlInterval, sqlResolution string) {
-	var resIdentifier string
-	switch resolution {
-	case SecondResolution:
-		resIdentifier = "second"
-	case MinuteResolution:
-		resIdentifier = "minute"
-	case HourResolution:
-		resIdentifier = "hour"
-	case DayResolution:
-		resIdentifier = "day"
-	case YearResolution:
-	default:
-		resIdentifier = "year"
+
+	var interval float64
+
+	switch {
+	case resolution >= YearResolution:
+		interval = (resolution.Truncate(YearResolution).Hours() / 24) / 365
+		sqlResolution = "years"
+	case resolution >= MonthResolution:
+		interval = (resolution.Truncate(MonthResolution).Hours() / 24) / 30
+		sqlResolution = "months"
+	case resolution >= DayResolution:
+		interval = resolution.Truncate(DayResolution).Hours() / 24
+		sqlResolution = "days"
+	case resolution >= HourResolution:
+		interval = resolution.Truncate(HourResolution).Hours()
+		sqlResolution = "hours"
+	case resolution >= MinuteResolution:
+		interval = resolution.Truncate(MinuteResolution).Minutes()
+		sqlResolution = "minutes"
+	case resolution >= SecondResolution:
+		interval = resolution.Truncate(SecondResolution).Seconds()
+		sqlResolution = "seconds"
 	}
 
-	sqlInterval = fmt.Sprintf("%d %s", 1, resIdentifier)
-	sqlResolution = resIdentifier
+	sqlInterval = fmt.Sprintf("%d %s", uint(interval), sqlResolution)
 
 	return
 }
