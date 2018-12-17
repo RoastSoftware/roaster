@@ -23,6 +23,8 @@ create table if not exists user_friends
 (
     username text not null,
     create_time timestamp with time zone not null,
+    friend text not null,
+    constraint friend_relation_uq unique (username, friend),
     constraint username_fk foreign key (username)
         references "user" (username) match simple
         on update cascade
