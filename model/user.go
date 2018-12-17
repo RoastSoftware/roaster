@@ -3,8 +3,6 @@ package model
 
 import (
 	"crypto/sha512"
-	"database/sql"
-	"errors"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -166,23 +164,10 @@ func GetUser(identifier string) (user User, err error) {
 
 // GetUserScore returns the score for an user.
 func GetUserScore(username string) (score UserScore, err error) {
-	var s sql.NullInt64
-
 	err = database.QueryRow(`
-		SELECT SUM(score)
+		SELECT COALESCE(SUM("score"), 0) AS "score"
 		FROM roaster.roast AS r
 		WHERE LOWER(r.username)=LOWER(TRIM($1))
-	`, username).Scan(&s)
-	if err != nil {
-		return
-	}
-
-	if !s.Valid {
-		err = errors.New("no score sum for the provided user")
-		return
-	}
-
-	score.Score = uint64(s.Int64)
-
+	`, username).Scan(&score.Score)
 	return
 }

@@ -2,7 +2,6 @@
 package model
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 )
@@ -144,21 +143,17 @@ func getRoastTimeseries(start, end time.Time, interval time.Duration, username s
 }
 
 func getLinesOfCode(username string) (lines LinesOfCode, err error) {
-	var l sql.NullInt64
-
 	err = database.QueryRow(`
-		SELECT SUM(lines_of_code)
+		SELECT COALESCE(SUM("lines_of_code"), 0) AS "lines_of_code"
 		FROM roaster.roast_statistics AS s
 		JOIN roaster.roast AS r
 		ON r.id = s.roast
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      LOWER(r.username)=LOWER(TRIM($1))
-	`, username).Scan(&l)
+	`, username).Scan(&lines.Lines)
 	if err != nil {
 		return
 	}
-
-	lines.Lines = uint64(l.Int64)
 
 	return
 }

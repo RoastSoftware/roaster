@@ -111,7 +111,7 @@ func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err er
 	username := mux.Vars(r)["username"]
 	score, err := model.GetUserScore(username)
 	if err != nil {
-		return http.StatusNotFound, causerr.New(err, "Could not find any score for the provided user")
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	err = json.NewEncoder(w).Encode(score)
