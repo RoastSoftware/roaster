@@ -130,7 +130,7 @@ func getRoastTimeseries(start, end time.Time, interval time.Duration, username s
 		start,
 		end,
 		fmt.Sprintf("%.0f minutes", interval.Minutes()),
-		int(interval.Minutes()),
+		interval.Minutes(),
 		username)
 	if err != nil {
 		return
