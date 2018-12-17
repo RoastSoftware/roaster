@@ -29,11 +29,11 @@ func retrieveRoastCountTimeseries(w http.ResponseWriter, r *http.Request) (int, 
 			"Missing or invalid '?end=' query parameter with timestamp formatted according to RFC3339")
 	}
 
-	resolution, err := time.ParseDuration(fmt.Sprintf("%s",
-		r.URL.Query().Get("resolution")))
+	interval, err := time.ParseDuration(fmt.Sprintf("%s",
+		r.URL.Query().Get("interval")))
 	if err != nil {
 		return http.StatusBadRequest, causerr.New(
-			errors.New("invalid ?resolution query parameters"),
+			errors.New("invalid ?interval query parameters"),
 			"Missing '?end=' query parameter with a time duration formatted such as '300s', '1.5h' or '2h45m'. Valid time units are 'ns', 'us' (or 'µs'), 'ms', 's', 'm', 'h'")
 	}
 
@@ -42,9 +42,9 @@ func retrieveRoastCountTimeseries(w http.ResponseWriter, r *http.Request) (int, 
 
 	var timeseries model.RoastCountTimeseries
 	if username == "" {
-		timeseries, err = model.GetGlobalRoastCountTimeseries(start, end, resolution)
+		timeseries, err = model.GetGlobalRoastCountTimeseries(start, end, interval)
 	} else {
-		timeseries, err = model.GetUserRoastCountTimeseries(start, end, resolution, username)
+		timeseries, err = model.GetUserRoastCountTimeseries(start, end, interval, username)
 	}
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
@@ -68,13 +68,13 @@ func Statistic(r *mux.Router) {
 	r.Handle("/roast", handler(retrieveRoastCountTimeseries)).
 		Queries("start", "",
 			"end", "",
-			"resolution", "").
+			"interval", "").
 		Methods(http.MethodGet)
 
 	// User Specific Roast Count Timeseries [GET].
 	r.Handle("/{username}/roast", handler(retrieveRoastCountTimeseries)).
 		Queries("start", "",
 			"end", "",
-			"resolution", "").
+			"interval", "").
 		Methods(http.MethodGet)
 }

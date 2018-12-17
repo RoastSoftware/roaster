@@ -596,57 +596,57 @@ API.
     ```
 
 ## Statistics [/statistic]
-### Global Roast Count Statistics [/statistic/roast/count{?start}{?end}{?resolution}]
+### Global Roast Count Statistics [/statistic/roast/count{?start}{?end}{?interval}]
 #### Get Count of Roasts as Time series [GET]
 + Request Roast count statistics as time series
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + resolution: 600 (number) - Resolution for each data point in seconds.
+        + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
 + Response 200 (application/json)
     + Body
     ```json
     [
  {
-  "timestamp": "Mon Dec  3 10:41:52 CET 2018",
+  "timestamp": "2018-12-17T23:10:00Z",
   "count": 123
  },
  {
-  "timestamp": "Mon Dec  3 10:51:52 CET 2018",
+  "timestamp": "2018-12-17T23:00:00Z",
   "count": 32
  }
     ]
     ```
 
-### User Specific Roast Count Statistics [/statistic/{username}/roast/count{?start}{?end}{?resolution}]
+### User Specific Roast Count Statistics [/statistic/{username}/roast/count{?start}{?end}{?interval}]
 #### Get Count of Roasts as Time series for Specific User [GET]
 + Request Roast count statistics as time series for specific user
     + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + resolution: 600 (number) - Resolution for each data point in seconds.
+        + start: "2018-12-17T23:00:00Z" (string) - Start date.
+        + end: "2018-12-17T23:10:00Z" (string) - End date.
+        + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
 + Response 200 (application/json)
     + Body
     ```json
     [
  {
-  "timestamp": "Mon Dec  3 10:41:52 CET 2018",
+  "timestamp": "2018-12-17T23:10:00Z",
   "count": 123
  },
  {
-  "timestamp": "Mon Dec  3 10:51:52 CET 2018",
+  "timestamp": "2018-12-17T23:00:00Z",
   "count": 32
  }
     ]
     ```
 
-### Global Language Statistics [/statistic/language{?start}{?end}{?resolution}]
+### Global Language Statistics [/statistic/language{?start}{?end}{?interval}]
 #### Get For All Languages [GET]
 + Request statistics for all languages
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + resolution: 600 (number) - Resolution for each data point in seconds.
+        + interval: 600 (number) - Interval for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
@@ -683,13 +683,13 @@ API.
     ```
 
 
-### Global Language Specific Statistics [/statistic/language/{language}{?start}{?end}{?resolution}]
+### Global Language Specific Statistics [/statistic/language/{language}{?start}{?end}{?interval}]
 #### Get For Specific Languages [GET]
 + Request statistics for specific languages
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + resolution: 600 (number) - Resolution for each data point in seconds.
+        + interval: 600 (number) - Interval for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
@@ -709,13 +709,13 @@ API.
     ]
     ```
 
-### User Language Statistics [/statistic/{username}/language{?start}{?end}{?resolution}]
+### User Language Statistics [/statistic/{username}/language{?start}{?end}{?interval}]
 #### Get For All Languages For User [GET]
 + Request statistics for all languages for user
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + Resolution: 600 (number) - Resolution for each data point in seconds.
+        + Interval: 600 (number) - Interval for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
@@ -751,25 +751,25 @@ API.
     }
     ```
 
-### User Language Specific Statistics [/statistic/{username}/language/{language}{?start}{?end}{?resolution}]
+### User Language Specific Statistics [/statistic/{username}/language/{language}{?start}{?end}{?interval}]
 #### Get For Specific Languages For User [GET]
 + Request statistics for specific languages for user
     + Parameters
         + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
         + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + resolution: 600 (number) - Resolution for each data point in seconds.
+        + interval: 600 (number) - Interval for each data point in seconds.
 + Response 200 (application/json)
     + Body
     ```json
     [
         {
-            "timestamp": "Mon Dec  3 10:41:52 CET 2018",
+            "timestamp": "Mon Dec  3 10:31:52 CET 2018",
             "errors": 5,
             "warnings": 7,
             "rows": 512
         },
         {
-            "timestamp": "Mon Dec  3 10:31:52 CET 2018",
+            "timestamp": "Mon Dec  3 10:41:52 CET 2018",
             "errors": 5,
             "warnings": 7,
             "rows": 512
