@@ -4,6 +4,7 @@ import base from './base';
 import Network from '../services/network';
 import Model from '../models/statistics';
 import Chart from 'chart.js';
+import {addFriend} from '../models/user';
 
 class UserProfile implements ξ.ClassComponent {
   view(vnode: ξ.CVnode) {
@@ -29,6 +30,12 @@ class UserProfile implements ξ.ClassComponent {
                 email),
             ξ('.ui.placeholder',
                 ξ('ui.image')),
+            ξ('button.ui.basic.teal.button', {
+                onclick: () => {
+                    addFriend(username);
+                },
+            },
+                'FOLLOW!'),
 
         ),
         ξ('.ui.column[min-height = 10em]',

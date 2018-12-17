@@ -158,3 +158,54 @@ func GetUser(identifier string) (user User, err error) {
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
 	return
 }
+
+// Friend holds a friend
+type Friend struct {
+    Username string `json:"username"`
+    CreateTime time.Time `json:"createTime"`
+    Friend string `json:"friend"`
+}
+
+// GetFriends returns 
+func GetFriends(identifier string) (friends []Friend, err error) {
+    // TODO: some way of looping in the query into the list
+    friendRows, err := database.Query(`
+    SELECT username, friend, create_time
+    FROM "roaster"."user_friends"
+    WHERE (LOWER(username)=LOWER(TRIM($1)))
+    `, identifier)
+    if err != nil {
+		return
+	}
+	defer friendRows.Close()
+
+    for friendRows.Next() {
+        res := Friend{}
+        err = friendRows.Scan(&res.Username, &res.CreateTime, &res.Friend)
+        friends = append(friends, res)
+        if err != nil {
+            return
+        }
+    }
+    return
+}
+
+// PutFriend returns
+func PutFriend(identifier string, friend string) (err error) {
+    _, err = database.Exec(`
+    INSERT INTO "roaster"."user_friends"
+    (username, create_time, friend)
+    VALUES
+    (TRIM($1), $2, TRIM($3))
+    `, identifier, time.Now(), friend)
+    return
+}
+
+// RemoveFriend returns
+func RemoveFriend(identifier string, friend string) (err error) {
+    _, err = database.Exec(`
+    DELETE FROM "roast"."user_friends"
+    WHERE (TRIM($1) and TRIM($2))
+    `, identifier, friend)
+    return
+}

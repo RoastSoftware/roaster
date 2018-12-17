@@ -1,9 +1,15 @@
 import ξ from 'mithril';
+import Network from '../services/network';
 
 export interface User {
   username: string;
   fullname: string;
   email: string;
+}
+
+export interface Friend {
+    username: string;
+    createTime: Date;
 }
 
 export class UserModel {
@@ -17,13 +23,16 @@ export class UserModel {
 
     static email: string = '';
     private static emailError: string = '';
+    
+    static friends: Friend[];
 
     static empty() {
       UserModel.username = '';
       UserModel.fullname = '';
       UserModel.password = '';
       UserModel.email = '';
-      UserModel.loggedIn = false;
+        UserModel.loggedIn = false;
+        UserModel.friends = [];
     };
 
     static isLoggedIn(): boolean {
@@ -191,4 +200,16 @@ function deAuthenticateUser() {
     url: '/session',
   });
 };
+
+function retrieveFriends() {
+    return ξ.request({
+        method: 'GET',
+        url: '/user/' + this.username + '/friend',
+    });
+};
 /* eslint-enable */
+export function addFriend(username: string) {
+    return Network.request<T>('POST', '/user/' + username + '/friend', {
+        'friend': username,
+    }); 
+};
