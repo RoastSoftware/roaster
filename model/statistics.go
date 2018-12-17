@@ -6,29 +6,17 @@ import (
 	"time"
 )
 
-// LanguageDatapoint represents a datapoint for language statistics.
-type LanguageDatapoint struct {
-	Start    time.Time
-	End      time.Time
-	Errors   uint64
-	Warnings uint64
-	Rows     uint64
+// RoastDatapoint represents a single datapoint with a timestamp.
+type RoastDatapoint struct {
+	Timestamp        time.Time `json:"timestamp"`
+	Count            uint64    `json:"count"`
+	NumberOfErrors   uint64    `json:"numberOfErrors"`
+	NumberOfWarnings uint64    `json:"numberOfWarnings"`
+	LinesOfCode      uint64    `json:"linesOfCode"`
 }
 
-// LanguageStatistics holds a collection of datapoints.
-type LanguageStatistics struct {
-	Datapoints []LanguageDatapoint `json:"items"`
-}
-
-// RoastCountDatapoint represents a single datapoint with a timestamp and the
-// count of Roasts during that timestamp.
-type RoastCountDatapoint struct {
-	Timestamp time.Time `json:"timestamp"`
-	Count     uint64    `json:"count"`
-}
-
-// RoastCountTimeseries holds a slice of RoastCountDatapoints.
-type RoastCountTimeseries []RoastCountDatapoint
+// RoastTimeseries holds a slice of RoastDatapoints.
+type RoastTimeseries []RoastDatapoint
 
 // NumberOfRoasts holds a named uint64 that represents the number of Roasts.
 type NumberOfRoasts struct {
@@ -75,31 +63,31 @@ func GetUserNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err 
 	return getNumberOfRoasts(username)
 }
 
-// GetGlobalRoastCountTimeseries returns a timeseries between a start and end
+// GetGlobalRoastTimeseries returns a timeseries between a start and end
 // timestamp, the interval parameter should be any duration above 1 minute,
 // anything less will default to 1 minute.
-func GetGlobalRoastCountTimeseries(start, end time.Time, resolution time.Duration) (
-	timeseries RoastCountTimeseries, err error) {
+func GetGlobalRoastTimeseries(start, end time.Time, resolution time.Duration) (
+	timeseries RoastTimeseries, err error) {
 
-	return getRoastCountTimeseries(start, end, resolution, "")
+	return getRoastTimeseries(start, end, resolution, "")
 }
 
-// GetUserRoastCountTimeseries returns a timeseries between a start and end
+// GetUserRoastTimeseries returns a timeseries between a start and end
 // timestamp for the provided username, the interval parameter should be any
 // duration above 1 minute, anything less will default to 1 minute.
-func GetUserRoastCountTimeseries(start, end time.Time, resolution time.Duration, username string) (
-	timeseries RoastCountTimeseries, err error) {
+func GetUserRoastTimeseries(start, end time.Time, resolution time.Duration, username string) (
+	timeseries RoastTimeseries, err error) {
 
-	return getRoastCountTimeseries(start, end, resolution, username)
+	return getRoastTimeseries(start, end, resolution, username)
 }
 
-// getRoastCountTimeseries returns a timeseries of number of Roasts per time
-// unit. See: GetGlobalRoastCountTimeseries or GetUserRoastCountTimeseries.
+// getRoastTimeseries returns a timeseries of number of Roasts per time
+// unit. See: GetGlobalRoastTimeseries or GetUserRoastTimeseries.
 //
 // The minimum interval is 1 minute, anything less will be set to 1 minute per
 // default.
-func getRoastCountTimeseries(start, end time.Time, interval time.Duration, username string) (
-	timeseries RoastCountTimeseries, err error) {
+func getRoastTimeseries(start, end time.Time, interval time.Duration, username string) (
+	timeseries RoastTimeseries, err error) {
 
 	// Round the interval to the closest minute.
 	interval = interval.Round(time.Minute)
@@ -124,12 +112,17 @@ func getRoastCountTimeseries(start, end time.Time, interval time.Duration, usern
 
 		SELECT
 			"time_series"."datapoint" AS "timestamp",
-			COUNT(r."id") AS "count"
+			COUNT(r."id") AS "count",
+			COALESCE(SUM(s."number_of_errors"), 0) AS "number_of_errors",
+			COALESCE(SUM(s."number_of_warnings"), 0) AS "number_of_warnings",
+			COALESCE(SUM(s."lines_of_code"), 0) AS "lines_of_code"
 		FROM "time_series"
 		LEFT JOIN "roaster"."roast" AS r
 			-- Truncate and compare per resolution.
 			ON date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = "time_series"."datapoint"
 			AND (COALESCE(TRIM($5), '')='' OR LOWER(r."username")=LOWER(TRIM($5))) -- Optionally only return for specified user.
+			LEFT JOIN "roaster"."roast_statistics" AS s -- Collect statistics for the Roasts.
+				ON s."roast" = r."id"
 		GROUP BY 1
 		ORDER BY "timestamp" DESC -- First in result is the latest timestamp.
 		LIMIT 1000 -- Do not return more than 1000 rows back in time.
@@ -145,9 +138,14 @@ func getRoastCountTimeseries(start, end time.Time, interval time.Duration, usern
 	defer rows.Close()
 
 	for rows.Next() {
-		datapoint := RoastCountDatapoint{}
+		datapoint := RoastDatapoint{}
 
-		err = rows.Scan(&datapoint.Timestamp, &datapoint.Count)
+		err = rows.Scan(
+			&datapoint.Timestamp,
+			&datapoint.Count,
+			&datapoint.NumberOfErrors,
+			&datapoint.NumberOfWarnings,
+			&datapoint.LinesOfCode)
 		if err != nil {
 			return
 		}

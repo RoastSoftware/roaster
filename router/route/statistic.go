@@ -40,11 +40,11 @@ func retrieveRoastCountTimeseries(w http.ResponseWriter, r *http.Request) (int, 
 	vars := mux.Vars(r)
 	username := vars["username"]
 
-	var timeseries model.RoastCountTimeseries
+	var timeseries model.RoastTimeseries
 	if username == "" {
-		timeseries, err = model.GetGlobalRoastCountTimeseries(start, end, interval)
+		timeseries, err = model.GetGlobalRoastTimeseries(start, end, interval)
 	} else {
-		timeseries, err = model.GetUserRoastCountTimeseries(start, end, interval, username)
+		timeseries, err = model.GetUserRoastTimeseries(start, end, interval, username)
 	}
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
