@@ -89,8 +89,7 @@ func removeUser(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
-	vars := mux.Vars(r)
-	username := vars["username"]
+	username := mux.Vars(r)["username"]
 
 	if username == "" {
 		return http.StatusBadRequest, causerr.New(
@@ -117,6 +116,21 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
 	return http.StatusOK, nil
 }
 
+func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err error) {
+	username := mux.Vars(r)["username"]
+	score, err := model.GetUserScore(username)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	err = json.NewEncoder(w).Encode(score)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	return http.StatusOK, nil
+}
+
 // User adds the handlers for the User [/user] endpoint.
 func User(r *mux.Router) {
 	// All handlers are required to use application/json as their
@@ -131,4 +145,5 @@ func User(r *mux.Router) {
 	r.Handle("/{username}", handler(removeUser)).Methods(http.MethodDelete)
 	r.Handle("/{username}", handler(retrieveUser)).Methods(http.MethodGet)
 
+	r.Handle("/{username}/score", handler(retrieveUserScore)).Methods(http.MethodGet)
 }

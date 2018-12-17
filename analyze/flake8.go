@@ -61,8 +61,6 @@ func (f flake8Result) toRoast(username string, code string) (roast *model.RoastR
 		}
 	}
 
-	roast.CalculateScore()
-
 	return
 }
 
