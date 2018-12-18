@@ -68,6 +68,12 @@ export default class Nav implements ξ.ClassComponent {
             class: this.setItemActive('/statistics')},
           ξ('i.chart.bar.icon'), 'STATISTICS'),
 
+          ξ('a.item', {
+            href: '/feed',
+            oncreate: ξ.route.link,
+            class: this.setItemActive('/feed')},
+          ξ('i.feed.icon'), 'FEED'),
+
           (UserModel.isLoggedIn() ?
             [
               ξ('a.item', {

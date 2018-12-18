@@ -1,4 +1,3 @@
-
 import ξ from 'mithril';
 import base from './base';
 import Network from '../services/network';
@@ -12,39 +11,42 @@ class UserProfile implements ξ.ClassComponent {
     const email = vnode.attrs.email;
 
     return ξ(base,
-        ξ('.ui.main.text.container.two.column.stackable.grid', {
-          style: 'margin-top: 2em;',
+        ξ('.ui.text.container', {
+          style: 'margin-top: 1em;',
         },
-        ξ('.ui.column',
-            ξ('img.ui.image.rounded.medium#picture',
-                {src: '/user/' + username + '/avatar'},
-                'User profile picture.'),
-            ξ('h2',
-                fullname),
-            ξ('p',
-                ξ('i.user.icon'),
-                username),
-            ξ('p',
-                ξ('i.mail.icon'),
-                email),
-            ξ('.ui.placeholder',
-                ξ('ui.image')),
+        ξ('h1', `${username}\'S PROFILE`.toUpperCase()),
+        ξ('.ui.divider')),
+        ξ('.ui.main.text.container.two.column.stackable.grid',
+            ξ('.ui.column',
+                ξ('img.ui.image.rounded.medium#picture',
+                    {src: '/user/' + username + '/avatar'},
+                    'User profile picture.'),
+                ξ('h2',
+                    fullname),
+                ξ('p',
+                    ξ('i.user.icon'),
+                    username),
+                ξ('p',
+                    ξ('i.mail.icon'),
+                    email),
+                ξ('.ui.placeholder',
+                    ξ('ui.image')),
 
+            ),
+            ξ('.ui.column[min-height = 10em]',
+                ξ('canvas#chart-area', {
+                  oncreate: ({dom}) => {
+                    const ctx = (document.getElementById(
+                        'chart-area') as HTMLCanvasElement)
+                        .getContext('2d');
+                    new Chart(ctx, {
+                      type: 'doughnut',
+                      data: Model.dataDonut,
+                      options: Model.optionsDonut,
+                    });
+                  }}),
+            ),
         ),
-        ξ('.ui.column[min-height = 10em]',
-            ξ('canvas#chart-area', {
-              oncreate: ({dom}) => {
-                const ctx = (document.getElementById(
-                    'chart-area') as HTMLCanvasElement)
-                    .getContext('2d');
-                new Chart(ctx, {
-                  type: 'doughnut',
-                  data: Model.dataDonut,
-                  options: Model.optionsDonut,
-                });
-              }})
-        )
-        )
     );
   }
 };

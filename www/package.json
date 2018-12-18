@@ -58,6 +58,7 @@
     "@types/chart.js": "^2.7.40",
     "chart.js": "^2.7.3",
     "mithril": "^1.1.6",
+    "moment": "^2.23.0",
     "monaco-editor": "^0.15.5",
     "monaco-editor-webpack-plugin": "^1.6.0",
     "monaco-themes": "^0.2.5",
