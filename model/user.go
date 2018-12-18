@@ -4,6 +4,7 @@ package model
 import (
 	"crypto/sha512"
 	"time"
+    "log"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -204,8 +205,11 @@ func PutFriend(identifier string, friend string) (err error) {
 // RemoveFriend returns
 func RemoveFriend(identifier string, friend string) (err error) {
     _, err = database.Exec(`
-    DELETE FROM "roast"."user_friends"
-    WHERE (TRIM($1) and TRIM($2))
+    DELETE FROM "roaster"."user_friends"
+    WHERE (lower(username)=lower(TRIM($1)) AND lower(friend)=lower(TRIM($2)))
     `, identifier, friend)
+    if err != nil {
+        log.Println(err)
+    }
     return
 }

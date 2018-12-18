@@ -7,6 +7,8 @@ import Chart from 'chart.js';
 import {addFriend} from '../models/user';
 
 class UserProfile implements ξ.ClassComponent {
+    isFriend: boolean = false;
+
   view(vnode: ξ.CVnode) {
     const username = vnode.attrs.username;
     const fullname = vnode.attrs.fullname;
@@ -30,15 +32,23 @@ class UserProfile implements ξ.ClassComponent {
                 email),
             ξ('.ui.placeholder',
                 ξ('ui.image')),
+            this.isFriend ?
+            ξ('button.ui.basic.red.button', {
+                onclick: () => {
+                    unFriend(username);
+                    // TODO: on success update friends and this.isFriend=false
+                },
+            }, 'UNFOLLOW')
+            :
             ξ('button.ui.basic.teal.button', {
                 onclick: () => {
                     addFriend(username);
+                    // TODO: on success update friends and this.isFriend=true
                 },
             },
                 'FOLLOW!'),
-
         ),
-        ξ('.ui.column[min-height = 10em]',
+            ξ('.ui.column[min-height = 10em]',
             ξ('canvas#chart-area', {
               oncreate: ({dom}) => {
                 const ctx = (document.getElementById(

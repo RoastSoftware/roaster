@@ -138,7 +138,7 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
         return http.StatusBadRequest, causerr.New(err,
         "unable to decode request")
     }
-    log.Println(f)
+    log.Println(username, f)
     if f.Friend == "" {
         return http.StatusBadRequest, causerr.New(
             errors.New("friend is empty"),
@@ -149,7 +149,8 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
     if err != nil {
         log.Println(err)
         if pgerr, ok := err.(*pq.Error); ok {
-            if pgerr.Constraint == "friend_realtion_uq" {
+            log.Println(pgerr.Constraint)
+            if pgerr.Constraint == "friend_relation_uq" {
                 return http.StatusConflict, causerr.New(err, "User already has this friend")
             }
             if pgerr.Constraint == "username_fk" {
@@ -196,16 +197,27 @@ func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func removeFriend(w http.ResponseWriter, r *http.Request) (int, error) {
+    s, err := session.Get(r, "roaster_auth")
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	username, ok := s.Values["username"].(string)
+	if !ok || username == "" {
+		return http.StatusNoContent, nil
+	}
+
     vars := mux.Vars(r)
-    username := vars["username"]
+    friend := vars["username"]
     // TODO: extract the logged in user in order to know which entry to delete
     if username == "" {
         return http.StatusBadRequest, causerr.New(
             errors.New("missing username for lookup"),
             "Missing username for lookup")
     }
-
-    err := model.RemoveFriend(username, username)
+    log.Println(username)
+    log.Println(friend)
+    err = model.RemoveFriend(username, friend)
     if err != nil {
         return http.StatusInternalServerError, causerr.New(err, "error removing friend")
     }

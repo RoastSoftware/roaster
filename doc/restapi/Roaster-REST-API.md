@@ -241,7 +241,16 @@ API.
     + Body
     ```json
     {
-        "friends": ["MyAwesomeFriend", "MyNotSoAwesomeFriend"]
+        "friends": [
+            {
+                username:"MyAwesomeFriend",
+                createTime:"2018-03-04:00:00:00Z"
+            }
+            {
+                username:"MyAwesomeFriend2",
+                createTime:"2018-07-04:00:00:00Z"
+            }
+        ]
     }
     ```
     + Schema
@@ -249,10 +258,12 @@ API.
     {
         "type": "object",
         "properties": {
-            "friends": {
+            "friends": 
+            {
                 "type": "array",
                 "items": {
-                    "type": "string"
+                    "type": "string",
+                    "properties": "string"
                 }
             }
         }

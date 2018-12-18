@@ -9,7 +9,7 @@ export interface User {
 
 export interface Friend {
     username: string;
-    createTime: Date;
+    createTime: string;
 }
 
 export class UserModel {
@@ -24,7 +24,7 @@ export class UserModel {
     static email: string = '';
     private static emailError: string = '';
     
-    static friends: Friend[];
+    static friends: Array<Friend>;
 
     static empty() {
       UserModel.username = '';
@@ -159,57 +159,18 @@ that is more than 1 googol^98 in entropy`;
     };
 };
 
-/* eslint-disable */
-function retrieveUser(username: string): Promise<User> {
-  return ξ.request<User>({
-    method: 'GET',
-    url: '/user/' + this.username,
-  }).then((result) => {
-    const user: User = result;
-    return user;
-  });
-};
-/* eslint-enable */
-export function createUser(user: User) {
-  return ξ.request({
-    method: 'POST',
-    url: '/user',
-    data: user,
-  });
-};
-/* eslint-disable */
-function saveUser() {
-  return ξ.request({
-    method: 'PATCH',
-    url: '/user/' + this.username,
-    data: this,
-  });
-};
-/* eslint-enable */
-export function authenticateUser(user: User) {
-  return ξ.request({
-    method: 'POST',
-    url: '/session',
-    data: user,
-  });
-};
-/* eslint-disable */
-function deAuthenticateUser() {
-  return ξ.request({
-    method: 'DELETE',
-    url: '/session',
-  });
-};
-
-function retrieveFriends() {
-    return ξ.request({
-        method: 'GET',
-        url: '/user/' + this.username + '/friend',
-    });
-};
-/* eslint-enable */
-export function addFriend(username: string) {
-    return Network.request<T>('POST', '/user/' + username + '/friend', {
+export function getFriend(username: string) {
+    return Network.request('GET', '/user/' + username + '/friend', {
         'friend': username,
     }); 
+};
+
+export function addFriend(username: string) {
+    return Network.request('POST', '/user/' + username + '/friend', {
+        'friend': username,
+    }); 
+};
+
+export function unFriend(username: string) {
+    return Network.request('DELETE', '/user/' + username + '/friend');
 };
