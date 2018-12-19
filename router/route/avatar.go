@@ -24,14 +24,16 @@ func createAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
 		return http.StatusUnauthorized, causerr.New(
-			nil,
+			err,
 			"Missing or unreadable cookie sent")
 	}
 
 	username, ok := s.Values["username"].(string)
 	if !ok || username == "" {
 		return http.StatusUnauthorized,
-			causerr.New(nil, "Unable to authenticate user")
+			causerr.New(
+				errors.New("no or empty username in session"),
+				"Unable to authenticate user")
 	}
 	mediaType, params, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil {
@@ -91,7 +93,7 @@ func retrieveAvatar(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code.Name() == "foreign_key_violation" {
 			return http.StatusNotFound,
-				causerr.New(nil, fmt.Sprintf("No avatar found for '%s'", u))
+				causerr.New(err, fmt.Sprintf("No avatar found for '%s'", u))
 		}
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
