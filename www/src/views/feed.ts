@@ -1,6 +1,7 @@
 import ξ from 'mithril';
 import base from './base';
 import Network from '../services/network';
+import {UserModel} from '../models/user';
 import moment from 'moment';
 
 interface FeedItem {
@@ -107,14 +108,40 @@ class PaginationList implements ξ.ClassComponent {
   };
 };
 
+const menuActiveItemStyle = `\
+border-bottom: 3px solid #f2f2f2;\
+`;
+
+const menuStyle = `\
+border-top: none;
+border-left: none;
+border-right: none;
+border-bottom: 1px solid #094959;\
+margin-right: -1px;\
+margin-left: -1px;\
+`;
 
 export default class Feed implements ξ.ClassComponent {
   currentPage: number = 0;
+  currentCategory: string = 'global';
   lastUpdatedPage: number = -1;
   feed: Feed = {} as Feed;
 
   fetchFeed() {
-    Network.request<Feed>('GET', '/feed?page=' + this.currentPage)
+    let categoryQuery: string= '';
+
+    switch (this.currentCategory) {
+      case 'global':
+        break;
+      case 'friends':
+        categoryQuery = `&user=${UserModel.getUsername()}&friends=true`;
+      case 'you':
+        categoryQuery = `&user=${UserModel.getUsername()}`;
+    }
+
+    Network.request<Feed>('GET', '/feed?page='
+      + this.currentPage + categoryQuery)
+
         .then((feed: Feed) => {
           this.feed = feed;
           this.lastUpdatedPage = this.currentPage;
@@ -124,6 +151,19 @@ export default class Feed implements ξ.ClassComponent {
   updatePage() {
     this.currentPage = parseInt(ξ.route.param('page')) || 0;
   };
+
+  updateCategory(category: string) {
+    this.currentCategory = category;
+    this.fetchFeed();
+  }
+
+  setItemActiveClass(category: string) {
+    return this.currentCategory == category ? 'item active' : 'item';
+  }
+
+  setItemActiveStyle(category: string) {
+    return this.currentCategory == category ? menuActiveItemStyle : '';
+  }
 
   oncreate(vnode: ξ.CVnodeDOM) {
     this.updatePage();
@@ -143,17 +183,51 @@ export default class Feed implements ξ.ClassComponent {
     console.log(this.feed.items);
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 1em;]',
-            ξ('h1', 'GLOBAL FEED'),
+            ξ('h1.ui.header',
+                ξ('i.feed.icon'),
+                ξ('.content', 'FEED',
+                    ξ('.sub.header',
+                        'Check out what everyone has been up to!')),
+            ),
             ξ('.ui.divider'),
-            (this.feed.items ?
-            ξ('.ui.feed', [
-              ξ(FeedList, {
-                'feed': this.feed,
-              }),
-            ]) : [
-              ξ('h2', 'You\'ve reached the end.'),
-              ξ('p', 'Welp, there are no more events to show you.'),
-            ]),
+            ξ('.ui.top.attached.secondary.pointing.menu', {style: menuStyle},
+                ξ('a.item', {
+                  class: this.setItemActiveClass('global'),
+                  style: this.setItemActiveStyle('global'),
+                  onclick: () => {
+                    this.updateCategory('global');
+                  },
+                },
+                ξ('i.globe.icon'), 'GLOBAL'),
+                ξ('a.item', {
+                  class: this.setItemActiveClass('friends'),
+                  style: this.setItemActiveStyle('friends'),
+                  onclick: () => {
+                    this.updateCategory('friends');
+                  },
+                },
+                ξ('i.users.icon'), 'FRIENDS'),
+                ξ('a.item', {
+                  class: this.setItemActiveClass('you'),
+                  style: this.setItemActiveStyle('you'),
+                  onclick: () => {
+                    this.updateCategory('you');
+                  },
+                },
+                ξ('i.user.icon'), 'YOU'),
+            ),
+            ξ('.ui.bottom.attached.segment',
+                (this.feed.items ?
+                  ξ('.ui.feed', [
+                    ξ(FeedList, {
+                      'feed': this.feed,
+                    }),
+                  ]) : [
+                    ξ('h2', 'You\'ve reached the end.'),
+                    ξ('p', 'Welp, there are no more events to show you.'),
+                  ]
+                ),
+            ),
             ξ('.ui.center.aligned.container[style=margin-bottom: 2em;]',
                 ξ('.ui.pagination.compact.menu',
                     ξ(PaginationList, {currentPage: this.currentPage}),

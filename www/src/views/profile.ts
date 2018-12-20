@@ -45,9 +45,15 @@ export default class Profile implements ξ.ClassComponent {
           ξ('.ui.text.container', {
             style: 'margin-top: 1em;',
           },
-          ξ('h1', `MY PROFILE`),
-          ξ('.ui.divider'),
+          ξ('h1.ui.header',
+              ξ('img.ui.circular.image', {
+                src: '/user/' + UserModel.getUsername() + '/avatar',
+              }),
+              ξ('.content',
+                  'MY PROFILE',
+                  ξ('.sub.header', `Hello there, ${UserModel.getFullname()}!`)),
           ),
+          ξ('.ui.divider')),
           ξ('.ui.main.text.container.two.column.stackable.grid',
               ξ('.ui.column',
                   ξ('input#upload',

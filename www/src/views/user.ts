@@ -14,7 +14,13 @@ class UserProfile implements ξ.ClassComponent {
         ξ('.ui.text.container', {
           style: 'margin-top: 1em;',
         },
-        ξ('h1', `${username}\'S PROFILE`.toUpperCase()),
+        ξ('h1.ui.header',
+            ξ('img.ui.circular.image', {
+              src: `/user/${username}/avatar`,
+            }),
+            ξ('.content', `${username}\'S PROFILE`.toUpperCase(),
+                ξ('.sub.header', `You are viewing ${fullname}'s profile.`)),
+        ),
         ξ('.ui.divider')),
         ξ('.ui.main.text.container.two.column.stackable.grid',
             ξ('.ui.column',
