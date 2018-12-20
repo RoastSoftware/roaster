@@ -53,7 +53,8 @@ func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
 	if username != "" {
 		err = model.PutRoast(roast)
 		if err != nil {
-			return http.StatusInternalServerError, causerr.New(err, "")
+			return http.StatusInternalServerError, causerr.New(
+				fmt.Errorf("failed to insert Roast for username: '%s': %v", username, err), "")
 		}
 	}
 
