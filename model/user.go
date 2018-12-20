@@ -163,7 +163,7 @@ func GetUser(identifier string) (user User, err error) {
 // Friend holds a friend
 type Friend struct {
     Username string `json:"username"`
-    CreateTime time.Time `json:"createTime"`
+    CreateTime string `json:"createTime"`
     Friend string `json:"friend"`
 }
 
@@ -171,7 +171,7 @@ type Friend struct {
 func GetFriends(identifier string) (friends []Friend, err error) {
     // TODO: some way of looping in the query into the list
     friendRows, err := database.Query(`
-    SELECT username, friend, create_time
+    SELECT username, create_time, friend
     FROM "roaster"."user_friends"
     WHERE (LOWER(username)=LOWER(TRIM($1)))
     `, identifier)

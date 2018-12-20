@@ -167,25 +167,21 @@ func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
     vars := mux.Vars(r)
     username := vars["username"]
 
-    f := model.Friend{}
-
     if username == "" {
         return http.StatusBadRequest, causerr.New(
             errors.New("missing username for lookup"),
             "Missing username for lookup")
     }
-    log.Println(f)
     // TODO: make query that either return a friend object full of friends or
     // a list of friend objects, USE LIST OF FRIENDS
     friends, err := model.GetFriends(username)
     if err != nil {
-        switch err {
-            case sql.ErrNoRows:
-                return http.StatusNoContent, causerr.New(err,
-                fmt.Sprintf("User: '%s' has no friends", username))
-            default:
                 return http.StatusInternalServerError, causerr.New(err, "")
-        }
+    }
+    if len(friends) <=0 {
+        return http.StatusNoContent, causerr.New(err,
+        fmt.Sprintf("User: '%s' has no friends", username))
+
     }
 
     err = json.NewEncoder(w).Encode(friends)
@@ -215,8 +211,6 @@ func removeFriend(w http.ResponseWriter, r *http.Request) (int, error) {
             errors.New("missing username for lookup"),
             "Missing username for lookup")
     }
-    log.Println(username)
-    log.Println(friend)
     err = model.RemoveFriend(username, friend)
     if err != nil {
         return http.StatusInternalServerError, causerr.New(err, "error removing friend")

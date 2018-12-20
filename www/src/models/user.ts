@@ -10,6 +10,7 @@ export interface User {
 export interface Friend {
     username: string;
     createTime: string;
+    friend: string;
 }
 
 export class UserModel {
