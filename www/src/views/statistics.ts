@@ -5,8 +5,10 @@ import Network from '../services/network';
 import moment from 'moment';
 import {RoastLinesStatisticsModel} from '../models/statistics';
 
-export default class Statistics implements ξ.ClassComponent {
-  linesStatistics: RoastLinesStatisticsModel = new RoastLinesStatisticsModel();
+class RoastLinesChart implements ξ.ClassComponent {
+  chart: Chart;
+  ctx: CanvasRenderingContext2D;
+  statistics: RoastLinesStatisticsModel;
 
   updateStatistics() {
     const interval = '10m';
@@ -27,8 +29,18 @@ export default class Statistics implements ξ.ClassComponent {
 
   oncreate({dom}) {
     this.updateStatistics();
+
+    this.ctx = (dom as HTMLCanvasElement).getContext('2d');
+    this.chart = new Chart(this.ctx,
+        this.statistics.getConfig());
   };
 
+  view(vnode: ξ.CVnode) {
+    return ξ('canvas');
+  };
+};
+
+export default class Statistics implements ξ.ClassComponent {
   view(vnode: ξ.CVnode) {
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 1em;]',
@@ -39,17 +51,8 @@ export default class Statistics implements ξ.ClassComponent {
             ),
             ξ('.ui.divider')),
         ξ('.ui.main.text.container',
-            ξ('canvas#chart-area', {
-              oncreate: ({dom}) => {
-                const ctx = (
-                  document.getElementById('chart-area') as HTMLCanvasElement)
-                    .getContext('2d');
-
-                new Chart(ctx, this.linesStatistics.getConfig());
-              },
-            }
-            ),
-        )
+            ξ(RoastLinesChart),
+        ),
     );
   };
 };
