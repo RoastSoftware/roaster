@@ -2,7 +2,7 @@ import ξ from 'mithril';
 import base from './base';
 import {UserModel} from '../models/user';
 import Network from '../services/network';
-import Model from '../models/statistics';
+import {RoastDoughnutStatisticsModel} from '../models/statistics';
 import Chart from 'chart.js';
 
 export default class Profile implements ξ.ClassComponent {
@@ -84,8 +84,8 @@ export default class Profile implements ξ.ClassComponent {
                           .getContext('2d');
                       new Chart(ctx, {
                         type: 'doughnut',
-                        data: Model.dataDonut,
-                        options: Model.optionsDonut,
+                        data: RoastDoughnutStatisticsModel.dataDonut,
+                        options: RoastDoughnutStatisticsModel.optionsDonut,
                       });
                     }})
               )

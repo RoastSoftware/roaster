@@ -1,62 +1,128 @@
-export default class StatisticsModel {
+import moment from 'moment';
+
+class StandardColorModel {
     static chartColors = {
-      red: 'rgb(250, 20, 47)',
+      red: 'rgb(250, 50, 47)',
       orange: 'rgb(203, 75, 22)',
       yellow: 'rgb(181, 137, 0)',
       green: 'rgb(133, 153, 0)',
       blue: 'rgb(38, 139, 210)',
       magenta: 'rgb(211, 54, 130)',
-      grey: 'rgb(201, 203, 207)',
+      grey: 'rgb(131, 148, 150)',
       violet: 'rgb(108, 113, 196)',
-      cyan: 'rgb(42, 161, 152)',
+      cyan: 'rgb(0, 181, 173)',
+      darkblue: 'rgb(7, 54, 66)',
     };
+};
 
-    static months = ['January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
-    static config = {
+
+function newDate(days) {
+  return moment().add(days, 'd').fromNow();
+}
+
+
+export class RoastLinesStatisticsModel {
+  data: Object = Object();
+
+  setData(data: Object) {
+    this.data = data;
+    console.log(this.data);
+  }
+
+  getLabels(): Array {
+    console.log(this.data);
+    const range = Array.from(moment(
+        this.data[0].timestamp,
+        this.data[this.data.length-1].timestamp).by('hours'));
+
+    const labels = [];
+    range.map((m) => {
+      labels.push(m.format());
+    });
+
+    return labels;
+  }
+
+  getConfig(): Object {
+    return {
       type: 'line',
+      options: {
+        responsive: true,
+        title: {
+          display: true,
+          text: 'Number of Lines Analyzed vs. Errors and Warnings',
+        },
+        scales: {
+          yAxes: [{
+            gridLines: {
+              color: StandardColorModel.chartColors.darkblue,
+            },
+          }],
+          xAxes: [{
+            gridLines: {
+              color: StandardColorModel.chartColors.darkblue,
+            },
+          }],
+        },
+      },
       data: {
-        labels: ['January', 'February', 'March', 'April',
-          'May', 'June', 'July'],
+        labels: this.getLabels(),
         datasets: [{
-          label: 'Active users.',
-          backgroundColor: StatisticsModel.chartColors.magenta,
-          borderColor: StatisticsModel.chartColors.magenta,
+          label: 'Errors',
+          backgroundColor: StandardColorModel.chartColors.red,
+          borderColor: StandardColorModel.chartColors.red,
           data: [
             100,
             10,
             70,
-            -10,
-            -90,
+            10,
+            90,
             30,
             5,
           ],
           fill: false,
         }, {
-          label: 'Lines analyzed.',
-          backgroundColor: StatisticsModel.chartColors.blue,
-          borderColor: StatisticsModel.chartColors.blue,
+          label: 'Warnings',
+          backgroundColor: StandardColorModel.chartColors.yellow,
+          borderColor: StandardColorModel.chartColors.yellow,
+          data: [
+            90,
+            20,
+            30,
+            10,
+            30,
+            40,
+            1,
+          ],
+          fill: false,
+        }, {
+          label: 'Lines Analyzed',
+          backgroundColor: StandardColorModel.chartColors.darkblue,
+          borderColor: StandardColorModel.chartColors.grey,
           data: [
             100,
             50,
             50,
             10,
-            -70,
-            -100,
+            70,
+            100,
             45,
           ],
           fill: true,
         }],
       },
     };
+  };
+};
 
+export class RoastDoughnutStatisticsModel {
     static dataDonut = {
       datasets: [{
         borderColor: 'rgba(0, 0, 0, 0.0)',
         backgroundColor: [
-          StatisticsModel.chartColors.yellow,
-          StatisticsModel.chartColors.cyan,
-          StatisticsModel.chartColors.green,
+          StandardColorModel.chartColors.yellow,
+          StandardColorModel.chartColors.cyan,
+          StandardColorModel.chartColors.green,
         ],
         data: [10, 20, 30],
       }],
@@ -69,8 +135,6 @@ export default class StatisticsModel {
             'Blue'
         ] */
     };
-
-
     static optionsDonut = {
       aspectRatio: 1,
       title: {
