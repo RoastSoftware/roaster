@@ -6,8 +6,8 @@ import Model from '../models/statistics';
 import Chart from 'chart.js';
 
 export default class Profile implements ξ.ClassComponent {
-    uploadError: APIError;
-    downloadError: APIError;
+    uploadError: Error;
+    downloadError: Error;
 
     upload(e: Any) {
       const avatar = e.target.files[0];
@@ -25,7 +25,7 @@ export default class Profile implements ξ.ClassComponent {
             img.src = '/user/' + UserModel.getUsername() +
                     '/avatar?' + new Date().getTime();
           })
-          .catch((err: APIError) => {
+          .catch((err: Error) => {
             this.uploadError = err;
             console.log(this.uploadError);
           });

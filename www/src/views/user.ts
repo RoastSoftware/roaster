@@ -4,16 +4,30 @@ import base from './base';
 import Network from '../services/network';
 import Model from '../models/statistics';
 import Chart from 'chart.js';
-import {addFriend} from '../models/user';
+import {UserModel, addFriend, unFriend, getFriends} from '../models/user';
 
 class UserProfile implements ξ.ClassComponent {
     isFriend: boolean = false;
-
+    friendCheck(username: string) {
+        console.log("friendcheck");
+        console.log(UserModel.friends);
+        for (let friend of UserModel.friends){
+            console.log("iterating");
+            if (friend.friend == username){
+                this.isFriend = true;
+                console.log("Friend:" + friend);
+                console.log("is friend?:" + this.isFriend);
+                break;
+            } else {
+                this.isFriend = false;
+            }
+        }
+    };
   view(vnode: ξ.CVnode) {
     const username = vnode.attrs.username;
     const fullname = vnode.attrs.fullname;
     const email = vnode.attrs.email;
-
+      
     return ξ(base,
         ξ('.ui.main.text.container.two.column.stackable.grid', {
           style: 'margin-top: 2em;',
@@ -36,6 +50,9 @@ class UserProfile implements ξ.ClassComponent {
             ξ('button.ui.basic.red.button', {
                 onclick: () => {
                     unFriend(username);
+                    getFriends();
+                    this.friendCheck(username);
+                    ξ.redraw();
                     // TODO: on success update friends and this.isFriend=false
                 },
             }, 'UNFOLLOW')
@@ -43,6 +60,9 @@ class UserProfile implements ξ.ClassComponent {
             ξ('button.ui.basic.teal.button', {
                 onclick: () => {
                     addFriend(username);
+                    getFriends();
+                    this.friendCheck(username);
+                    ξ.redraw();
                     // TODO: on success update friends and this.isFriend=true
                 },
             },
@@ -67,7 +87,7 @@ class UserProfile implements ξ.ClassComponent {
 };
 
 export default class UserView implements ξ.ClassComponent {
-    downloadError: APIError;
+    downloadError: Error;
     user: User;
     ready: boolean;
 

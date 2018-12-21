@@ -25,7 +25,7 @@ export class UserModel {
     static email: string = '';
     private static emailError: string = '';
     
-    static friends: Array<Friend>;
+    static friends: Array<Friend> = [];
 
     static empty() {
       UserModel.username = '';
@@ -158,6 +158,7 @@ that is more than 1 googol^98 in entropy`;
     static validPassword(): boolean {
       return UserModel.passwordError == '';
     };
+
 };
 
 export function getFriend(username: string) {
@@ -175,3 +176,12 @@ export function addFriend(username: string) {
 export function unFriend(username: string) {
     return Network.request('DELETE', '/user/' + username + '/friend');
 };
+
+export function getFriends(){
+   return Network.request<Array<Friend>>('GET', '/user/' +
+        UserModel.getUsername() + '/friend')
+        .then((result) => {
+            UserModel.friends = result;
+            console.log(UserModel.friends)
+        });
+}; 
