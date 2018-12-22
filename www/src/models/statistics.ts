@@ -1,29 +1,51 @@
 import moment from 'moment';
 import Network from '../services/network';
 
-class StandardColorModel {
-    static chartColors = {
-      red: 'rgb(250, 50, 47)',
-      orange: 'rgb(203, 75, 22)',
-      yellow: 'rgb(181, 137, 0)',
-      green: 'rgb(133, 153, 0)',
-      blue: 'rgb(38, 139, 210)',
-      magenta: 'rgb(211, 54, 130)',
-      grey: 'rgb(131, 148, 150)',
-      violet: 'rgb(108, 113, 196)',
-      cyan: 'rgb(0, 181, 173)',
-      darkblue: 'rgb(7, 54, 66)',
-    };
+const colors = {
+  red: 'rgb(250, 50, 47)',
+  orange: 'rgb(203, 75, 22)',
+  yellow: 'rgb(181, 137, 0)',
+  green: 'rgb(133, 153, 0)',
+  blue: 'rgb(38, 139, 210)',
+  magenta: 'rgb(211, 54, 130)',
+  grey: 'rgb(131, 148, 150)',
+  violet: 'rgb(108, 113, 196)',
+  cyan: 'rgb(0, 181, 173)',
+  darkblue: 'rgb(7, 54, 66)',
 };
 
-export class RoastLinesStatisticsModel {
-  data: Object = Object();
+class CountModel {
+  public count: number;
+}
 
-  setData(data: Object) {
-    this.data = data;
-  }
+export class LineCountModel extends CountModel {
+  public update(): Promise {
+    const uri = '/statistics/roast/lines';
 
-  update(): Promise {
+    return Network.request<Object>('GET', uri)
+        .then((data: Object) => {
+          console.log('lel', this.count);
+          this.count = data.lines;
+        });
+  };
+}
+
+export class RoastCountModel extends CountModel {
+  public update(): Promise {
+    const uri = '/statistics/roast/count';
+
+    return Network.request<Object>('GET', uri)
+        .then((data: Object) => {
+          console.log('lol', this.count);
+          this.count = data.count;
+        });
+  };
+}
+
+class RoastMessageStatisticsModel {
+  private data: Object = Object();
+
+  public update(): Promise {
     const interval = '30m';
     const end = moment();
     const start = moment().subtract(5, 'hours');
@@ -34,31 +56,25 @@ export class RoastLinesStatisticsModel {
 &interval=${interval}\
 `;
 
-    return Network.request<RoastLinesStatisticsModel>('GET', uri)
+    return Network.request<Object>('GET', uri)
         .then((stats: Object) => {
-          this.setData(stats.reverse());
+          this.data = stats.reverse();
         });
   };
 
-  getErrors(): Array {
+  private getErrors(): Array {
     return this.data.map((p) => {
       return p.numberOfErrors;
     });
   };
 
-  getWarnings(): Array {
+  private getWarnings(): Array {
     return this.data.map((p) => {
       return p.numberOfWarnings;
     });
   };
 
-  getLines(): Array {
-    return this.data.map((p) => {
-      return p.linesOfCode;
-    });
-  };
-
-  getLabels(): Array {
+  private getLabels(): Array {
     const labels = [];
     for (let i = 0; i < this.data.length; i++) {
       console.log(this.data[i]);
@@ -67,8 +83,104 @@ export class RoastLinesStatisticsModel {
 
     return labels;
   };
+}
 
-  getConfig(): Object {
+export class RoastCountStatisticsModel extends RoastMessageStatisticsModel {
+  private getCount(): Array {
+    return this.data.map((p) => {
+      return p.count;
+    });
+  };
+
+  public getConfig(): Object {
+    return {
+      type: 'line',
+      options: {
+        responsive: true,
+        title: {
+          display: true,
+          text: 'Number of Roasts vs. Errors and Warnings',
+        },
+        scales: {
+          yAxes: [{
+            id: 'count',
+            position: 'left',
+            scaleLabel: {
+              labelString: 'Number of Roasts',
+              display: true,
+            },
+            gridLines: {
+              color: colors.grey,
+            },
+            ticks: {
+              beginAtZero: true,
+              // Only allow integers for ticker.
+              callback: (v) => {
+                if (Number.isInteger(v)) {
+                  return v;
+                }
+              },
+            },
+          }, {
+            id: 'messages',
+            position: 'right',
+            scaleLabel: {
+              labelString: 'Errors and Warnings',
+              display: true,
+            },
+            gridLines: {
+              color: colors.darkblue,
+            },
+          }],
+          xAxes: [{
+            scaleLabel: {
+              labelString: 'Time',
+              display: true,
+            },
+            gridLines: {
+              color: colors.darkblue,
+            },
+          }],
+        },
+      },
+      data: {
+        labels: this.getLabels(),
+        datasets: [{
+          label: 'Errors',
+          yAxisID: 'messages',
+          backgroundColor: colors.red,
+          borderColor: colors.red,
+          data: this.getErrors(),
+          fill: false,
+        }, {
+          label: 'Warnings',
+          yAxisID: 'messages',
+          backgroundColor: colors.yellow,
+          borderColor: colors.yellow,
+          data: this.getWarnings(),
+          fill: false,
+        }, {
+          label: 'Number of Roasts',
+          yAxisID: 'count',
+          backgroundColor: colors.darkblue,
+          borderColor: colors.grey,
+          data: this.getCount(),
+          fill: true,
+        }],
+      },
+    };
+  };
+};
+
+
+export class RoastLinesStatisticsModel extends RoastMessageStatisticsModel {
+  private getLines(): Array {
+    return this.data.map((p) => {
+      return p.linesOfCode;
+    });
+  };
+
+  public getConfig(): Object {
     return {
       type: 'line',
       options: {
@@ -79,13 +191,21 @@ export class RoastLinesStatisticsModel {
         },
         scales: {
           yAxes: [{
+            scaleLabel: {
+              labelString: 'n',
+              display: true,
+            },
             gridLines: {
-              color: StandardColorModel.chartColors.darkblue,
+              color: colors.darkblue,
             },
           }],
           xAxes: [{
+            scaleLabel: {
+              labelString: 'Time',
+              display: true,
+            },
             gridLines: {
-              color: StandardColorModel.chartColors.darkblue,
+              color: colors.darkblue,
             },
           }],
         },
@@ -94,20 +214,20 @@ export class RoastLinesStatisticsModel {
         labels: this.getLabels(),
         datasets: [{
           label: 'Errors',
-          backgroundColor: StandardColorModel.chartColors.red,
-          borderColor: StandardColorModel.chartColors.red,
+          backgroundColor: colors.red,
+          borderColor: colors.red,
           data: this.getErrors(),
           fill: false,
         }, {
           label: 'Warnings',
-          backgroundColor: StandardColorModel.chartColors.yellow,
-          borderColor: StandardColorModel.chartColors.yellow,
+          backgroundColor: colors.yellow,
+          borderColor: colors.yellow,
           data: this.getWarnings(),
           fill: false,
         }, {
           label: 'Lines Analyzed',
-          backgroundColor: StandardColorModel.chartColors.darkblue,
-          borderColor: StandardColorModel.chartColors.grey,
+          backgroundColor: colors.darkblue,
+          borderColor: colors.grey,
           data: this.getLines(),
           fill: true,
         }],
@@ -121,9 +241,9 @@ export class RoastDoughnutStatisticsModel {
       datasets: [{
         borderColor: 'rgba(0, 0, 0, 0.0)',
         backgroundColor: [
-          StandardColorModel.chartColors.yellow,
-          StandardColorModel.chartColors.cyan,
-          StandardColorModel.chartColors.green,
+          colors.yellow,
+          colors.cyan,
+          colors.green,
         ],
         data: [10, 20, 30],
       }],
