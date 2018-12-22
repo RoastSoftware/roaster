@@ -1,4 +1,5 @@
 import moment from 'moment';
+import Network from '../services/network';
 
 class StandardColorModel {
     static chartColors = {
@@ -15,33 +16,57 @@ class StandardColorModel {
     };
 };
 
-
-function newDate(days) {
-  return moment().add(days, 'd').fromNow();
-}
-
-
 export class RoastLinesStatisticsModel {
   data: Object = Object();
 
   setData(data: Object) {
     this.data = data;
-    console.log(this.data);
   }
+
+  update(): Promise {
+    const interval = '30m';
+    const end = moment();
+    const start = moment().subtract(5, 'hours');
+    const uri = `\
+/statistics/roast/timeseries\
+?start=${start.utc().format()}\
+&end=${end.utc().format()}\
+&interval=${interval}\
+`;
+
+    return Network.request<RoastLinesStatisticsModel>('GET', uri)
+        .then((stats: Object) => {
+          this.setData(stats.reverse());
+        });
+  };
+
+  getErrors(): Array {
+    return this.data.map((p) => {
+      return p.numberOfErrors;
+    });
+  };
+
+  getWarnings(): Array {
+    return this.data.map((p) => {
+      return p.numberOfWarnings;
+    });
+  };
+
+  getLines(): Array {
+    return this.data.map((p) => {
+      return p.linesOfCode;
+    });
+  };
 
   getLabels(): Array {
-    console.log(this.data);
-    const range = Array.from(moment(
-        this.data[0].timestamp,
-        this.data[this.data.length-1].timestamp).by('hours'));
-
     const labels = [];
-    range.map((m) => {
-      labels.push(m.format());
-    });
+    for (let i = 0; i < this.data.length; i++) {
+      console.log(this.data[i]);
+      labels.push(moment(this.data[i].timestamp).format('HH:mm'));
+    }
 
     return labels;
-  }
+  };
 
   getConfig(): Object {
     return {
@@ -71,43 +96,19 @@ export class RoastLinesStatisticsModel {
           label: 'Errors',
           backgroundColor: StandardColorModel.chartColors.red,
           borderColor: StandardColorModel.chartColors.red,
-          data: [
-            100,
-            10,
-            70,
-            10,
-            90,
-            30,
-            5,
-          ],
+          data: this.getErrors(),
           fill: false,
         }, {
           label: 'Warnings',
           backgroundColor: StandardColorModel.chartColors.yellow,
           borderColor: StandardColorModel.chartColors.yellow,
-          data: [
-            90,
-            20,
-            30,
-            10,
-            30,
-            40,
-            1,
-          ],
+          data: this.getWarnings(),
           fill: false,
         }, {
           label: 'Lines Analyzed',
           backgroundColor: StandardColorModel.chartColors.darkblue,
           borderColor: StandardColorModel.chartColors.grey,
-          data: [
-            100,
-            50,
-            50,
-            10,
-            70,
-            100,
-            45,
-          ],
+          data: this.getLines(),
           fill: true,
         }],
       },

@@ -1,8 +1,6 @@
 import ξ from 'mithril';
 import base from './base';
 import Chart from 'chart.js';
-import Network from '../services/network';
-import moment from 'moment';
 import {RoastLinesStatisticsModel} from '../models/statistics';
 
 class RoastLinesChart implements ξ.ClassComponent {
@@ -10,29 +8,14 @@ class RoastLinesChart implements ξ.ClassComponent {
   ctx: CanvasRenderingContext2D;
   statistics: RoastLinesStatisticsModel;
 
-  updateStatistics() {
-    const interval = '10m';
-    const end = moment();
-    const start = moment().subtract(1, 'days');
-    const uri = `\
-/statistics/roast/timeseries\
-?start=${start.utc().format()}\
-&end=${end.utc().format()}\
-&interval=${interval}\
-`;
-
-    Network.request<RoastLinesStatisticsModel>('GET', uri)
-        .then((stats: Object) => {
-          this.linesStatistics.setData(stats);
-        });
-  };
-
   oncreate({dom}) {
-    this.updateStatistics();
+    this.statistics = new RoastLinesStatisticsModel();
 
-    this.ctx = (dom as HTMLCanvasElement).getContext('2d');
-    this.chart = new Chart(this.ctx,
-        this.statistics.getConfig());
+    this.statistics.update().then(() => {
+      this.ctx = (dom as HTMLCanvasElement).getContext('2d');
+      this.chart = new Chart(this.ctx,
+          this.statistics.getConfig());
+    });
   };
 
   view(vnode: ξ.CVnode) {
