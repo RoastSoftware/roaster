@@ -4,25 +4,52 @@ import base from './base';
 import Network from '../services/network';
 import Model from '../models/statistics';
 import Chart from 'chart.js';
-import {UserModel, addFriend, unFriend, getFriends} from '../models/user';
+import {UserModel, Friend} from '../models/user';
 
 class UserProfile implements ξ.ClassComponent {
     isFriend: boolean = false;
-    friendCheck(username: string) {
-        console.log("friendcheck");
-        console.log(UserModel.friends);
+    
+    hasFriend(username: string) {
         for (let friend of UserModel.friends){
-            console.log("iterating");
             if (friend.friend == username){
                 this.isFriend = true;
-                console.log("Friend:" + friend);
-                console.log("is friend?:" + this.isFriend);
                 break;
             } else {
                 this.isFriend = false;
             }
         }
     };
+
+    async friendCheck(username: string) {
+        const getFriends =  Network.request<Array<Friend>>('GET', '/user/' +
+            UserModel.getUsername() + '/friend')
+            .then((result) => {
+                UserModel.emptyFriends();
+            UserModel.friends = result;
+            this.hasFriend(username);
+            ξ.redraw();
+        });
+    };
+
+    async unFriend(username: string) {
+        Network.request('DELETE', '/user/' + username + '/friend')
+            .then(() => {
+                this.friendCheck(username);
+            });
+    };
+
+    async addFriend(username: string) {
+    Network.request('POST', '/user/' + username + '/friend', {
+        'friend': username,
+    })
+            .then(() => {
+                this.friendCheck(username);
+            });
+    };
+
+    oncreate(vnode: ξ.CVnodeDOM) {
+        this.friendCheck(vnode.attrs.username);
+    }
   view(vnode: ξ.CVnode) {
     const username = vnode.attrs.username;
     const fullname = vnode.attrs.fullname;
@@ -49,21 +76,13 @@ class UserProfile implements ξ.ClassComponent {
             this.isFriend ?
             ξ('button.ui.basic.red.button', {
                 onclick: () => {
-                    unFriend(username);
-                    getFriends();
-                    this.friendCheck(username);
-                    ξ.redraw();
-                    // TODO: on success update friends and this.isFriend=false
+                    this.unFriend(username);
                 },
             }, 'UNFOLLOW')
             :
             ξ('button.ui.basic.teal.button', {
                 onclick: () => {
-                    addFriend(username);
-                    getFriends();
-                    this.friendCheck(username);
-                    ξ.redraw();
-                    // TODO: on success update friends and this.isFriend=true
+                    this.addFriend(username);
                 },
             },
                 'FOLLOW!'),
@@ -99,8 +118,8 @@ export default class UserView implements ξ.ClassComponent {
     oncreate(vnode: ξ.CVnodeDOM) {
       Network.request<User>('GET', '/user/' + vnode.attrs.username)
           .then((user: User) => {
-            this.user = user;
-            this.ready = true;
+              this.user = user;
+              this.ready = true;
             ξ.redraw();
           });
     }

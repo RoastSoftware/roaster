@@ -178,10 +178,8 @@ func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
     if err != nil {
                 return http.StatusInternalServerError, causerr.New(err, "")
     }
-    if len(friends) <=0 || friends == nil{
-        return http.StatusNoContent, causerr.New(errors.New("database returned null for user friends"),
-        fmt.Sprintf("User: '%s' has no friends", username))
-
+    if len(friends) <=0 {
+        return http.StatusNoContent, nil
     }
 
     err = json.NewEncoder(w).Encode(friends)
