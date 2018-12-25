@@ -5,21 +5,33 @@ import {RoastDoughnutStatisticsModel} from '../models/statistics';
 import Chart from 'chart.js';
 
 class UserProfile implements ξ.ClassComponent {
-  view(vnode: ξ.CVnode) {
-    const username = vnode.attrs.username;
-    const fullname = vnode.attrs.fullname;
-    const email = vnode.attrs.email;
+  view({attrs}) {
+    const username = attrs.username;
+    const fullname = attrs.fullname;
+    const email = attrs.email;
+    const score = attrs.score;
 
     return ξ(base,
         ξ('.ui.text.container', {
           style: 'margin-top: 1em;',
         },
-        ξ('h1.ui.header',
-            ξ('img.ui.circular.image', {
-              src: `/user/${username}/avatar`,
-            }),
-            ξ('.content', `${username}\'S PROFILE`.toUpperCase(),
-                ξ('.sub.header', `You are viewing ${fullname}'s profile.`)),
+        ξ('.ui.vertical.basic.segment.clearing[style=padding: 0; margin: 0;]',
+            ξ('h1.ui.header.left.floated[style=margin: 0;]',
+                ξ('img.ui.circular.image', {
+                  src: `/user/${username}/avatar`,
+                }),
+                ξ('.content', `${username}\'S PROFILE`.toUpperCase(),
+                    ξ('.sub.header', `You are viewing ${fullname}'s profile.`)),
+            ),
+            ξ('.ui.right.floated.statistic',
+                ξ('.value',
+                    ξ('i.trophy.icon[style=color: gold;]'),
+                    score,
+                ),
+                ξ('.label',
+                    'ROAST® SCORE™',
+                ),
+            ),
         ),
         ξ('.ui.divider')),
         ξ('.ui.main.text.container.two.column.stackable.grid',
@@ -61,34 +73,28 @@ class UserProfile implements ξ.ClassComponent {
 export default class UserView implements ξ.ClassComponent {
     downloadError: APIError;
     user: User;
+    score: number = 0;
     ready: boolean;
 
-    getUserStat() {
-      console.log('getting user statistics');
-      // TODO: Network.request statistics
-    }
-
-    oncreate(vnode: ξ.CVnodeDOM) {
-      Network.request<User>('GET', '/user/' + vnode.attrs.username)
+    oncreate({attrs}) {
+      Network.request<User>('GET', '/user/' + attrs.username)
           .then((user: User) => {
             this.user = user;
-            this.ready = true;
-            ξ.redraw();
+          });
+
+      Network.request<Object>('GET', '/user/' + attrs.username + '/score')
+          .then(({score}) => {
+            this.score = score;
           });
     }
 
     view(vnode: ξ.CVnode) {
-      // let idUser = ξ.route.param(username);
-      // TODO: fill in temporary class wide user model.
-      // see username to request will be available in vnode.attrs.username
-      // see: https://mithril.js.org/route.html
-      // })
-      return this.ready ?
+      return this.user ?
             ξ(UserProfile, {
               username: this.user.username,
               fullname: this.user.fullname,
               email: this.user.email,
-            })
-            : '';
+              score: this.score,
+            }): '';
     }
 };
