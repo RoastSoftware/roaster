@@ -8,22 +8,23 @@ import Chart from 'chart.js';
 export default class Profile implements ξ.ClassComponent {
     uploadError: APIError;
     downloadError: APIError;
+    profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
+      new Date().getTime();
 
-    upload(e: Any) {
-      const avatar = e.target.files[0];
+    upload({target}) {
+      const avatar = target.files[0];
       if (avatar == undefined || avatar.length == 0) {
         return;
       }
-      console.log('SUCCESS');
+
       const data = new FormData();
       data.append('file', avatar);
+
       Network.request<FormData>('PUT', '/user/' +
           UserModel.getUsername() + '/avatar', data)
-          .then((_: any) => {
-            const img = document
-                .getElementById('picture') as HTMLImageElement;
-            img.src = '/user/' + UserModel.getUsername() +
-                    '/avatar?' + new Date().getTime();
+          .then(() => {
+            this.profileImageURI = `/user/${UserModel.getUsername()}/avatar?`
+              + new Date().getTime();
           })
           .catch((err: APIError) => {
             this.uploadError = err;
@@ -47,7 +48,7 @@ export default class Profile implements ξ.ClassComponent {
           },
           ξ('h1.ui.header',
               ξ('img.ui.circular.image', {
-                src: '/user/' + UserModel.getUsername() + '/avatar',
+                src: this.profileImageURI,
               }),
               ξ('.content',
                   'MY PROFILE',
@@ -56,17 +57,20 @@ export default class Profile implements ξ.ClassComponent {
           ξ('.ui.divider')),
           ξ('.ui.main.text.container.two.column.stackable.grid',
               ξ('.ui.column',
-                  ξ('input#upload',
-                      {onchange: this.upload,
-                        type: 'File',
-                        style: 'display: none;',
-                        accept: '.png, .jpg, .jpeg;',
-                      }),
-                  ξ('img.ui.image.rounded.medium#picture',
-                      {src: '/user/' + UserModel.getUsername() + '/avatar',
-                        onclick: this.clickImg,
-                        style: 'cursor: pointer;'},
-                      'User profile picture.'),
+                  ξ('input#upload', {
+                    onchange: (e) => {
+                      this.upload(e);
+                    },
+                    type: 'File',
+                    style: 'display: none;',
+                    accept: '.png, .jpg, .jpeg;',
+                  }),
+                  ξ('img.ui.image.rounded.medium#picture', {
+                    src: this.profileImageURI,
+                    onclick: this.clickImg,
+                    style: 'cursor: pointer;',
+                  },
+                  'User profile picture.'),
                   ξ('h2',
                       UserModel.getFullname()),
                   ξ('p',

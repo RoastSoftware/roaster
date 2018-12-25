@@ -24,9 +24,10 @@ class UserProfile implements ξ.ClassComponent {
         ξ('.ui.divider')),
         ξ('.ui.main.text.container.two.column.stackable.grid',
             ξ('.ui.column',
-                ξ('img.ui.image.rounded.medium#picture',
-                    {src: '/user/' + username + '/avatar'},
-                    'User profile picture.'),
+                ξ('img.ui.image.rounded.medium#picture', {
+                  src: `/user/${username}/avatar`,
+                },
+                'User profile picture.'),
                 ξ('h2',
                     fullname),
                 ξ('p',
