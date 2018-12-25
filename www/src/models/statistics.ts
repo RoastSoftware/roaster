@@ -1,5 +1,6 @@
 import moment from 'moment';
 import Network from '../services/network';
+import {UserModel} from './user';
 
 export enum StatisticsFilter {
   Global = 1,
@@ -22,26 +23,47 @@ const colors = {
 
 class CountModel {
   public count: number;
+  public filter: StatisticsFilter;
 }
 
 export class LineCountModel extends CountModel {
-  public update(): Promise {
-    const uri = '/statistics/roast/lines';
+  public async update(): Promise {
+    let uri = '/statistics/roast/lines';
+
+    switch (this.filter) {
+      case StatisticsFilter.Friends:
+        uri += `?user=${UserModel.getUsername()}&friends=true`;
+        break;
+      case StatisticsFilter.User:
+        uri += `?user=${UserModel.getUsername()}`;
+        break;
+    }
 
     return Network.request<Object>('GET', uri)
         .then((data: Object) => {
           this.count = data.lines;
+          return;
         });
   };
 }
 
 export class RoastCountModel extends CountModel {
-  public update(): Promise {
-    const uri = '/statistics/roast/count';
+  public async update(): Promise {
+    let uri = '/statistics/roast/count';
+
+    switch (this.filter) {
+      case StatisticsFilter.Friends:
+        uri += `?user=${UserModel.getUsername()}&friends=true`;
+        break;
+      case StatisticsFilter.User:
+        uri += `?user=${UserModel.getUsername()}`;
+        break;
+    }
 
     return Network.request<Object>('GET', uri)
         .then((data: Object) => {
           this.count = data.count;
+          return;
         });
   };
 }
@@ -49,16 +71,26 @@ export class RoastCountModel extends CountModel {
 class RoastMessageStatisticsModel {
   private data: Object = Object();
 
+  public filter: StatisticsFilter = StatisticsFilter.Global;
+
   public update(): Promise {
     const interval = '30m';
     const end = moment();
     const start = moment().subtract(5, 'hours');
-    const uri = `\
+
+    let uri = `\
 /statistics/roast/timeseries\
 ?start=${start.utc().format()}\
 &end=${end.utc().format()}\
 &interval=${interval}\
 `;
+
+    switch(this.filter) {
+      case StatisticsFilter.Friends:
+        uri += `&friends=true`
+      case StatisticsFilter.User:
+        uri += `&user=${UserModel.getUsername()}`
+    }
 
     return Network.request<Object>('GET', uri)
         .then((stats: Object) => {
@@ -93,6 +125,34 @@ export class RoastCountStatisticsModel extends RoastMessageStatisticsModel {
     return this.data.map((p) => {
       return p.count;
     });
+  };
+
+  public getData(): Object {
+    return {
+        labels: this.getLabels(),
+        datasets: [{
+          label: 'Errors',
+          yAxisID: 'messages',
+          backgroundColor: colors.red,
+          borderColor: colors.red,
+          data: this.getErrors(),
+          fill: false,
+        }, {
+          label: 'Warnings',
+          yAxisID: 'messages',
+          backgroundColor: colors.yellow,
+          borderColor: colors.yellow,
+          data: this.getWarnings(),
+          fill: false,
+        }, {
+          label: 'Number of Roasts',
+          yAxisID: 'count',
+          backgroundColor: colors.darkblue,
+          borderColor: colors.grey,
+          data: this.getCount(),
+          fill: true,
+        }],
+      };
   };
 
   public getConfig(): Object {
@@ -134,6 +194,15 @@ export class RoastCountStatisticsModel extends RoastMessageStatisticsModel {
             gridLines: {
               color: colors.darkblue,
             },
+            ticks: {
+              beginAtZero: true,
+              // Only allow integers for ticker.
+              callback: (v) => {
+                if (Number.isInteger(v)) {
+                  return v;
+                }
+              },
+            },
           }],
           xAxes: [{
             scaleLabel: {
@@ -146,31 +215,7 @@ export class RoastCountStatisticsModel extends RoastMessageStatisticsModel {
           }],
         },
       },
-      data: {
-        labels: this.getLabels(),
-        datasets: [{
-          label: 'Errors',
-          yAxisID: 'messages',
-          backgroundColor: colors.red,
-          borderColor: colors.red,
-          data: this.getErrors(),
-          fill: false,
-        }, {
-          label: 'Warnings',
-          yAxisID: 'messages',
-          backgroundColor: colors.yellow,
-          borderColor: colors.yellow,
-          data: this.getWarnings(),
-          fill: false,
-        }, {
-          label: 'Number of Roasts',
-          yAxisID: 'count',
-          backgroundColor: colors.darkblue,
-          borderColor: colors.grey,
-          data: this.getCount(),
-          fill: true,
-        }],
-      },
+      data: this.getData(),
     };
   };
 };
@@ -181,6 +226,31 @@ export class RoastLinesStatisticsModel extends RoastMessageStatisticsModel {
     return this.data.map((p) => {
       return p.linesOfCode;
     });
+  };
+
+  public getData(): Object {
+    return {
+        labels: this.getLabels(),
+        datasets: [{
+          label: 'Errors',
+          backgroundColor: colors.red,
+          borderColor: colors.red,
+          data: this.getErrors(),
+          fill: false,
+        }, {
+          label: 'Warnings',
+          backgroundColor: colors.yellow,
+          borderColor: colors.yellow,
+          data: this.getWarnings(),
+          fill: false,
+        }, {
+          label: 'Lines Analyzed',
+          backgroundColor: colors.darkblue,
+          borderColor: colors.grey,
+          data: this.getLines(),
+          fill: true,
+        }],
+      };
   };
 
   public getConfig(): Object {
@@ -213,28 +283,7 @@ export class RoastLinesStatisticsModel extends RoastMessageStatisticsModel {
           }],
         },
       },
-      data: {
-        labels: this.getLabels(),
-        datasets: [{
-          label: 'Errors',
-          backgroundColor: colors.red,
-          borderColor: colors.red,
-          data: this.getErrors(),
-          fill: false,
-        }, {
-          label: 'Warnings',
-          backgroundColor: colors.yellow,
-          borderColor: colors.yellow,
-          data: this.getWarnings(),
-          fill: false,
-        }, {
-          label: 'Lines Analyzed',
-          backgroundColor: colors.darkblue,
-          borderColor: colors.grey,
-          data: this.getLines(),
-          fill: true,
-        }],
-      },
+      data: this.getData(),
     };
   };
 };
