@@ -57,11 +57,13 @@ export default class Nav implements ξ.ClassComponent {
 
       // TODO: Make this DRY, generate the navbar instead?
       ξ('.right.menu',
+
+          ξ.route.get() != '/' ?
           ξ('.item',
               ξ('a.ui.primary.button[style=max-height=0.1em;]', {
                 href: '/',
                 oncreate: ξ.route.link,
-              }, 'GET ROASTED!')),
+              }, 'GET ROASTED!')): '',
 
           ξ('a.item', {
             href: '/about',

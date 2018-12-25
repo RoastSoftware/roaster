@@ -1,6 +1,7 @@
 import ξ from 'mithril';
 import base from './base';
 import Chart from 'chart.js';
+import {UserModel} from '../models/user';
 import {
   RoastLinesStatisticsModel,
   RoastCountStatisticsModel,
@@ -162,27 +163,29 @@ export default class Statistics implements ξ.ClassComponent {
             ξ('.row.center.aligned',
                 ξ('.sixteen.wide.column',
                     ξ('.ui.compact.secondary.menu',
-                        ξ('a.item', {
-                          class: this.setActive(StatisticsFilter.Global),
-                          onclick: () => {
-                            this.setFilter(StatisticsFilter.Global);
+                        UserModel.isLoggedIn() ? [
+                          ξ('a.item', {
+                            class: this.setActive(StatisticsFilter.Global),
+                            onclick: () => {
+                              this.setFilter(StatisticsFilter.Global);
+                            },
                           },
-                        },
-                        ξ('i.globe.icon'), 'GLOBAL'),
-                        ξ('a.item', {
-                          class: this.setActive(StatisticsFilter.Friends),
-                          onclick: () => {
-                            this.setFilter(StatisticsFilter.Friends);
+                          ξ('i.globe.icon'), 'GLOBAL'),
+                          ξ('a.item', {
+                            class: this.setActive(StatisticsFilter.Friends),
+                            onclick: () => {
+                              this.setFilter(StatisticsFilter.Friends);
+                            },
                           },
-                        },
-                        ξ('i.users.icon'), 'FRIENDS'),
-                        ξ('a.item', {
-                          class: this.setActive(StatisticsFilter.User),
-                          onclick: () => {
-                            this.setFilter(StatisticsFilter.User);
+                          ξ('i.users.icon'), 'FRIENDS'),
+                          ξ('a.item', {
+                            class: this.setActive(StatisticsFilter.User),
+                            onclick: () => {
+                              this.setFilter(StatisticsFilter.User);
+                            },
                           },
-                        },
-                        ξ('i.user.icon'), 'YOU'),
+                          ξ('i.user.icon'), 'YOU'),
+                        ]: '',
                     ),
                 ),
             ),

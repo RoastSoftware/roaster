@@ -190,32 +190,33 @@ export default class Feed implements ξ.ClassComponent {
                         'Check out what everyone has been up to!')),
             ),
             ξ('.ui.divider'),
-            ξ('.ui.top.attached.secondary.pointing.menu', {style: menuStyle},
-                ξ('a.item', {
-                  class: this.setItemActiveClass('global'),
-                  style: this.setItemActiveStyle('global'),
-                  onclick: () => {
-                    this.updateCategory('global');
+            UserModel.isLoggedIn() ?
+              ξ('.ui.top.attached.secondary.pointing.menu', {style: menuStyle},
+                  ξ('a.item', {
+                    class: this.setItemActiveClass('global'),
+                    style: this.setItemActiveStyle('global'),
+                    onclick: () => {
+                      this.updateCategory('global');
+                    },
                   },
-                },
-                ξ('i.globe.icon'), 'GLOBAL'),
-                ξ('a.item', {
-                  class: this.setItemActiveClass('friends'),
-                  style: this.setItemActiveStyle('friends'),
-                  onclick: () => {
-                    this.updateCategory('friends');
+                  ξ('i.globe.icon'), 'GLOBAL'),
+                  ξ('a.item', {
+                    class: this.setItemActiveClass('friends'),
+                    style: this.setItemActiveStyle('friends'),
+                    onclick: () => {
+                      this.updateCategory('friends');
+                    },
                   },
-                },
-                ξ('i.users.icon'), 'FRIENDS'),
-                ξ('a.item', {
-                  class: this.setItemActiveClass('you'),
-                  style: this.setItemActiveStyle('you'),
-                  onclick: () => {
-                    this.updateCategory('you');
+                  ξ('i.users.icon'), 'FRIENDS'),
+                  ξ('a.item', {
+                    class: this.setItemActiveClass('you'),
+                    style: this.setItemActiveStyle('you'),
+                    onclick: () => {
+                      this.updateCategory('you');
+                    },
                   },
-                },
-                ξ('i.user.icon'), 'YOU'),
-            ),
+                  ξ('i.user.icon'), 'YOU'),
+              ): '',
             ξ('.ui.bottom.attached.segment',
                 (this.feed.items ?
                   ξ('.ui.feed', [

@@ -27,7 +27,7 @@ export default class Login implements ξ.ClassComponent {
   view() {
     return ξ(base, ξ('.ui.main.text.container[style=margin-top: 2em;]',
         ξ('.ui.grid',
-            ξ('.ui.container.six.wide.column.centered',
+            ξ('.ui.container.eight.wide.column.centered',
                 ξ('.ui.segments',
                     ξ('.ui.segment', ξ('h2', 'LOGIN')),
 
@@ -39,7 +39,7 @@ export default class Login implements ξ.ClassComponent {
                                   'Oh noeh!'),
                               ξ('p', this.loginError.message)))),
 
-                    ξ('.ui.segment', ξ('form.ui.form', {
+                    ξ('.ui.segment.clearing', ξ('form.ui.form', {
                       onsubmit: () => {
                         this.authenticate();
                       }},
@@ -68,7 +68,7 @@ export default class Login implements ξ.ClassComponent {
                               placeholder: 's3cur3p#55w0rd',
                             }))]),
 
-                      ξ('button.ui.teal.basic.button', {
+                      ξ('button.ui.teal.basic.button.right.floated', {
                         disabled: !(UserModel.validLogin()),
                       }, 'LOGIN!'),
                     ]))
