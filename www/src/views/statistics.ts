@@ -6,6 +6,7 @@ import {
   RoastCountStatisticsModel,
   RoastCountModel,
   LineCountModel,
+  StatisticsFilter,
 } from '../models/statistics';
 
 class RoastLinesChart implements ξ.ClassComponent {
@@ -23,7 +24,7 @@ class RoastLinesChart implements ξ.ClassComponent {
     });
   };
 
-  view(vnode: ξ.CVnode) {
+  view() {
     return ξ('canvas');
   };
 };
@@ -43,7 +44,7 @@ class RoastCountChart implements ξ.ClassComponent {
     });
   };
 
-  view(vnode: ξ.CVnode) {
+  view() {
     return ξ('canvas');
   };
 };
@@ -52,11 +53,14 @@ class RoastCount implements ξ.ClassComponent {
   roasts: RoastCountModel = new RoastCountModel();
   intervalID: number;
 
-  oncreate({dom}) {
+  async update() {
     this.roasts.update();
+  }
 
+  oncreate({dom}) {
+    this.update();
     this.intervalID = setInterval(() => {
-      this.roasts.update();
+      this.update();
     }, 5000);
   };
 
@@ -64,7 +68,7 @@ class RoastCount implements ξ.ClassComponent {
     clearInterval(this.intervalID);
   };
 
-  view(vnode: ξ.CVnode) {
+  view() {
     return ξ('h1.ui.icon.blue.header',
         ξ('.content[style=font-size: 3em;]', this.roasts.count,
             ξ('.sub.header[style=margin-top: 1em;]',
@@ -73,14 +77,21 @@ class RoastCount implements ξ.ClassComponent {
 };
 
 class LineCount implements ξ.ClassComponent {
-  lines: LineCountModel = new LineCountModel();
+  lines: LineCountModel;
   intervalID: number;
 
-  oncreate({dom}) {
+  async update() {
     this.lines.update();
+  }
 
+  oninit({attrs}) {
+    this.lines = new LineCountModel(attrs.filter);
+  };
+
+  oncreate({dom}) {
+    this.update();
     this.intervalID = setInterval(() => {
-      this.lines.update();
+      this.update();
     }, 5000);
   };
 
@@ -88,7 +99,7 @@ class LineCount implements ξ.ClassComponent {
     clearInterval(this.intervalID);
   };
 
-  view(vnode: ξ.CVnode) {
+  view() {
     return ξ('h1.ui.icon.blue.header',
         ξ('.content[style=font-size: 3em;]',
             this.lines.count,
@@ -98,7 +109,13 @@ class LineCount implements ξ.ClassComponent {
 };
 
 export default class Statistics implements ξ.ClassComponent {
-  view(vnode: ξ.CVnode) {
+  currentFilter: StatisticsFilter = StatisticsFilter.Global;
+
+  setFilter(filter: StatisticsFilter) {
+    this.currentFilter = filter;
+  };
+
+  view() {
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 1em;]',
             ξ('h1.ui.header',
@@ -111,29 +128,41 @@ export default class Statistics implements ξ.ClassComponent {
             ξ('.row.center.aligned',
                 ξ('.sixteen.wide.column',
                     ξ('.ui.compact.secondary.menu',
-                        ξ('a.item.active',
-                            ξ('i.globe.icon'), 'GLOBAL'),
-                        ξ('a.item',
-                            ξ('i.users.icon'), 'FRIENDS'),
-                        ξ('a.item',
-                            ξ('i.user.icon'), 'YOU'),
+                        ξ('a.item.active', {
+                          onclick: () => {
+                            this.setFilter(StatisticsFilter.Global);
+                          },
+                        },
+                        ξ('i.globe.icon'), 'GLOBAL'),
+                        ξ('a.item', {
+                          onclick: () => {
+                            this.setFilter(StatisticsFilter.Friends);
+                          },
+                        },
+                        ξ('i.users.icon'), 'FRIENDS'),
+                        ξ('a.item', {
+                          onclick: () => {
+                            this.setFilter(StatisticsFilter.User);
+                          },
+                        },
+                        ξ('i.user.icon'), 'YOU'),
                     ),
                 ),
             ),
             ξ('.row.center.aligned',
                 ξ('.eight.wide.column',
-                    ξ(LineCount),
+                    ξ(LineCount, {filter: this.currentFilter}),
                 ),
                 ξ('.eight.wide.column',
-                    ξ(RoastCount),
+                    ξ(RoastCount, {filter: this.currentFilter}),
                 ),
             ),
             ξ('.row',
                 ξ('.eight.wide.column',
-                    ξ(RoastLinesChart),
+                    ξ(RoastLinesChart, {filter: this.currentFilter}),
                 ),
                 ξ('.eight.wide.column',
-                    ξ(RoastCountChart),
+                    ξ(RoastCountChart, {filter: this.currentFilter}),
                 ),
             ),
         ),

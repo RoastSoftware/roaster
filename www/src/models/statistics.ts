@@ -1,6 +1,12 @@
 import moment from 'moment';
 import Network from '../services/network';
 
+export enum StatisticsFilter {
+  Global = 1,
+  Friends,
+  User,
+};
+
 const colors = {
   red: 'rgb(250, 50, 47)',
   orange: 'rgb(203, 75, 22)',
@@ -24,7 +30,6 @@ export class LineCountModel extends CountModel {
 
     return Network.request<Object>('GET', uri)
         .then((data: Object) => {
-          console.log('lel', this.count);
           this.count = data.lines;
         });
   };
@@ -36,7 +41,6 @@ export class RoastCountModel extends CountModel {
 
     return Network.request<Object>('GET', uri)
         .then((data: Object) => {
-          console.log('lol', this.count);
           this.count = data.count;
         });
   };
@@ -77,7 +81,6 @@ class RoastMessageStatisticsModel {
   private getLabels(): Array {
     const labels = [];
     for (let i = 0; i < this.data.length; i++) {
-      console.log(this.data[i]);
       labels.push(moment(this.data[i].timestamp).format('HH:mm'));
     }
 

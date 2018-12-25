@@ -6,6 +6,7 @@ import roasterLogo from '../assets/icons/roaster-icon-teal.svg';
 const navBarStyle = `\
 border: 1px solid #094959;\
 z-index: 9999;\
+min-height: 50px;\
 `;
 
 const logotypeStyle = `\
@@ -23,7 +24,7 @@ color: #00b5ad;\
  */
 export default class Nav implements ξ.ClassComponent {
   setItemActive(url: string): string {
-    return ξ.route.get() == url ? 'item active' : 'item';
+    return ξ.route.get() == url ? 'active' : '';
   };
 
   deauthenticate(): Promise {
@@ -40,7 +41,7 @@ export default class Nav implements ξ.ClassComponent {
    * @return {CVnode}
    */
   view(vnode: CVnode) {
-    return ξ('nav.ui.massive.borderless.stackable.menu.attached', {
+    return ξ('nav.ui.borderless.stackable.menu.attached', {
       style: navBarStyle,
     }, [
       ξ('a.header.item', {
@@ -56,6 +57,12 @@ export default class Nav implements ξ.ClassComponent {
 
       // TODO: Make this DRY, generate the navbar instead?
       ξ('.right.menu',
+          ξ('.item',
+              ξ('a.ui.primary.button[style=max-height=0.1em;]', {
+                href: '/',
+                oncreate: ξ.route.link,
+              }, 'GET ROASTED!')),
+
           ξ('a.item', {
             href: '/about',
             oncreate: ξ.route.link,
@@ -85,9 +92,6 @@ export default class Nav implements ξ.ClassComponent {
               UserModel.getUsername().toUpperCase()),
               ξ('a.item', {
                 href: '#!/',
-                // For some reason this dissappears when the
-                // class above gets evaluated, bug in Mithril?
-                class: 'item',
                 onclick: this.deauthenticate},
               ξ('i.sign.out.icon'), 'LOGOUT'),
             ]
