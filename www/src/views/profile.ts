@@ -1,8 +1,9 @@
 import ξ from 'mithril';
 import base from './base';
-import {UserModel} from '../models/user';
 import Network from '../services/network';
 import {RoastDoughnutStatisticsModel} from '../models/statistics';
+import {UserProfileHeader} from './user';
+import {UserModel} from '../models/user';
 import Chart from 'chart.js';
 
 export default class Profile implements ξ.ClassComponent {
@@ -10,6 +11,10 @@ export default class Profile implements ξ.ClassComponent {
     downloadError: APIError;
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
+    username: string = UserModel.getUsername();
+    fullname: string = UserModel.getFullname();
+    email: string = UserModel.getEmail();
+    score: number = 0;
 
     upload({target}) {
       const avatar = target.files[0];
@@ -32,28 +37,28 @@ export default class Profile implements ξ.ClassComponent {
           });
     };
 
-    clickImg() {
+    oncreate() {
+      Network.request<Object>('GET', '/user/' + this.username + '/score')
+          .then(({score}) => {
+            this.score = score;
+          });
+    };
+
+    clickImage() {
       document.getElementById('upload').click();
     };
 
-    getUserStat() {
-      console.log('getting user statistics');
-      // TODO: Network.request statistics
-    }
-
-    view(vnode: ξ.CVnode) {
+    view({attrs}) {
       return ξ(base,
           ξ('.ui.text.container', {
             style: 'margin-top: 1em;',
           },
-          ξ('h1.ui.header',
-              ξ('img.ui.circular.image', {
-                src: this.profileImageURI,
-              }),
-              ξ('.content',
-                  'MY PROFILE',
-                  ξ('.sub.header', `Hello there, ${UserModel.getFullname()}!`)),
-          ),
+          ξ(UserProfileHeader, {
+            username: this.username,
+            fullname: this.fullname,
+            score: this.score,
+            loggedIn: true,
+          }),
           ξ('.ui.divider')),
           ξ('.ui.main.text.container.two.column.stackable.grid',
               ξ('.ui.column',
@@ -67,18 +72,18 @@ export default class Profile implements ξ.ClassComponent {
                   }),
                   ξ('img.ui.image.rounded.medium#picture', {
                     src: this.profileImageURI,
-                    onclick: this.clickImg,
+                    onclick: this.clickImage,
                     style: 'cursor: pointer;',
                   },
                   'User profile picture.'),
                   ξ('h2',
-                      UserModel.getFullname()),
+                      this.fullname),
                   ξ('p',
                       ξ('i.user.icon'),
-                      UserModel.getUsername()),
+                      this.username),
                   ξ('p',
                       ξ('i.mail.icon'),
-                      UserModel.getEmail()),
+                      this.email),
               ),
               ξ('.ui.column[minheight=10em]',
                   ξ('canvas#chart-area', {
