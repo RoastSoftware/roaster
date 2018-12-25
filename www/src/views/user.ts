@@ -4,105 +4,105 @@ import base from './base';
 import Network from '../services/network';
 import Model from '../models/statistics';
 import Chart from 'chart.js';
-import {UserModel, Friend} from '../models/user';
+import {UserModel} from '../models/user';
 
 class UserProfile implements ξ.ClassComponent {
     isFriend: boolean = false;
-    
+
     hasFriend(username: string) {
-        for (let friend of UserModel.friends){
-            if (friend.friend == username){
-                this.isFriend = true;
-                break;
-            } else {
-                this.isFriend = false;
-            }
+      for (const friend of UserModel.friends) {
+        if (friend.friend == username) {
+          this.isFriend = true;
+          break;
+        } else {
+          this.isFriend = false;
         }
+      }
     };
 
     async friendCheck(username: string) {
-        const getFriends =  Network.request<Array<Friend>>('GET', '/user/' +
+      return Network.request<Array<Friend>>('GET', '/user/' +
             UserModel.getUsername() + '/friend')
-            .then((result) => {
-                UserModel.emptyFriends();
+          .then((result) => {
+            UserModel.emptyFriends();
             UserModel.friends = result;
             this.hasFriend(username);
             ξ.redraw();
-        });
+          });
     };
 
     async unFriend(username: string) {
-        Network.request('DELETE', '/user/' + username + '/friend')
-            .then(() => {
-                this.friendCheck(username);
-            });
+      Network.request('DELETE', '/user/' + username + '/friend')
+          .then(() => {
+            this.friendCheck(username);
+          });
     };
 
     async addFriend(username: string) {
-    Network.request('POST', '/user/' + username + '/friend', {
+      Network.request('POST', '/user/' + username + '/friend', {
         'friend': username,
-    })
-            .then(() => {
-                this.friendCheck(username);
-            });
+      })
+          .then(() => {
+            this.friendCheck(username);
+          });
     };
 
     oncreate(vnode: ξ.CVnodeDOM) {
-        this.friendCheck(vnode.attrs.username);
+      this.friendCheck(vnode.attrs.username);
     }
-  view(vnode: ξ.CVnode) {
-    const username = vnode.attrs.username;
-    const fullname = vnode.attrs.fullname;
-    const email = vnode.attrs.email;
-      
-    return ξ(base,
-        ξ('.ui.main.text.container.two.column.stackable.grid', {
-          style: 'margin-top: 2em;',
-        },
-        ξ('.ui.column',
-            ξ('img.ui.image.rounded.medium#picture',
-                {src: '/user/' + username + '/avatar'},
-                'User profile picture.'),
-            ξ('h2',
-                fullname),
-            ξ('p',
-                ξ('i.user.icon'),
-                username),
-            ξ('p',
-                ξ('i.mail.icon'),
-                email),
-            ξ('.ui.placeholder',
-                ξ('ui.image')),
+    view(vnode: ξ.CVnode) {
+      const username = vnode.attrs.username;
+      const fullname = vnode.attrs.fullname;
+      const email = vnode.attrs.email;
+
+      return ξ(base,
+          ξ('.ui.main.text.container.two.column.stackable.grid', {
+            style: 'margin-top: 2em;',
+          },
+          ξ('.ui.column',
+              ξ('img.ui.image.rounded.medium#picture',
+                  {src: '/user/' + username + '/avatar'},
+                  'User profile picture.'),
+              ξ('h2',
+                  fullname),
+              ξ('p',
+                  ξ('i.user.icon'),
+                  username),
+              ξ('p',
+                  ξ('i.mail.icon'),
+                  email),
+              ξ('.ui.placeholder',
+                  ξ('ui.image')),
             this.isFriend ?
             ξ('button.ui.basic.red.button', {
-                onclick: () => {
-                    this.unFriend(username);
-                },
+              onclick: () => {
+                this.unFriend(username);
+              },
             }, 'UNFOLLOW')
             :
             ξ('button.ui.basic.teal.button', {
-                onclick: () => {
-                    this.addFriend(username);
-                },
+              onclick: () => {
+                this.addFriend(username);
+              },
             },
-                'FOLLOW!'),
-        ),
-            ξ('.ui.column[min-height = 10em]',
-            ξ('canvas#chart-area', {
-              oncreate: ({dom}) => {
-                const ctx = (document.getElementById(
-                    'chart-area') as HTMLCanvasElement)
-                    .getContext('2d');
-                new Chart(ctx, {
-                  type: 'doughnut',
-                  data: Model.dataDonut,
-                  options: Model.optionsDonut,
-                });
-              }})
-        )
-        )
-    );
-  }
+            'FOLLOW!'),
+          ),
+          ξ('.ui.column[min-height = 10em]',
+              ξ('canvas#chart-area', {
+                oncreate: ({dom}) => {
+                  const ctx = (document.getElementById(
+                      'chart-area') as HTMLCanvasElement)
+                      .getContext('2d');
+                  new Chart(ctx, {
+                    type: 'doughnut',
+                    data: Model.dataDonut,
+                    options: Model.optionsDonut,
+                  });
+                }})
+          )
+          )
+      );
+    }
 };
 
 export default class UserView implements ξ.ClassComponent {
@@ -118,8 +118,8 @@ export default class UserView implements ξ.ClassComponent {
     oncreate(vnode: ξ.CVnodeDOM) {
       Network.request<User>('GET', '/user/' + vnode.attrs.username)
           .then((user: User) => {
-              this.user = user;
-              this.ready = true;
+            this.user = user;
+            this.ready = true;
             ξ.redraw();
           });
     }

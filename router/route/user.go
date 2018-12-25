@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
-    "log"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
@@ -130,68 +130,65 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusNoContent, nil
 	}
 
-    f := model.Friend{}
+	f := model.Friend{}
 
-    err = json.NewDecoder(r.Body).Decode(&f)
-    if err != nil {
-        log.Println(err)
-        return http.StatusBadRequest, causerr.New(err,
-        "unable to decode request")
-    }
-    log.Println(username, f)
-    if f.Friend == "" {
-        return http.StatusBadRequest, causerr.New(
-            errors.New("friend is empty"),
-            "Missing friend parameter in URI")
-    }
+	err = json.NewDecoder(r.Body).Decode(&f)
+	if err != nil {
+		log.Println(err)
+		return http.StatusBadRequest, causerr.New(err,
+			"unable to decode request")
+	}
+	if f.Friend == "" {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("friend is empty"),
+			"Missing friend parameter in URI")
+	}
 
-    err = model.PutFriend(username, f.Friend)
-    if err != nil {
-        log.Println(err)
-        if pgerr, ok := err.(*pq.Error); ok {
-            log.Println(pgerr.Constraint)
-            if pgerr.Constraint == "friend_relation_uq" {
-                return http.StatusConflict, causerr.New(err, "User already has this friend")
-            }
-            if pgerr.Constraint == "username_fk" {
-                return http.StatusBadRequest, causerr.New(err, "No user registered, are you logged in?")
-            }
-        }
-        return http.StatusInternalServerError, causerr.New(err, "")
-    }
-    return http.StatusOK, nil
+	err = model.PutFriend(username, f.Friend)
+	if err != nil {
+		log.Println(err)
+		if pgerr, ok := err.(*pq.Error); ok {
+			log.Println(pgerr.Constraint)
+			if pgerr.Constraint == "friend_relation_uq" {
+				return http.StatusConflict, causerr.New(err, "User already has this friend")
+			}
+			if pgerr.Constraint == "username_fk" {
+				return http.StatusBadRequest, causerr.New(err, "No user registered, are you logged in?")
+			}
+		}
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+	return http.StatusOK, nil
 }
 
-// retrieveFriends returns 
+// retrieveFriends returns
 func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
-    vars := mux.Vars(r)
-    username := vars["username"]
+	vars := mux.Vars(r)
+	username := vars["username"]
 
-    if username == "" {
-        return http.StatusBadRequest, causerr.New(
-            errors.New("missing username for lookup"),
-            "Missing username for lookup")
-    }
-    // TODO: make query that either return a friend object full of friends or
-    // a list of friend objects, USE LIST OF FRIENDS
-    friends, err := model.GetFriends(username)
-    if err != nil {
-                return http.StatusInternalServerError, causerr.New(err, "")
-    }
-    if len(friends) <=0 {
-        return http.StatusNoContent, nil
-    }
+	if username == "" {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("missing username for lookup"),
+			"Missing username for lookup")
+	}
+	friends, err := model.GetFriends(username)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+	if len(friends) <= 0 {
+		return http.StatusNoContent, nil
+	}
 
-    err = json.NewEncoder(w).Encode(friends)
-    if err != nil {
-        return http.StatusInternalServerError, causerr.New(err, "error when preparing response")
-    }
+	err = json.NewEncoder(w).Encode(friends)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "error when preparing response")
+	}
 
-    return http.StatusOK, nil
+	return http.StatusOK, nil
 }
 
 func removeFriend(w http.ResponseWriter, r *http.Request) (int, error) {
-    s, err := session.Get(r, "roaster_auth")
+	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -201,19 +198,18 @@ func removeFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusNoContent, nil
 	}
 
-    vars := mux.Vars(r)
-    friend := vars["username"]
-    // TODO: extract the logged in user in order to know which entry to delete
-    if username == "" {
-        return http.StatusBadRequest, causerr.New(
-            errors.New("missing username for lookup"),
-            "Missing username for lookup")
-    }
-    err = model.RemoveFriend(username, friend)
-    if err != nil {
-        return http.StatusInternalServerError, causerr.New(err, "error removing friend")
-    }
-    return http.StatusOK, nil
+	vars := mux.Vars(r)
+	friend := vars["username"]
+	if username == "" {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("missing username for lookup"),
+			"Missing username for lookup")
+	}
+	err = model.RemoveFriend(username, friend)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "error removing friend")
+	}
+	return http.StatusOK, nil
 }
 
 // User adds the handlers for the User [/user] endpoint.
@@ -229,8 +225,8 @@ func User(r *mux.Router) {
 	r.Handle("/{username}", handler(changeUser)).Methods(http.MethodPatch)
 	r.Handle("/{username}", handler(removeUser)).Methods(http.MethodDelete)
 	r.Handle("/{username}", handler(retrieveUser)).Methods(http.MethodGet)
-    r.Handle("/{username}/friend", handler(putFriend)).Methods(http.MethodPost)
-    r.Handle("/{username}/friend", handler(retrieveFriends)).Methods(http.MethodGet)
-    r.Handle("/{username}/friend", handler(removeFriend)).Methods(http.MethodDelete)
+	r.Handle("/{username}/friend", handler(putFriend)).Methods(http.MethodPost)
+	r.Handle("/{username}/friend", handler(retrieveFriends)).Methods(http.MethodGet)
+	r.Handle("/{username}/friend", handler(removeFriend)).Methods(http.MethodDelete)
 
 }

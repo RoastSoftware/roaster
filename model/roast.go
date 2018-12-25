@@ -136,9 +136,9 @@ func GetRoast(id int) (roast *RoastResult, err error) {
 		msg := RoastError{}
 		err = errorRows.Scan(&msg.Hash, &msg.Row, &msg.Column, &msg.Engine, &msg.Name, &msg.Description)
 		roast.Errors = append(roast.Errors, msg)
-        if err != nil {
-            return
-        }
+		if err != nil {
+			return
+		}
 	}
 
 	warningRows, err := database.Query(`

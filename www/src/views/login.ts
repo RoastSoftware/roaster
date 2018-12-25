@@ -1,37 +1,26 @@
 import ξ from 'mithril';
 import base from './base';
-import {UserModel, Friend, User} from '../models/user';
+import {UserModel} from '../models/user';
 import Auth from '../services/auth';
-import Network from '../services/network';
 
 export default class Login implements ξ.ClassComponent {
   loginError: Error;
 
-  async authenticate(): Promise<any> {
-    
-      if (UserModel.validLogin()) {
-          const getUser = Auth.login<User>(UserModel.getUsername(), UserModel.getPassword())
-              .then((user) => {
-                  UserModel.setLoggedIn(true);
-                  Object.assign(UserModel, user);
-                  ξ.route.set('/');
+  authenticate(): Promise<User> {
+    if (UserModel.validLogin()) {
+      return Auth.login<User>(UserModel.getUsername(), UserModel.getPassword())
+          .then((user) => {
+            UserModel.setLoggedIn(true);
+            Object.assign(UserModel, user);
+            ξ.route.set('/');
 
-                  return user;
-              })
-              .catch((err: Error) => {
-                  this.loginError = err;
-                  console.log(this);
-                  ξ.redraw();
-              });
-
-          const getFriends = Network.request<Array<Friend>>('GET', '/user/' +
-              UserModel.getUsername() + '/friend')
-              .then((result) => {
-                  UserModel.friends = result;
-                  console.log(UserModel.friends)
-              });
-
-          return Promise.all([getUser, getFriends]);
+            return user;
+          })
+          .catch((err: Error) => {
+            this.loginError = err;
+            console.log(this);
+            ξ.redraw();
+          });
     }
   };
 

@@ -1,5 +1,6 @@
 // Package forwardengineer was generated automatically by inlinesql at 2018-12-17 10:25:41.280893 +0100 CET m=+0.020787701.
 package forwardengineer
+
 // GetQueries returns a pre-parsed slice of SQL queries.
 func GetQueries() []string {
 	return []string{

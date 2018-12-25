@@ -1,4 +1,3 @@
-import ξ from 'mithril';
 import Network from '../services/network';
 
 export interface User {
@@ -24,7 +23,7 @@ export class UserModel {
 
     static email: string = '';
     private static emailError: string = '';
-    
+
     static friends: Array<Friend> = [];
 
     static empty() {
@@ -32,8 +31,8 @@ export class UserModel {
       UserModel.fullname = '';
       UserModel.password = '';
       UserModel.email = '';
-        UserModel.loggedIn = false;
-        UserModel.friends = [];
+      UserModel.loggedIn = false;
+      UserModel.friends = [];
     };
 
     static isLoggedIn(): boolean {
@@ -158,25 +157,25 @@ that is more than 1 googol^98 in entropy`;
     static validPassword(): boolean {
       return UserModel.passwordError == '';
     };
-    
+
     static emptyFriends() {
-        UserModel.friends = [];
+      UserModel.friends = [];
     };
 };
 
 export function getFriend(username: string) {
-    return Network.request('GET', '/user/' + username + '/friend', {
-        'friend': username,
-    }); 
+  return Network.request('GET', '/user/' + username + '/friend', {
+    'friend': username,
+  });
 };
 
 export function addFriend(username: string) {
-    return Network.request('POST', '/user/' + username + '/friend', {
-        'friend': username,
-    }); 
+  return Network.request('POST', '/user/' + username + '/friend', {
+    'friend': username,
+  });
 };
 
 export function unFriend(username: string) {
-    return Network.request('DELETE', '/user/' + username + '/friend');
+  return Network.request('DELETE', '/user/' + username + '/friend');
 };
 
