@@ -6,12 +6,21 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/model"
 	"github.com/gorilla/mux"
 	"github.com/willeponken/causerr"
 )
+
+func getBooleanFromString(s string) bool {
+	if strings.ToLower(s) == "true" {
+		return true
+	}
+
+	return false
+}
 
 func retrieveFeed(w http.ResponseWriter, r *http.Request) (int, error) {
 	pageStr := r.URL.Query().Get("page")
@@ -28,14 +37,20 @@ func retrieveFeed(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
-	vars := mux.Vars(r)
-	username := vars["username"]
+	username := r.URL.Query().Get("user")
+	friends := getBooleanFromString(r.URL.Query().Get("friends"))
+
+	if username != "" && friends {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("request for friends is missing user query parameter"),
+			"Friends query parameter also requires the user query parameter")
+	}
 
 	var feed model.Feed
 	if username == "" {
 		feed, err = model.GetGlobalFeed(page)
 	} else {
-		feed, err = model.GetUserFeed(username, page)
+		feed, err = model.GetUserFeed(username, friends, page)
 	}
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
@@ -57,11 +72,6 @@ func Feed(r *mux.Router) {
 
 	// Global Feed [GET].
 	r.Handle("", handler(retrieveFeed)).
-		Queries("page", "{[0-9]+}").
-		Methods(http.MethodGet)
-
-	// User Feed [/feed/{username}].
-	r.Handle("/{username}", handler(retrieveFeed)).
 		Queries("page", "{[0-9]+}").
 		Methods(http.MethodGet)
 }

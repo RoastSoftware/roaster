@@ -78,6 +78,18 @@ create table if not exists "error"
   description text    not null
 );
 
+create table if not exists "roast_statistics"
+(
+  roast integer not null
+    constraint roast_fk
+    references roast (id)
+    on update cascade
+    on delete cascade,
+  lines_of_code integer not null,
+  number_of_errors integer not null,
+  number_of_warnings integer not null
+);
+
 create table if not exists "roast_has_errors"
 (
   roast integer not null
@@ -115,3 +127,22 @@ create table if not exists avatar
 
 create index if not exists username_avatar_idx
   on avatar using btree (username);
+
+drop function if exists round_minutes(timestamp without time zone, integer);
+drop function if exists round_minutes(timestamp without time zone, integer, text);
+
+create function round_minutes(timestamp without time zone, integer)
+returns timestamp without time zone as $$
+  select
+     date_trunc('hour', $1)
+     +  cast(($2::varchar||' min') as interval)
+     * round(
+     (date_part('minute',$1)::float + date_part('second',$1)/ 60.)::float
+     / $2::float
+      )
+$$ language sql immutable;
+
+create function round_minutes(timestamp without time zone, integer, text)
+returns text as $$
+  select to_char(round_minutes($1,$2),$3)
+$$ language sql immutable;

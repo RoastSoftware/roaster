@@ -28,16 +28,17 @@ type Feed struct {
 // GetGlobalFeed collects the latest N (N = pageSize) feed items for all users.
 // Pagination is supported where page = 0 is the first (latest) page.
 func GetGlobalFeed(page uint64) (feed Feed, err error) {
-	return getFeed("", page)
+	return getFeed("", false, page)
 }
 
 // GetUserFeed collects the latest N (N = pageSize) feed items for an user.
 // Pagination is supported where page = 0 is the first (latest) page.
-func GetUserFeed(username string, page uint64) (feed Feed, err error) {
-	return getFeed(username, page)
+func GetUserFeed(username string, friends bool, page uint64) (feed Feed, err error) {
+	return getFeed(username, friends, page)
 }
 
-func getFeed(username string, page uint64) (feed Feed, err error) {
+// TODO: Add friends to SQL query when the Friends table has been implemented.
+func getFeed(username string, friends bool, page uint64) (feed Feed, err error) {
 	rows, err := database.Query(`
 	SELECT username, score, language, create_time
 	FROM "roaster"."roast"

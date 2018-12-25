@@ -5,7 +5,13 @@ export default {
   view(vnode: CVnode) {
     return [
       ξ(base,
-          ξ('.ui.main.text.container[style=margin-top: 2em;]',
+          ξ('.ui.main.text.container[style=margin-top: 1em;]',
+              ξ('h1.ui.header',
+                  ξ('i.question.circle.outline.icon'),
+                  ξ('.content', 'ABOUT US',
+                      ξ('.sub.header', 'Oh boy do we have stuff to tell you.')),
+              ),
+              ξ('.ui.divider'),
               ξ('h1', `What is Roaster?`),
               ξ('p', `Roaster is a site that will run static code analysis on\
                   code you write or paste into the IDE on the home page.\

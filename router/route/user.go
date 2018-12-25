@@ -37,7 +37,9 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Email == "" || u.Password == "" {
-		return http.StatusBadRequest, causerr.New("missing field in request", "Missing field in request")
+		return http.StatusBadRequest, causerr.New(
+			errors.New("missing field in request"),
+			"Missing field in request")
 	}
 
 	err = model.PutUser(u.User, []byte(u.Password))
@@ -90,8 +92,7 @@ func removeUser(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
-	vars := mux.Vars(r)
-	username := vars["username"]
+	username := mux.Vars(r)["username"]
 
 	if username == "" {
 		return http.StatusBadRequest, causerr.New(
@@ -115,6 +116,16 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
+	return http.StatusOK, nil
+}
+
+func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err error) {
+	username := mux.Vars(r)["username"]
+	score, err := model.GetUserScore(username)
+	err = json.NewEncoder(w).Encode(score)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
 	return http.StatusOK, nil
 }
 
@@ -229,4 +240,5 @@ func User(r *mux.Router) {
 	r.Handle("/{username}/friend", handler(retrieveFriends)).Methods(http.MethodGet)
 	r.Handle("/{username}/friend", handler(removeFriend)).Methods(http.MethodDelete)
 
+	r.Handle("/{username}/score", handler(retrieveUserScore)).Methods(http.MethodGet)
 }

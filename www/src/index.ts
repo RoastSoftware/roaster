@@ -4,6 +4,7 @@ import about from './views/about';
 import register from './views/register';
 import profile from './views/profile';
 import statistics from './views/statistics';
+import feed from './views/feed';
 import login from './views/login';
 import user from './views/user';
 
@@ -48,6 +49,7 @@ class Roaster {
       '/': home,
       '/about': about,
       '/statistics': statistics,
+      '/feed': feed,
       '/profile': {onmatch: redirectMatcher(profile, (): boolean => {
         return UserModel.isLoggedIn();
       }, '/')},
@@ -60,7 +62,9 @@ class Roaster {
         }, '/')},
       '/user/:username': {
         onmatch: redirectMatcher(user, (args: any[]): boolean => {
-          return args[0].username != UserModel.getUsername();
+          return (
+            args[0].username.toLowerCase() !=
+            UserModel.getUsername().toLowerCase());
         }, '/profile'),
       },
     });

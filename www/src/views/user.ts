@@ -1,4 +1,3 @@
-
 import ξ from 'mithril';
 import base from './base';
 import Network from '../services/network';
@@ -54,55 +53,64 @@ class UserProfile implements ξ.ClassComponent {
       const username = vnode.attrs.username;
       const fullname = vnode.attrs.fullname;
       const email = vnode.attrs.email;
-
-      return ξ(base,
-          ξ('.ui.main.text.container.two.column.stackable.grid', {
-            style: 'margin-top: 2em;',
-          },
-          ξ('.ui.column',
-              ξ('img.ui.image.rounded.medium#picture',
-                  {src: '/user/' + username + '/avatar'},
-                  'User profile picture.'),
-              ξ('h2',
-                  fullname),
-              ξ('p',
-                  ξ('i.user.icon'),
-                  username),
-              ξ('p',
-                  ξ('i.mail.icon'),
-                  email),
-              ξ('.ui.placeholder',
-                  ξ('ui.image')),
-            this.isFriend ?
-            ξ('button.ui.basic.red.button', {
-              onclick: () => {
-                this.unFriend(username);
-              },
-            }, 'UNFOLLOW')
-            :
-            ξ('button.ui.basic.teal.button', {
-              onclick: () => {
-                this.addFriend(username);
-              },
-            },
-            'FOLLOW!'),
-          ),
-          ξ('.ui.column[min-height = 10em]',
-              ξ('canvas#chart-area', {
-                oncreate: ({dom}) => {
-                  const ctx = (document.getElementById(
-                      'chart-area') as HTMLCanvasElement)
-                      .getContext('2d');
-                  new Chart(ctx, {
-                    type: 'doughnut',
-                    data: Model.dataDonut,
-                    options: Model.optionsDonut,
-                  });
-                }})
-          )
-          )
-      );
-    }
+    
+        return ξ(base,
+        ξ('.ui.text.container', {
+          style: 'margin-top: 1em;',
+        },
+        ξ('h1.ui.header',
+            ξ('img.ui.circular.image', {
+              src: `/user/${username}/avatar`,
+            }),
+            ξ('.content', `${username}\'S PROFILE`.toUpperCase(),
+                ξ('.sub.header', `You are viewing ${fullname}'s profile.`)),
+        ),
+        ξ('.ui.divider')),
+        ξ('.ui.main.text.container.two.column.stackable.grid',
+            ξ('.ui.column',
+                ξ('img.ui.image.rounded.medium#picture',
+                    {src: '/user/' + username + '/avatar'},
+                    'User profile picture.'),
+                ξ('h2',
+                    fullname),
+                ξ('p',
+                    ξ('i.user.icon'),
+                    username),
+                ξ('p',
+                    ξ('i.mail.icon'),
+                    email),
+                ξ('.ui.placeholder',
+                    ξ('ui.image')),
+                this.isFriend ?
+                ξ('button.ui.basic.red.button', {
+                    onclick: () => {
+                        this.unFriend(username);
+                    },
+                }, 'UNFOLLOW')
+                :
+                ξ('button.ui.basic.teal.button', {
+                    onclick: () => {
+                        this.addFriend(username);
+                    },
+                },
+                    'FOLLOW!'),
+            ),
+            ξ('.ui.column[min-height = 10em]',
+                ξ('canvas#chart-area', {
+                  oncreate: ({dom}) => {
+                    const ctx = (document.getElementById(
+                        'chart-area') as HTMLCanvasElement)
+                        .getContext('2d');
+                    new Chart(ctx, {
+                      type: 'doughnut',
+                      data: Model.dataDonut,
+                      options: Model.optionsDonut,
+                    });
+                  }}),
+            ),
+        ),
+    );
+  }
 };
 
 export default class UserView implements ξ.ClassComponent {

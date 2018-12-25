@@ -19,6 +19,11 @@ type User struct {
 	Fullname string `json:"fullname"`
 }
 
+// UserScore holds a named uint64 that represents the users score.
+type UserScore struct {
+	Score uint64 `json:"score"`
+}
+
 // generateHash hashes the password as:
 // 	hash = bcrypt(sha512(password))
 //
@@ -158,6 +163,16 @@ func GetUser(identifier string) (user User, err error) {
 		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
 	return
+}
+
+// GetUserScore returns the score for an user.
+func GetUserScore(username string) (score UserScore, err error) {
+	err = database.QueryRow(`
+		SELECT COALESCE(SUM("score"), 0) AS "score"
+		FROM roaster.roast AS r
+		WHERE LOWER(r.username)=LOWER(TRIM($1))
+	`, username).Scan(&score.Score)
+    return
 }
 
 // Friend holds a friend

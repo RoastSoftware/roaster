@@ -35,15 +35,23 @@ type RoastWarning struct {
 	RoastMessage
 }
 
+// RoastStatistics holds statistics for a Roast.
+type RoastStatistics struct {
+	LinesOfCode      uint64 `json:"linesOfCode"`
+	NumberOfErrors   uint64 `json:"numberOfErrors"`
+	NumberOfWarnings uint64 `json:"numberOfWarnings"`
+}
+
 // RoastResult represent a Roast result.
 type RoastResult struct {
-	Username   string         `json:"username"`
-	Code       string         `json:"code"`
-	Score      uint           `json:"score"`
-	Language   string         `json:"language"`
-	Errors     []RoastError   `json:"errors"`
-	Warnings   []RoastWarning `json:"warnings"`
-	CreateTime time.Time      `json:"createTime"`
+	Username   string          `json:"username"`
+	Code       string          `json:"code"`
+	Score      uint            `json:"score"`
+	Language   string          `json:"language"`
+	Errors     []RoastError    `json:"errors"`
+	Warnings   []RoastWarning  `json:"warnings"`
+	CreateTime time.Time       `json:"createTime"`
+	Statistics RoastStatistics `json:"statistics"`
 }
 
 // AddError adds an error to the RoastResult.
@@ -58,6 +66,8 @@ func (r *RoastResult) AddError(hash uuid.UUID, row, column uint, engine, name, d
 			Description: description,
 		},
 	})
+	r.Statistics.NumberOfErrors++
+	r.calculateScore()
 }
 
 // AddWarning adds an warning to the RoastResult.
@@ -72,41 +82,48 @@ func (r *RoastResult) AddWarning(hash uuid.UUID, row, column uint, engine, name,
 			Description: description,
 		},
 	})
+	r.Statistics.NumberOfWarnings++
+	r.calculateScore()
 }
 
-// sloc implements a naĩve line counter for code.
+// calculateSLOC implements a naïve line counter for code.
 // All newlines are counted, so even empty rows and comments are counted.
 //
 // Note: Yes this will toast the CPU and fill the RAM for large code snippets -
 // it should have been implemented using streams and stuff. But this would
 // require some refactoring so the code is passed as a stream through out the
 // system.
-func (r *RoastResult) sloc() int {
-	n := strings.Count(r.Code, "\n")
+func (r *RoastResult) calculateSLOC() {
+	n := uint64(strings.Count(r.Code, "\n"))
 	if len(r.Code) > 0 && !strings.HasSuffix(r.Code, "\n") {
 		n++
 	}
-	return n
+	r.Statistics.LinesOfCode = n
+	return
 }
 
-// CalculateScore calculates the score according to a not-so-smart algorithm.
-func (r *RoastResult) CalculateScore() {
-	sloc := float64(r.sloc())
+// calculateScore calculates the score according to a not-so-smart algorithm.
+func (r *RoastResult) calculateScore() {
 	numErrors := float64(len(r.Errors))
 	numWarnings := float64(len(r.Warnings))
 
-	r.Score = uint(math.Round(sloc /
+	r.Score = uint(math.Round(float64(r.Statistics.LinesOfCode) /
 		(((errorCost * numErrors) + (warningCost * numWarnings)) + 1)))
 }
 
 // NewRoastResult creates a new RoastResult with username, language and code but
-// without warning/error messages and score.
-func NewRoastResult(username, language, code string) *RoastResult {
-	return &RoastResult{
+// without warning/error messages.
+func NewRoastResult(username, language, code string) (result *RoastResult) {
+	result = &RoastResult{
 		Username: username,
 		Language: language,
 		Code:     code,
 	}
+
+	result.calculateSLOC()
+	result.calculateScore()
+
+	return
 }
 
 // GetRoast returns the RoastResult for the specific ID.
@@ -193,6 +210,20 @@ func PutRoast(roast *RoastResult) (err error) {
 		roast.Score,
 		roast.Language,
 		time.Now()).Scan(&roastID)
+	if err != nil {
+		return
+	}
+
+	_, err = tx.Exec(`
+		INSERT INTO "roaster"."roast_statistics"
+		(roast, lines_of_code, number_of_errors, number_of_warnings)
+		VALUES
+		($1, $2, $3, $4)
+		`,
+		roastID,
+		roast.Statistics.LinesOfCode,
+		roast.Statistics.NumberOfErrors,
+		roast.Statistics.NumberOfWarnings)
 	if err != nil {
 		return
 	}

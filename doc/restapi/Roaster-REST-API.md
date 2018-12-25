@@ -175,6 +175,28 @@ API.
     }
     ```
 
+### User Score [/user/{username}/score]
+#### Retrieve User Score [GET]
++ Request user score
++ Response 200 (application/json)
+    + Body
+    ```json
+    {
+        "score": 123
+    }
+    ```
+    + Schema
+    ```json
+    {
+        "type": "object",
+        "properties": {
+            "score": {
+                "type": "number"
+            }
+        }
+    }
+    ```
+
 #### Remove User [DELETE]
 + Request remove user
     + Headers
@@ -411,7 +433,11 @@ API.
     + Body
     ```json
     {
-        "grade": 12,
+        "username": "willeponken",
+        "language": "python3",
+        "code": "print('I´m Roastin´ Roger... Roger.', invalid = 'Bönor är ändå rätt gött'",
+        "createTime": "2018-12-17T23:00:00Z",
+        "score": 12,
         "warnings": [
             {
                 "row": 1,
@@ -429,7 +455,12 @@ API.
                 "name": "TypeError",
                 "description": "print() got an unexpected keyword argument 'invalid'"
             }
-        ]
+        ],
+        "statistics": {
+            "numberOfErrors": 1,
+            "numberOfWarnings": 1,
+            "linesOfCode": 1
+        }
     }
     ```
     + Schema
@@ -437,8 +468,34 @@ API.
     {
         "type": "object",
         "properties": {
-            "grade": {
+            "username": {
+                "type": "string"
+            },
+            "score": {
                 "type": "number"
+            },
+            "language": {
+                "type": "string"
+            },
+            "code": {
+                "type": "string"
+            },
+            "createTime": {
+                "type": "string"
+            },
+            "statistics": {
+            "type": "object",
+            "properties": {
+                "linesOfCode": {
+                    "type": "number"
+                },
+                "numberOfWarnings": {
+                    "type": "number"
+                },
+                "numberOfErrors": {
+                    "type": "number"
+                }
+            }
             },
             "warning": {
                 "type": "array",
@@ -606,151 +663,58 @@ API.
     }
     ```
 
-## Statistics [/statistic]
-### Global Language Statistics [/statistic/language{?start}{?end}{?interval}]
-#### Get For All Languages [GET]
-+ Request statistics for all languages
+## Statistics [/statistics]
+### Roast Statistics Timeseries [/statistics/roast/timeseries{?start}{?end}{?interval}{?user}]
+#### Get Statistics for Roasts as Time series [GET]
++ Request Roast count statistics as time series
     + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
-+ Response 200 (application/json)
-    + Body
-    ```json
-    {
-        "python": [
-            {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            },
-            {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            }
-        ],
-        "fortran": [
-            {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
-                "errors": 1125,
-                "warnings": 127,
-                "rows": 5
-            },
-            {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 5943,
-                "warnings": 712,
-                "rows": 3
-            }
-        ]
-    }
-    ```
-
-### Global Language Specific Statistics [/statistic/language/{language}{?start}{?end}{?interval}]
-#### Get For Specific Languages [GET]
-+ Request statistics for specific languages
-    + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + start: "2018-12-17T23:00:00Z" (string) - Start date according to RFC3339.
+        + end: "2018-12-17T23:10:00Z" (string) - End date according to RFC3339.
+        + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
+        + user: willeponken (string, optional) - Show statistics for specific user.
 + Response 200 (application/json)
     + Body
     ```json
     [
-        {
-            "start": "Mon Dec  3 10:41:52 CET 2018",
-            "end": "Mon Dec  3 10:51:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        },
-        {
-            "start": "Mon Dec  3 10:31:52 CET 2018",
-            "end": "Mon Dec  3 10:41:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        }
+ {
+  "timestamp": "2018-12-17T23:10:00Z",
+  "count": 123,
+  "numberOfErrors": 231,
+  "numberOfWarnings": 210,
+  "linesOfCode": 5901
+ },
+ {
+  "timestamp": "2018-12-17T23:00:00Z",
+  "count": 32,
+  "numberOfErrors": 5,
+  "numberOfWarnings": 7,
+  "linesOfCode": 512
+ }
     ]
     ```
 
-### User Language Statistics [/statistic/{username}/language{?start}{?end}{?interval}]
-#### Get For All Languages For User [GET]
-+ Request statistics for all languages for user
+### Roast Statistics Count [/statistics/roast/count{?user}]
+#### Get Number of Roasts [GET]
++ Request Number of Roasts
     + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + user: willeponken (string, optional) - Show count for specific user.
 + Response 200 (application/json)
     + Body
     ```json
-    {
-        "python": [
-            {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            },
-            {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 5,
-                "warnings": 7,
-                "rows": 512
-            }
-        ],
-        "fortran": [
-            {
-                "start": "Mon Dec  3 10:41:52 CET 2018",
-                "end": "Mon Dec  3 10:51:52 CET 2018",
-                "errors": 1125,
-                "warnings": 127,
-                "rows": 5
-            },
-            {
-                "start": "Mon Dec  3 10:31:52 CET 2018",
-                "end": "Mon Dec  3 10:41:52 CET 2018",
-                "errors": 5943,
-                "warnings": 712,
-                "rows": 3
-            }
-        ]
-    }
+ {
+  "count": 321
+ }
     ```
 
-### User Language Specific Statistics [/statistic/{username}/language/{language}{?start}{?end}{?interval}]
-#### Get For Specific Languages For User [GET]
-+ Request statistics for specific languages for user
+### Roast Statistics Lines of Code [/statistics/roast/lines{?user}]
+#### Get Lines of Code Analyzed [GET]
++ Request Lines of code analyzed
     + Parameters
-        + start: "Mon Dec  3 10:31:52 CET 2018" (string) - Start date.
-        + end: "Mon Dec  3 10:51:52 CET 2018" (string) - End date.
-        + interval: 10 (number) - Interval for each data point in seconds.
+        + user: willeponken (string, optional) - Show lines of code for specific user.
 + Response 200 (application/json)
     + Body
     ```json
-    [
-        {
-            "start": "Mon Dec  3 10:41:52 CET 2018",
-            "end": "Mon Dec  3 10:51:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        },
-        {
-            "start": "Mon Dec  3 10:31:52 CET 2018",
-            "end": "Mon Dec  3 10:41:52 CET 2018",
-            "errors": 5,
-            "warnings": 7,
-            "rows": 512
-        }
-    ]
+ {
+  "lines": 321
+ }
     ```
