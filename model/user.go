@@ -172,7 +172,7 @@ func GetUserScore(username string) (score UserScore, err error) {
 		FROM roaster.roast AS r
 		WHERE LOWER(r.username)=LOWER(TRIM($1))
 	`, username).Scan(&score.Score)
-    return
+	return
 }
 
 // Friend holds a friend
