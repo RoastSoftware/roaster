@@ -122,9 +122,9 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
 func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err error) {
 	username := mux.Vars(r)["username"]
 	score, err := model.GetUserScore(username)
-    if err != nil {
-        return http.StatusInternalServerError, causerr.New(err, "")
-    }
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
 	err = json.NewEncoder(w).Encode(score)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")

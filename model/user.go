@@ -176,9 +176,9 @@ func GetUserScore(username string) (score UserScore, err error) {
 
 // Friend holds a friend with the associated user and the date they became friends.
 type Friend struct {
-	Username   string `json:"username"`
+	Username   string    `json:"username"`
 	CreateTime time.Time `json:"createTime"`
-	Friend     string `json:"friend"`
+	Friend     string    `json:"friend"`
 }
 
 // GetFriends returns a list of friends if successful, otherwise error.

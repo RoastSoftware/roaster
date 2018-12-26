@@ -9,12 +9,12 @@ class UserProfile implements ξ.ClassComponent {
     isFriend: boolean = false;
 
     hasFriend(username: string) {
-        this.isFriend = false;
+      this.isFriend = false;
       for (const friend of UserModel.friends) {
         if (friend.friend == username) {
           this.isFriend = true;
           break;
-        }  
+        }
       }
     };
 
