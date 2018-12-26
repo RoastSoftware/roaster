@@ -152,10 +152,10 @@ func GetRoast(id int) (roast *RoastResult, err error) {
 	for errorRows.Next() {
 		msg := RoastError{}
 		err = errorRows.Scan(&msg.Hash, &msg.Row, &msg.Column, &msg.Engine, &msg.Name, &msg.Description)
-		roast.Errors = append(roast.Errors, msg)
 		if err != nil {
 			return
 		}
+		roast.Errors = append(roast.Errors, msg)
 	}
 
 	warningRows, err := database.Query(`
@@ -173,6 +173,9 @@ func GetRoast(id int) (roast *RoastResult, err error) {
 	for warningRows.Next() {
 		msg := RoastWarning{}
 		err = warningRows.Scan(&msg.Hash, &msg.Row, &msg.Column, &msg.Engine, &msg.Name, &msg.Description)
+		if err != nil {
+			return
+		}
 		roast.Warnings = append(roast.Warnings, msg)
 	}
 

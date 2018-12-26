@@ -265,12 +265,12 @@ API.
     {
         "friends": [
             {
-                username:"MyAwesomeFriend",
-                createTime:"2018-03-04:00:00:00Z"
+                "username":"MyAwesomeFriend",
+                "createTime":"2018-03-04:00:00:00Z"
             }
             {
-                username:"MyAwesomeFriend2",
-                createTime:"2018-07-04:00:00:00Z"
+                "username":"MyAwesomeFriend2",
+                "createTime":"2018-07-04:00:00:00Z"
             }
         ]
     }
@@ -284,8 +284,7 @@ API.
             {
                 "type": "array",
                 "items": {
-                    "type": "string",
-                    "properties": "string"
+                    "type": "string"
                 }
             }
         }

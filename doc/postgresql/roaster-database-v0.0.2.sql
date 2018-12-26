@@ -29,6 +29,10 @@ create table if not exists user_friends
         references "user" (username) match simple
         on update cascade
         on delete cascade
+    contraint friend_fk foreign key (username)
+        references "user" (username) match simple
+        on update cascade
+        on delete cascade
 );
 
 create index if not exists username_user_friends_idx

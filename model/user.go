@@ -3,7 +3,6 @@ package model
 
 import (
 	"crypto/sha512"
-	"log"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -175,14 +174,14 @@ func GetUserScore(username string) (score UserScore, err error) {
 	return
 }
 
-// Friend holds a friend
+// Friend holds a friend with the associated user and the date they became friends.
 type Friend struct {
 	Username   string `json:"username"`
-	CreateTime string `json:"createTime"`
+	CreateTime time.Time `json:"createTime"`
 	Friend     string `json:"friend"`
 }
 
-// GetFriends returns
+// GetFriends returns a list of friends if successful, otherwise error.
 func GetFriends(identifier string) (friends []Friend, err error) {
 	friendRows, err := database.Query(`
     SELECT username, create_time, friend
@@ -197,15 +196,15 @@ func GetFriends(identifier string) (friends []Friend, err error) {
 	for friendRows.Next() {
 		res := Friend{}
 		err = friendRows.Scan(&res.Username, &res.CreateTime, &res.Friend)
-		friends = append(friends, res)
 		if err != nil {
 			return
 		}
+		friends = append(friends, res)
 	}
 	return
 }
 
-// PutFriend returns
+// PutFriend saves a friend relation to the DB, returns error if unsuccessful.
 func PutFriend(identifier string, friend string) (err error) {
 	_, err = database.Exec(`
     INSERT INTO "roaster"."user_friends"
@@ -216,14 +215,11 @@ func PutFriend(identifier string, friend string) (err error) {
 	return
 }
 
-// RemoveFriend returns
-func RemoveFriend(identifier string, friend string) (err error) {
+// RemoveFriend deletes a friend relation from DB, returns error if unsuccessful.
+func RemoveFriend(username string, friend string) (err error) {
 	_, err = database.Exec(`
     DELETE FROM "roaster"."user_friends"
     WHERE (lower(username)=lower(TRIM($1)) AND lower(friend)=lower(TRIM($2)))
-    `, identifier, friend)
-	if err != nil {
-		log.Println(err)
-	}
+    `, username, friend)
 	return
 }

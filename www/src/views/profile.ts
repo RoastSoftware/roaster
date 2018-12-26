@@ -27,7 +27,7 @@ export default class Profile implements ξ.ClassComponent {
           })
           .catch((err: Error) => {
             this.uploadError = err;
-            console.log(this.uploadError);
+            console.error(this.uploadError);
           });
     };
 

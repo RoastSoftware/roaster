@@ -122,6 +122,9 @@ func retrieveUser(w http.ResponseWriter, r *http.Request) (int, error) {
 func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err error) {
 	username := mux.Vars(r)["username"]
 	score, err := model.GetUserScore(username)
+    if err != nil {
+        return http.StatusInternalServerError, causerr.New(err, "")
+    }
 	err = json.NewEncoder(w).Encode(score)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
@@ -129,7 +132,6 @@ func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err er
 	return http.StatusOK, nil
 }
 
-// putFriend returns
 func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
@@ -172,7 +174,6 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 	return http.StatusOK, nil
 }
 
-// retrieveFriends returns
 func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
 	vars := mux.Vars(r)
 	username := vars["username"]

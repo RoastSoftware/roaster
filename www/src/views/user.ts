@@ -9,13 +9,12 @@ class UserProfile implements ξ.ClassComponent {
     isFriend: boolean = false;
 
     hasFriend(username: string) {
+        this.isFriend = false;
       for (const friend of UserModel.friends) {
         if (friend.friend == username) {
           this.isFriend = true;
           break;
-        } else {
-          this.isFriend = false;
-        }
+        }  
       }
     };
 
@@ -23,7 +22,6 @@ class UserProfile implements ξ.ClassComponent {
       return Network.request<Array<Friend>>('GET', '/user/' +
             UserModel.getUsername() + '/friend')
           .then((result) => {
-            UserModel.emptyFriends();
             UserModel.friends = result;
             this.hasFriend(username);
             ξ.redraw();
@@ -48,11 +46,12 @@ class UserProfile implements ξ.ClassComponent {
 
     oncreate(vnode: ξ.CVnodeDOM) {
       this.friendCheck(vnode.attrs.username);
-    }
-    view(vnode: ξ.CVnode) {
-      const username = vnode.attrs.username;
-      const fullname = vnode.attrs.fullname;
-      const email = vnode.attrs.email;
+    };
+
+    view({attrs}) {
+      const username = attrs.username;
+      const fullname = attrs.fullname;
+      const email = attrs.email;
 
       return ξ(base,
           ξ('.ui.text.container', {
@@ -95,7 +94,7 @@ class UserProfile implements ξ.ClassComponent {
                 },
                 'FOLLOW!'),
               ),
-              ξ('.ui.column[min-height = 10em]',
+              ξ('.ui.column[style=min-height: 10em;]',
                   ξ('canvas#chart-area', {
                     oncreate: ({dom}) => {
                       const ctx = (document.getElementById(
