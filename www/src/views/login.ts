@@ -24,6 +24,7 @@ export default class Login implements ξ.ClassComponent {
     }
   };
 
+
   view() {
     return ξ(base, ξ('.ui.main.text.container[style=margin-top: 2em;]',
         ξ('.ui.grid',
