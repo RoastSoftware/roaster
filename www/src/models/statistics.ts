@@ -22,8 +22,8 @@ const colors = {
 };
 
 class CountModel {
-  public count: number;
-  public filter: StatisticsFilter;
+  public count: number = 0;
+  public filter: StatisticsFilter = StatisticsFilter.Global;
 }
 
 export class LineCountModel extends CountModel {
@@ -271,6 +271,15 @@ export class RoastLinesStatisticsModel extends RoastMessageStatisticsModel {
             gridLines: {
               color: colors.darkblue,
             },
+            ticks: {
+              beginAtZero: true,
+              // Only allow integers for ticker.
+              callback: (v) => {
+                if (Number.isInteger(v)) {
+                  return v;
+                }
+              },
+            },
           }],
           xAxes: [{
             scaleLabel: {
@@ -288,66 +297,112 @@ export class RoastLinesStatisticsModel extends RoastMessageStatisticsModel {
   };
 };
 
-export class RoastDoughnutStatisticsModel {
-    static dataDonut = {
-      datasets: [{
-        borderColor: 'rgba(0, 0, 0, 0.0)',
-        backgroundColor: [
-          colors.yellow,
-          colors.cyan,
-          colors.green,
-        ],
-        data: [10, 20, 30],
-      }],
+class RoastRatioModel {
+  public linesOfCode: number = 0;
+  public numberOfErrors: number = 0;
+  public numberOfWarnings: number = 0;
+  public filter: StatisticsFilter = StatisticsFilter.Global;
 
-      // These labels appear in the legend and in the
-      // tooltips when hovering different arcs
-      /* labels: [
-            'ERR',
-            'WARN',
-            'Blue'
-        ] */
-    };
-    static optionsDonut = {
-      aspectRatio: 1,
-      title: {
-        display: true,
-        text: 'ROAST SCORE',
-        position: 'bottom',
-        fontStyle: 'bold',
-        fontSize: 16,
-      },
+  protected constructor(filter: number) {
+    this.filter = filter;
+  };
+
+  public async update(): Promise {
+    let uri = '/statistics/roast/ratio';
+
+    switch (this.filter) {
+      case StatisticsFilter.Friends:
+        uri += `?user=${UserModel.getUsername()}&friends=true`;
+        break;
+      case StatisticsFilter.User:
+        uri += `?user=${UserModel.getUsername()}`;
+        break;
     }
 
-    static options = {
-      responsive: true,
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart',
-      },
-      tooltips: {
-        mode: 'index',
-        intersect: false,
-      },
-      hover: {
-        mode: 'nearest',
-        intersect: true,
-      },
-      scales: {
-        xAxes: [{
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Month',
-          },
-        }],
-        yAxes: [{
-          display: true,
-          scaleLabel: {
-            display: true,
-            labelString: 'Value',
-          },
-        }],
-      },
+    return Network.request<RoastRatioModel>('GET', uri)
+        .then((ratio: RoastRatioModel) => {
+          Object.assign(this, ratio);
+          return;
+        });
+  };
+}
+
+export class RoastDoughnutStatisticsModel extends RoastRatioModel {
+  constructor(filter: number) {
+    super(filter);
+  };
+
+  private getSuccessLines(): number {
+    return this.linesOfCode - this.numberOfErrors - this.numberOfWarnings;
+  };
+
+  private getSuccessRatio(): number {
+    return Math.round((1 - ((this.numberOfErrors + this.numberOfWarnings) /
+      this.getSuccessLines())) * 100);
+  }
+
+  public getData(): Object {
+    return {
+      datasets: [{
+        borderColor: 'rgba(0, 0, 0, 0.3)',
+        backgroundColor: [
+          colors.yellow,
+          colors.red,
+          colors.green,
+        ],
+        data: [
+          this.numberOfWarnings,
+          this.numberOfErrors,
+          this.getSuccessLines(),
+        ],
+      }],
+
+      labels: [
+        'Errors',
+        'Warnings',
+        'Success',
+      ],
     };
+  };
+
+  public getConfig(): Object {
+    const obj = this;
+
+    return {
+      type: 'doughnut',
+      plugins: [{
+        beforeDraw: function(chart) {
+          const width = chart.chart.width;
+          const height = chart.chart.height;
+          const ctx = chart.chart.ctx;
+
+          ctx.restore();
+
+          const fontSize = (height / 114).toFixed(2);
+
+          ctx.font = fontSize + 'em sans-serif';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = 'white';
+
+          const text = obj.getSuccessRatio() + '%';
+          const textX = Math.round((width - ctx.measureText(text).width) / 2);
+          const textY = height / 2;
+
+          ctx.fillText(text, textX, textY);
+          ctx.save();
+        },
+      }],
+      options: {
+        aspectRatio: 1,
+        title: {
+          display: true,
+          text: 'ROAST® RATIO™',
+          position: 'bottom',
+          fontStyle: 'bold',
+          fontSize: 16,
+        },
+      },
+      data: this.getData(),
+    };
+  };
 };

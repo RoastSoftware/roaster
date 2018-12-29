@@ -1,10 +1,12 @@
 import ξ from 'mithril';
 import base from './base';
 import Network from '../services/network';
-import {RoastDoughnutStatisticsModel} from '../models/statistics';
-import {UserProfileHeader} from './user';
+import {
+  UserProfileHeader,
+  RoastRatio,
+} from './user';
+import {StatisticsFilter} from '../models/statistics';
 import {UserModel} from '../models/user';
-import Chart from 'chart.js';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: APIError;
@@ -86,19 +88,9 @@ export default class Profile implements ξ.ClassComponent {
                       this.email),
               ),
               ξ('.ui.column[minheight=10em]',
-                  ξ('canvas#chart-area', {
-                    oncreate: ({dom}) => {
-                      const ctx = (document.getElementById(
-                          'chart-area') as HTMLCanvasElement)
-                          .getContext('2d');
-                      new Chart(ctx, {
-                        type: 'doughnut',
-                        data: RoastDoughnutStatisticsModel.dataDonut,
-                        options: RoastDoughnutStatisticsModel.optionsDonut,
-                      });
-                    }})
-              )
-          )
+                  ξ(RoastRatio, {filter: StatisticsFilter.User})
+              ),
+          ),
       );
     }
 };

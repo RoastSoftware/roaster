@@ -1,8 +1,41 @@
 import ξ from 'mithril';
+import Chart from 'chart.js';
 import base from './base';
 import Network from '../services/network';
-import {RoastDoughnutStatisticsModel} from '../models/statistics';
-import Chart from 'chart.js';
+import {
+  RoastDoughnutStatisticsModel,
+  StatisticsFilter,
+} from '../models/statistics';
+
+export class RoastRatio implements ξ.ClassComponent {
+  chart: Chart;
+  ctx: CanvasRenderingContext2D;
+  ratio: RoastDoughnutStatisticsModel;
+
+  oncreate({dom, attrs}) {
+    this.ratio = new RoastDoughnutStatisticsModel(attrs.filter);
+
+    this.ratio.update().then(() => {
+      this.ctx = (dom as HTMLCanvasElement).getContext('2d');
+      this.chart = new Chart(this.ctx,
+          this.ratio.getConfig());
+    });
+  };
+
+  onupdate({attrs}) {
+    if (this.ratio.filter != attrs.filter) {
+      this.ratio.filter = attrs.filter;
+      this.ratio.update().then(() => {
+        this.chart.data = this.ratio.getData();
+        this.chart.update();
+      });
+    }
+  };
+
+  view() {
+    return ξ('canvas');
+  };
+};
 
 export class UserProfileHeader implements ξ.ClassComponent {
   view({attrs}) {
@@ -66,17 +99,7 @@ class UserProfile implements ξ.ClassComponent {
 
             ),
             ξ('.ui.column[min-height = 10em]',
-                ξ('canvas#chart-area', {
-                  oncreate: ({dom}) => {
-                    const ctx = (document.getElementById(
-                        'chart-area') as HTMLCanvasElement)
-                        .getContext('2d');
-                    new Chart(ctx, {
-                      type: 'doughnut',
-                      data: RoastDoughnutStatisticsModel.dataDonut,
-                      options: RoastDoughnutStatisticsModel.optionsDonut,
-                    });
-                  }}),
+                ξ(RoastRatio, {filter: StatisticsFilter.Global})
             ),
         ),
     );
