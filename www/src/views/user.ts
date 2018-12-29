@@ -13,7 +13,7 @@ export class RoastRatio implements ξ.ClassComponent {
   ratio: RoastDoughnutStatisticsModel;
 
   oncreate({dom, attrs}) {
-    this.ratio = new RoastDoughnutStatisticsModel(attrs.filter);
+    this.ratio = new RoastDoughnutStatisticsModel(attrs.filter, attrs.username);
 
     this.ratio.update().then(() => {
       this.ctx = (dom as HTMLCanvasElement).getContext('2d');
@@ -105,7 +105,10 @@ class UserProfile implements ξ.ClassComponent {
 
             ),
             ξ('.ui.column[min-height = 10em]',
-                ξ(RoastRatio, {filter: StatisticsFilter.User})
+                ξ(RoastRatio, {
+                  filter: StatisticsFilter.User,
+                  username: username,
+                }),
             ),
         ),
     );

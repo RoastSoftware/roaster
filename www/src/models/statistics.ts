@@ -302,9 +302,13 @@ class RoastRatioModel {
   public numberOfErrors: number = 0;
   public numberOfWarnings: number = 0;
   public filter: StatisticsFilter = StatisticsFilter.Global;
+  public username: string = '';
 
-  protected constructor(filter: number) {
+  protected constructor(filter: number, username?: string) {
     this.filter = filter;
+    if (username) {
+      this.username = username;
+    }
   };
 
   public async update(): Promise {
@@ -312,10 +316,10 @@ class RoastRatioModel {
 
     switch (this.filter) {
       case StatisticsFilter.Friends:
-        uri += `?user=${UserModel.getUsername()}&friends=true`;
+        uri += `?user=${this.username}&friends=true`;
         break;
       case StatisticsFilter.User:
-        uri += `?user=${UserModel.getUsername()}`;
+        uri += `?user=${this.username}`;
         break;
     }
 
@@ -328,8 +332,8 @@ class RoastRatioModel {
 }
 
 export class RoastDoughnutStatisticsModel extends RoastRatioModel {
-  constructor(filter: number) {
-    super(filter);
+  constructor(filter: number, username?: string) {
+    super(filter, username);
   };
 
   private getSuccessLines(): number {

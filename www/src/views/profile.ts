@@ -88,7 +88,10 @@ export default class Profile implements ξ.ClassComponent {
                       this.email),
               ),
               ξ('.ui.column[minheight=10em]',
-                  ξ(RoastRatio, {filter: StatisticsFilter.User})
+                  ξ(RoastRatio, {
+                    filter: StatisticsFilter.User,
+                    username: this.username,
+                  }),
               ),
           ),
       );
