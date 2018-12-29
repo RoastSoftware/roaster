@@ -28,51 +28,20 @@ type LinesOfCode struct {
 	Lines uint64 `json:"lines"`
 }
 
-// GetGlobalLinesOfCode returns the number of lines of code for all users.
-func GetGlobalLinesOfCode() (lines LinesOfCode, err error) {
-	return getLinesOfCode("")
+// RoastRatio represents a ratio between lines of code versus errors and
+// warnings.
+type RoastRatio struct {
+	LinesOfCode      uint64 `json:"linesOfCode"`
+	NumberOfErrors   uint64 `json:"numberOfErrors"`
+	NumberOfWarnings uint64 `json:"numberOfWarnings"`
 }
 
-// GetUserLinesOfCode returns the number of lines of code for an user.
-func GetUserLinesOfCode(username string) (lines LinesOfCode, err error) {
-	return getLinesOfCode(username)
-}
-
-// GetGlobalNumberOfRoasts returns the number of Roasts for all users and
-// languages.
-func GetGlobalNumberOfRoasts() (numberOfRoasts NumberOfRoasts, err error) {
-	return getNumberOfRoasts("")
-}
-
-// GetUserNumberOfRoasts returns the number of Roasts for a specific user.
-func GetUserNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
-	return getNumberOfRoasts(username)
-}
-
-// GetGlobalRoastTimeseries returns a timeseries between a start and end
-// timestamp, the interval parameter should be any duration above 1 minute,
-// anything less will default to 1 minute.
-func GetGlobalRoastTimeseries(start, end time.Time, resolution time.Duration) (
-	timeseries RoastTimeseries, err error) {
-
-	return getRoastTimeseries(start, end, resolution, "")
-}
-
-// GetUserRoastTimeseries returns a timeseries between a start and end
-// timestamp for the provided username, the interval parameter should be any
-// duration above 1 minute, anything less will default to 1 minute.
-func GetUserRoastTimeseries(start, end time.Time, resolution time.Duration, username string) (
-	timeseries RoastTimeseries, err error) {
-
-	return getRoastTimeseries(start, end, resolution, username)
-}
-
-// getRoastTimeseries returns a timeseries of number of Roasts per time
-// unit. See: GetGlobalRoastTimeseries or GetUserRoastTimeseries.
+// GetRoastTimeseries returns a timeseries of number of Roasts per time
+// unit. Username is optional, an empty string represent every user.
 //
 // The minimum interval is 1 minute, anything less will be set to 1 minute per
 // default.
-func getRoastTimeseries(start, end time.Time, interval time.Duration, username string) (
+func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string) (
 	timeseries RoastTimeseries, err error) {
 
 	// Round the interval to the closest minute.
@@ -142,7 +111,9 @@ func getRoastTimeseries(start, end time.Time, interval time.Duration, username s
 	return
 }
 
-func getLinesOfCode(username string) (lines LinesOfCode, err error) {
+// GetLinesOfCode returns the number of lines of code for everyone or a specific
+// user. An empty string as username represents everyone.
+func GetLinesOfCode(username string) (lines LinesOfCode, err error) {
 	err = database.QueryRow(`
 		SELECT COALESCE(SUM("lines_of_code"), 0) AS "lines_of_code"
 		FROM roaster.roast_statistics AS s
@@ -151,23 +122,34 @@ func getLinesOfCode(username string) (lines LinesOfCode, err error) {
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      LOWER(r.username)=LOWER(TRIM($1))
 	`, username).Scan(&lines.Lines)
-	if err != nil {
-		return
-	}
-
 	return
 }
 
-func getNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
+// GetNumberOfRoasts returns the number of Roasts for everyone or a specific
+// user. An empty string as username represents everyone.
+func GetNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
 	err = database.QueryRow(`
 		SELECT COUNT(username)
 		FROM roaster.roast
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      LOWER(username)=LOWER(TRIM($1))
 	`, username).Scan(&numberOfRoasts.Count)
-	if err != nil {
-		return
-	}
+	return
+}
 
+// GetRoastRatio returns the lines of code, number of errors and warnings for
+// everyone or a specific user. An Empty string as username represents everyone.
+func GetRoastRatio(username string) (roastRatio RoastRatio, err error) {
+	err = database.QueryRow(`
+		SELECT
+			COALESCE(SUM(s."number_of_errors"), 0) AS "number_of_errors",
+			COALESCE(SUM(s."number_of_warnings"), 0) AS "number_of_warnings",
+			COALESCE(SUM("lines_of_code"), 0) AS "lines_of_code"
+		FROM roaster.roast_statistics AS s
+			JOIN roaster.roast AS r
+			ON r.id = s.roast
+		WHERE COALESCE(TRIM($1), '')='' OR
+		      LOWER(r.username)=LOWER(TRIM($1))
+	`, username).Scan(&roastRatio.NumberOfErrors, &roastRatio.NumberOfWarnings, &roastRatio.LinesOfCode)
 	return
 }

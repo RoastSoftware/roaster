@@ -39,12 +39,7 @@ func retrieveRoastTimeseries(w http.ResponseWriter, r *http.Request) (int, error
 
 	username := r.URL.Query().Get("user")
 
-	var timeseries model.RoastTimeseries
-	if username == "" {
-		timeseries, err = model.GetGlobalRoastTimeseries(start, end, interval)
-	} else {
-		timeseries, err = model.GetUserRoastTimeseries(start, end, interval, username)
-	}
+	timeseries, err := model.GetRoastTimeseries(start, end, interval, username)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -60,12 +55,7 @@ func retrieveRoastTimeseries(w http.ResponseWriter, r *http.Request) (int, error
 func retrieveRoastCount(w http.ResponseWriter, r *http.Request) (code int, err error) {
 	username := r.URL.Query().Get("user")
 
-	var numberOfRoasts model.NumberOfRoasts
-	if username == "" {
-		numberOfRoasts, err = model.GetGlobalNumberOfRoasts()
-	} else {
-		numberOfRoasts, err = model.GetUserNumberOfRoasts(username)
-	}
+	numberOfRoasts, err := model.GetNumberOfRoasts(username)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -81,17 +71,28 @@ func retrieveRoastCount(w http.ResponseWriter, r *http.Request) (code int, err e
 func retrieveLinesCount(w http.ResponseWriter, r *http.Request) (code int, err error) {
 	username := r.URL.Query().Get("user")
 
-	var linesOfCode model.LinesOfCode
-	if username == "" {
-		linesOfCode, err = model.GetGlobalLinesOfCode()
-	} else {
-		linesOfCode, err = model.GetUserLinesOfCode(username)
-	}
+	linesOfCode, err := model.GetLinesOfCode(username)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	err = json.NewEncoder(w).Encode(linesOfCode)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	return http.StatusOK, nil
+}
+
+func retrieveRoastRatio(w http.ResponseWriter, r *http.Request) (code int, err error) {
+	username := r.URL.Query().Get("user")
+
+	roastRatio, err := model.GetRoastRatio(username)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	err = json.NewEncoder(w).Encode(roastRatio)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -118,5 +119,9 @@ func Statistics(r *mux.Router) {
 
 	// Lines of Code [GET].
 	r.Handle("/roast/lines", handler(retrieveLinesCount)).
+		Methods(http.MethodGet)
+
+	// Roast Ratio [GET].
+	r.Handle("/roast/ratio", handler(retrieveRoastRatio)).
 		Methods(http.MethodGet)
 }

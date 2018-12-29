@@ -136,6 +136,10 @@ export default class Home implements ξ.ClassComponent {
     });
   };
 
+  reset() {
+    this.roast = {} as RoastResult;
+  };
+
   view(vnode: ξ.CVnode): ξ.Children {
     return ξ(base,
         ξ('section#roast-container', {style: containerStyle},
@@ -146,7 +150,10 @@ export default class Home implements ξ.ClassComponent {
 
             ξ('#roast-column', {style: roastColumnStyle},
                 ξ('#messages-row', {style: messagesRowStyle},
-                    ξ('.ui.teal.dividing.header',
+                    ξ('.ui.vertical.basic.segment.clearing', {
+                      style: 'padding: 0; margin: 0;',
+                    },
+                    ξ('h3.ui.header.teal.left.floated[style=margin: 0;]',
                         ξ('i.bug.icon'),
                         ξ('.content',
                             'Code Result',
@@ -155,6 +162,16 @@ export default class Home implements ξ.ClassComponent {
                             )
                         )
                     ),
+                    this.roast.score ?
+                    ξ('.ui.small.right.floated.statistic', {
+                      style: 'margin-bottom: -2px;',
+                    },
+                    ξ('.value',
+                        ξ('i.trophy.icon[style=color: gold;]'),
+                        ` ${this.roast.score}`,
+                    ),
+                    ): ''),
+                    ξ('.ui.divider'),
                     ξ('.ui.relaxed.list.divided', {style: messagesListStyle}, [
                       ξ(RoastMessageList, {
                         errors: this.roast.errors,
@@ -176,8 +193,12 @@ export default class Home implements ξ.ClassComponent {
                         }),
                         'ROAST ME!'),
                         ξ('.or'),
-                        ξ('button.ui.button',
-                            'Reset'),
+                        ξ('button.ui.button', {
+                          onclick: () => {
+                            this.reset();
+                          },
+                        },
+                        'Reset'),
                     ),
                     ξ('select.ui.compact.selection.dropdown', {
                       style: dropdownStyle,

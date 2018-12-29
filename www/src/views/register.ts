@@ -31,7 +31,7 @@ export default class Register implements ξ.ClassComponent {
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 2em;]',
             ξ('.ui.grid',
-                ξ('.ui.container.six.wide.column.centered',
+                ξ('.ui.container.eight.wide.column.centered',
                     ξ('.ui.segments',
                         ξ('.ui.segment', ξ('h2', 'REGISTER')),
 
@@ -43,7 +43,7 @@ export default class Register implements ξ.ClassComponent {
                                       'Oh noeh!'),
                                   ξ('p', this.registerError.message)))),
 
-                        ξ('.ui.segment',
+                        ξ('.ui.segment.clearing',
                             ξ('form.ui.form', {onsubmit: () => {
                               this.registerUser();
                             }}, [
@@ -98,7 +98,7 @@ export default class Register implements ξ.ClassComponent {
                                           e.currentTarget.value),
                                       placeholder: 'Mynameis@example.com',
                                     }))]),
-                              ξ('button.ui.teal.basic.button', {
+                              ξ('button.ui.teal.basic.button.right.floated', {
                                 disabled: !(UserModel.validAll()),
                               },
                               'GET ROASTED!'),

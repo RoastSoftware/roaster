@@ -67,9 +67,8 @@ export default class Editor implements ClassComponent {
 
   /**
    * Loads and adds a Monaco Editor to the empty div#editor created by view.
-   * @param {CVnode} vnode - Virtual node.
    */
-  oncreate(vnode: ξ.CVnodeDOM) {
+  oncreate({dom}) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
       EditorModel.setCode(`\
 """
@@ -113,7 +112,7 @@ def too_complex():
       EditorModel.createModel();
       EditorModel.setLanguage('python3');
 
-      this.editor = monaco.editor.create(vnode.dom as HTMLElement, {
+      this.editor = monaco.editor.create(dom as HTMLElement, {
         value: EditorModel.getCode(),
         minimap: {
           enabled: false,
