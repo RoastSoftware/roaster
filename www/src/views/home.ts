@@ -136,6 +136,10 @@ export default class Home implements ξ.ClassComponent {
     });
   };
 
+  reset() {
+    this.roast = {} as RoastResult;
+  };
+
   view(vnode: ξ.CVnode): ξ.Children {
     return ξ(base,
         ξ('section#roast-container', {style: containerStyle},
@@ -187,8 +191,12 @@ export default class Home implements ξ.ClassComponent {
                         }),
                         'ROAST ME!'),
                         ξ('.or'),
-                        ξ('button.ui.button',
-                            'Reset'),
+                        ξ('button.ui.button', {
+                          onclick: () => {
+                            this.reset();
+                          },
+                        },
+                        'Reset'),
                     ),
                     ξ('select.ui.compact.selection.dropdown', {
                       style: dropdownStyle,
