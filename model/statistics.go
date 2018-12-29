@@ -138,7 +138,7 @@ func GetNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err erro
 }
 
 // GetRoastRatio returns the lines of code, number of errors and warnings for
-// everyone or a specific user. An Empty string as usernmae represents everyone.
+// everyone or a specific user. An Empty string as username represents everyone.
 func GetRoastRatio(username string) (roastRatio RoastRatio, err error) {
 	err = database.QueryRow(`
 		SELECT
