@@ -27,6 +27,10 @@ export default {
                   warnings (low impact on score), \
                   errors (high impact on score) and the amount of lines you've\
                   analysed. `),
+              ξ('h2', `Roast® Ratio™`),
+              ξ('p', `The Roast® Ratio™ is a ratio between the problem free
+                      lines of code and the lines with errors or warnings.
+                      The higher the percentage, the better the code quality.`),
               ξ('h2', `Getting started`),
               ξ('p', `You can of course analyze your code without registering\
               an account but then you will loose the benefit of progress\
@@ -41,8 +45,8 @@ export default {
               ξ('h3', ` Congratulations, you've made your first tiny steps to\
                   writing better code!\ We hope that you will find joy\
                   in using Roast® Inc.`),
-              ξ('p', `// Roast® Inc. Team.`)
-
+              ξ('p', `// Roast® Inc. Team.`),
+              ξ('.ui.hidden.divider'),
           ),
       ),
     ];

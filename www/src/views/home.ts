@@ -163,11 +163,13 @@ export default class Home implements ξ.ClassComponent {
                         )
                     ),
                     this.roast.score ?
-                    ξ('.ui.small.right.floated.statistic',
-                        ξ('.value',
-                            ξ('i.trophy.icon[style=color: gold;]'),
-                            ` ${this.roast.score}`,
-                        ),
+                    ξ('.ui.small.right.floated.statistic', {
+                      style: 'margin-bottom: -2px;',
+                    },
+                    ξ('.value',
+                        ξ('i.trophy.icon[style=color: gold;]'),
+                        ` ${this.roast.score}`,
+                    ),
                     ): ''),
                     ξ('.ui.divider'),
                     ξ('.ui.relaxed.list.divided', {style: messagesListStyle}, [
