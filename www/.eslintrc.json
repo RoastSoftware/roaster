@@ -1,13 +1,15 @@
 {
-  "extends": "google",
-  "parser": "typescript-eslint-parser",
+  "extends": [
+    "google"
+  ],
+  "parser": "eslint-plugin-typescript/parser",
+  "plugins": ["typescript"],
   "parserOptions": {
     "ecmaVersion": 6,
     "sourceType": "module"
   },
   "env": { "es6": true },
   "rules": {
-    "require-jsdoc": "off",
-    "no-unused-vars": "error"
+    "require-jsdoc": "off"
   }
 }
