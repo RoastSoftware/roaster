@@ -42,7 +42,7 @@ export class RoastScore implements ξ.ClassComponent {
     return ξ('.ui.right.floated.statistic',
         ξ('.value',
             ξ('i.trophy.icon[style=color: gold;]'),
-            attrs.score,
+            ` ${attrs.score}`,
         ),
         ξ('.label',
             'ROAST® SCORE™',
