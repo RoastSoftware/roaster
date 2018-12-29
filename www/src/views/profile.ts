@@ -9,8 +9,8 @@ import {StatisticsFilter} from '../models/statistics';
 import {UserModel} from '../models/user';
 
 export default class Profile implements ξ.ClassComponent {
-    uploadError: APIError;
-    downloadError: APIError;
+    uploadError: Error;
+    downloadError: Error;
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
     username: string = UserModel.getUsername();
@@ -33,9 +33,9 @@ export default class Profile implements ξ.ClassComponent {
             this.profileImageURI = `/user/${UserModel.getUsername()}/avatar?`
               + new Date().getTime();
           })
-          .catch((err: APIError) => {
+          .catch((err: Error) => {
             this.uploadError = err;
-            console.log(this.uploadError);
+            console.error(this.uploadError);
           });
     };
 

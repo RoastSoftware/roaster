@@ -19,6 +19,25 @@ create table if not exists "user"
 
 create unique index if not exists username_user_idx on "user" (lower(username));
 
+create table if not exists user_friends
+(
+    username text not null,
+    create_time timestamp with time zone not null,
+    friend text not null,
+    constraint friend_relation_uq unique (username, friend),
+    constraint username_fk foreign key (username)
+        references "user" (username) match simple
+        on update cascade
+        on delete cascade,
+    constraint friend_fk foreign key (username)
+        references "user" (username) match simple
+        on update cascade
+        on delete cascade
+);
+
+create index if not exists username_user_friends_idx
+on user_friends using btree (username);
+
 create table if not exists "roast"
 (
   id       	serial        	not null

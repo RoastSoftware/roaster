@@ -1,9 +1,15 @@
-import ξ from 'mithril';
+import Network from '../services/network';
 
 export interface User {
   username: string;
   fullname: string;
   email: string;
+}
+
+export interface Friend {
+    username: string;
+    createTime: string;
+    friend: string;
 }
 
 export class UserModel {
@@ -18,12 +24,15 @@ export class UserModel {
     static email: string = '';
     private static emailError: string = '';
 
+    static friends: Array<Friend> = [];
+
     static empty() {
       UserModel.username = '';
       UserModel.fullname = '';
       UserModel.password = '';
       UserModel.email = '';
       UserModel.loggedIn = false;
+      UserModel.friends = [];
     };
 
     static isLoggedIn(): boolean {
@@ -148,47 +157,25 @@ that is more than 1 googol^98 in entropy`;
     static validPassword(): boolean {
       return UserModel.passwordError == '';
     };
+
+    static emptyFriends() {
+      UserModel.friends = [];
+    };
 };
 
-/* eslint-disable */
-function retrieveUser(username: string): Promise<User> {
-  return ξ.request<User>({
-    method: 'GET',
-    url: '/user/' + this.username,
-  }).then((result) => {
-    const user: User = result;
-    return user;
+export function getFriend(username: string) {
+  return Network.request('GET', '/user/' + username + '/friend', {
+    'friend': username,
   });
 };
-/* eslint-enable */
-export function createUser(user: User) {
-  return ξ.request({
-    method: 'POST',
-    url: '/user',
-    data: user,
+
+export function addFriend(username: string) {
+  return Network.request('POST', '/user/' + username + '/friend', {
+    'friend': username,
   });
 };
-/* eslint-disable */
-function saveUser() {
-  return ξ.request({
-    method: 'PATCH',
-    url: '/user/' + this.username,
-    data: this,
-  });
+
+export function unFriend(username: string) {
+  return Network.request('DELETE', '/user/' + username + '/friend');
 };
-/* eslint-enable */
-export function authenticateUser(user: User) {
-  return ξ.request({
-    method: 'POST',
-    url: '/session',
-    data: user,
-  });
-};
-/* eslint-disable */
-function deAuthenticateUser() {
-  return ξ.request({
-    method: 'DELETE',
-    url: '/session',
-  });
-};
-/* eslint-enable */
+
