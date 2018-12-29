@@ -37,6 +37,20 @@ export class RoastRatio implements ξ.ClassComponent {
   };
 };
 
+export class RoastScore implements ξ.ClassComponent {
+  view({attrs}) {
+    return ξ('.ui.right.floated.statistic',
+        ξ('.value',
+            ξ('i.trophy.icon[style=color: gold;]'),
+            attrs.score,
+        ),
+        ξ('.label',
+            'ROAST® SCORE™',
+        ),
+    );
+  };
+}
+
 export class UserProfileHeader implements ξ.ClassComponent {
   view({attrs}) {
     return ξ('.ui.vertical.basic.segment.clearing', {
@@ -53,15 +67,7 @@ export class UserProfileHeader implements ξ.ClassComponent {
         ξ('.content', `${attrs.username}\'S PROFILE`.toUpperCase(),
             ξ('.sub.header', `You are viewing ${attrs.fullname}'s profile.`)),
     ),
-    ξ('.ui.right.floated.statistic',
-        ξ('.value',
-            ξ('i.trophy.icon[style=color: gold;]'),
-            attrs.score,
-        ),
-        ξ('.label',
-            'ROAST® SCORE™',
-        ),
-    ));
+    ξ(RoastScore, {score: attrs.score}));
   };
 };
 
