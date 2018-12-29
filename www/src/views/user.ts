@@ -99,7 +99,7 @@ class UserProfile implements ξ.ClassComponent {
 
             ),
             ξ('.ui.column[min-height = 10em]',
-                ξ(RoastRatio, {filter: StatisticsFilter.Global})
+                ξ(RoastRatio, {filter: StatisticsFilter.User})
             ),
         ),
     );

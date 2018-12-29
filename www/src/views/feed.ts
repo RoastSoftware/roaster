@@ -180,7 +180,6 @@ export default class Feed implements ξ.ClassComponent {
   };
 
   view(vnode: ξ.CVnode): ξ.Children {
-    console.log(this.feed.items);
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 1em;]',
             ξ('h1.ui.header',
