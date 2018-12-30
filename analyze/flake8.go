@@ -32,6 +32,7 @@ type flake8Message struct {
 	Text         string `json:"text"`
 	PhysicalLine string `json:"physical_line"`
 }
+
 type flake8Result map[string][]flake8Message
 
 func (f flake8Result) toRoast(username string, code string) (roast *model.RoastResult) {
