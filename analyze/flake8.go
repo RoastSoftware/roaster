@@ -34,14 +34,6 @@ type flake8Message struct {
 }
 type flake8Result map[string][]flake8Message
 
-type flake8CacheItem struct {
-	Score      uint
-	Language   string
-	Errors     []model.RoastError
-	Warnings   []model.RoastWarning
-	Statistics model.RoastStatistics
-}
-
 func (f flake8Result) toRoast(username string, code string) (roast *model.RoastResult) {
 	result := f["stdin"]
 
