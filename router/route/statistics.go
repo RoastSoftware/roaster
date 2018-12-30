@@ -38,8 +38,15 @@ func retrieveRoastTimeseries(w http.ResponseWriter, r *http.Request) (int, error
 	}
 
 	username := r.URL.Query().Get("user")
+	friends := getBooleanFromString(r.URL.Query().Get("friends"))
 
-	timeseries, err := model.GetRoastTimeseries(start, end, interval, username)
+	if username == "" && friends {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("request for friends is missing user query parameter"),
+			"Friends query parameter also requires the user query parameter")
+	}
+
+	timeseries, err := model.GetRoastTimeseries(start, end, interval, username, friends)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}

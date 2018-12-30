@@ -41,7 +41,7 @@ type RoastRatio struct {
 //
 // The minimum interval is 1 minute, anything less will be set to 1 minute per
 // default.
-func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string) (
+func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string, friends bool) (
 	timeseries RoastTimeseries, err error) {
 
 	// Round the interval to the closest minute.
@@ -66,18 +66,30 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 		)
 
 		SELECT
-			"time_series"."datapoint" AS "timestamp",
+			t."datapoint" AS "timestamp",
 			COUNT(r."id") AS "count",
 			COALESCE(SUM(s."number_of_errors"), 0) AS "number_of_errors",
 			COALESCE(SUM(s."number_of_warnings"), 0) AS "number_of_warnings",
 			COALESCE(SUM(s."lines_of_code"), 0) AS "lines_of_code"
-		FROM "time_series"
+		FROM "time_series" AS t
+
+		-- Collect users friends if requested.
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+			ON $6 AND LOWER(f."username")=LOWER(TRIM($5))
+
+		-- Collect all the Roasts per resolution.
 		LEFT JOIN "roaster"."roast" AS r
 			-- Truncate and compare per resolution.
-			ON date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = "time_series"."datapoint"
-			AND (COALESCE(TRIM($5), '')='' OR LOWER(r."username")=LOWER(TRIM($5))) -- Optionally only return for specified user.
-			LEFT JOIN "roaster"."roast_statistics" AS s -- Collect statistics for the Roasts.
+			ON
+				date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = t."datapoint"
+				AND (COALESCE(TRIM($5), '')='' OR
+				NOT $6 AND LOWER(r.username)=LOWER(TRIM($5)) OR -- Optionally only return for specified user.
+				$6 AND r.username = f.friend) -- Or only return that users friends.
+
+			-- Collect statistics for the Roasts.
+			LEFT JOIN "roaster"."roast_statistics" AS s
 				ON s."roast" = r."id"
+
 		GROUP BY 1
 		ORDER BY "timestamp" DESC -- First in result is the latest timestamp.
 		LIMIT 1000 -- Do not return more than 1000 rows back in time.
@@ -86,7 +98,8 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 		end,
 		fmt.Sprintf("%.0f minutes", interval.Minutes()),
 		interval.Minutes(),
-		username)
+		username,
+		friends)
 	if err != nil {
 		return
 	}

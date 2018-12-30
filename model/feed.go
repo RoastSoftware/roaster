@@ -42,7 +42,7 @@ func GetFeed(username string, friends bool, page uint64) (feed Feed, err error) 
 		LEFT OUTER JOIN "roaster"."user_friends" AS f
 		ON $2 AND LOWER(f.username)=LOWER(TRIM($1))
 	WHERE
-		coalesce(TRIM($1), '')='' OR
+		COALESCE(TRIM($1), '')='' OR
 		NOT $2 AND LOWER(r.username)=LOWER(TRIM($1)) OR
 		$2 AND r.username = f.friend
 	ORDER BY r.create_time DESC LIMIT $3 OFFSET $4
