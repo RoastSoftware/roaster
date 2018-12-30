@@ -362,8 +362,8 @@ export class RoastDoughnutStatisticsModel extends RoastRatioModel {
       }],
 
       labels: [
-        'Errors',
         'Warnings',
+        'Errors',
         'Success',
       ],
     };
