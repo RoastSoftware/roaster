@@ -83,8 +83,8 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 			ON
 				date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = t."datapoint"
 				AND (COALESCE(TRIM($5), '')='' OR
-				NOT $6 AND LOWER(r.username)=LOWER(TRIM($5)) OR -- Optionally only return for specified user.
-				$6 AND r.username = f.friend) -- Or only return that users friends.
+				NOT $6 AND LOWER(r."username")=LOWER(TRIM($5)) OR -- Optionally only return for specified user.
+				$6 AND r."username" = f."friend") -- Or only return that users friends.
 
 			-- Collect statistics for the Roasts.
 			LEFT JOIN "roaster"."roast_statistics" AS s
@@ -142,7 +142,7 @@ func GetLinesOfCode(username string, friends bool) (lines LinesOfCode, err error
 		-- Return either globally, for specific user, or for specific users friends.
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      NOT $2 AND LOWER(r."username")=LOWER(TRIM($1)) OR
-		      $2 AND r."username" = f."username"
+		      $2 AND r."username" = f."friend"
 	`, username, friends).Scan(&lines.Lines)
 	return
 }
@@ -160,8 +160,8 @@ func GetNumberOfRoasts(username string, friends bool) (numberOfRoasts NumberOfRo
 
 		-- Return either globally, for specific user, or for specific users friends.
 		WHERE COALESCE(TRIM($1), '')='' OR
-		      NOT $2 AND LOWER(r."username")=LOWER(TRIM($1)) OR
-		      $2 AND r."username" = f."username"
+		      (NOT $2 AND LOWER(r."username")=LOWER(TRIM($1))) OR
+		      ($2 AND r."username" = f."friend")
 	`, username, friends).Scan(&numberOfRoasts.Count)
 	return
 }
