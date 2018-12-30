@@ -68,6 +68,10 @@ func (f flake8Result) toRoast(username string, code string) (roast *model.RoastR
 func WithFlake8(username, code string) (result *model.RoastResult, err error) {
 	if r, ok := flake8Cache.Get(code); ok {
 		if result, ok := r.(model.RoastResult); ok {
+
+			result.Username = username
+			result.Code = code
+
 			return &result, err
 		}
 	}
