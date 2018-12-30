@@ -134,9 +134,9 @@ export default class Feed implements ξ.ClassComponent {
       case 'global':
         break;
       case 'friends':
-        categoryQuery = `&user=${UserModel.getUsername()}&friends=true`;
+        categoryQuery += `&friends=true`;
       case 'you':
-        categoryQuery = `&user=${UserModel.getUsername()}`;
+        categoryQuery += `&user=${UserModel.getUsername()}`;
     }
 
     Network.request<Feed>('GET', '/feed?page='

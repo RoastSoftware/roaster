@@ -41,7 +41,7 @@ type RoastRatio struct {
 //
 // The minimum interval is 1 minute, anything less will be set to 1 minute per
 // default.
-func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string) (
+func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string, friends bool) (
 	timeseries RoastTimeseries, err error) {
 
 	// Round the interval to the closest minute.
@@ -66,18 +66,30 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 		)
 
 		SELECT
-			"time_series"."datapoint" AS "timestamp",
+			t."datapoint" AS "timestamp",
 			COUNT(r."id") AS "count",
 			COALESCE(SUM(s."number_of_errors"), 0) AS "number_of_errors",
 			COALESCE(SUM(s."number_of_warnings"), 0) AS "number_of_warnings",
 			COALESCE(SUM(s."lines_of_code"), 0) AS "lines_of_code"
-		FROM "time_series"
+		FROM "time_series" AS t
+
+		-- Collect users friends if requested.
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+			ON $6 AND LOWER(f."username")=LOWER(TRIM($5))
+
+		-- Collect all the Roasts per resolution.
 		LEFT JOIN "roaster"."roast" AS r
 			-- Truncate and compare per resolution.
-			ON date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = "time_series"."datapoint"
-			AND (COALESCE(TRIM($5), '')='' OR LOWER(r."username")=LOWER(TRIM($5))) -- Optionally only return for specified user.
-			LEFT JOIN "roaster"."roast_statistics" AS s -- Collect statistics for the Roasts.
+			ON
+				date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = t."datapoint"
+				AND (COALESCE(TRIM($5), '')='' OR
+				NOT $6 AND LOWER(r."username")=LOWER(TRIM($5)) OR -- Optionally only return for specified user.
+				$6 AND r."username" = f."friend") -- Or only return that users friends.
+
+			-- Collect statistics for the Roasts.
+			LEFT JOIN "roaster"."roast_statistics" AS s
 				ON s."roast" = r."id"
+
 		GROUP BY 1
 		ORDER BY "timestamp" DESC -- First in result is the latest timestamp.
 		LIMIT 1000 -- Do not return more than 1000 rows back in time.
@@ -86,7 +98,8 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 		end,
 		fmt.Sprintf("%.0f minutes", interval.Minutes()),
 		interval.Minutes(),
-		username)
+		username,
+		friends)
 	if err != nil {
 		return
 	}
@@ -111,34 +124,50 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 	return
 }
 
-// GetLinesOfCode returns the number of lines of code for everyone or a specific
-// user. An empty string as username represents everyone.
-func GetLinesOfCode(username string) (lines LinesOfCode, err error) {
+// GetLinesOfCode returns the number of lines of code for everyone, a specific
+// user or that user's friends. An empty string as username represents everyone.
+func GetLinesOfCode(username string, friends bool) (lines LinesOfCode, err error) {
 	err = database.QueryRow(`
 		SELECT COALESCE(SUM("lines_of_code"), 0) AS "lines_of_code"
-		FROM roaster.roast_statistics AS s
-		JOIN roaster.roast AS r
-		ON r.id = s.roast
+		FROM "roaster"."roast_statistics" AS s
+
+		-- Optionally collect the users friends.
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+			ON $2 AND LOWER(f."username")=LOWER(TRIM($1))
+
+		-- Collect Roasts to compare with specfic username.
+		JOIN "roaster"."roast" AS r
+			ON r."id" = s."roast"
+
+		-- Return either globally, for specific user, or for specific users friends.
 		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(r.username)=LOWER(TRIM($1))
-	`, username).Scan(&lines.Lines)
+		      NOT $2 AND LOWER(r."username")=LOWER(TRIM($1)) OR
+		      $2 AND r."username" = f."friend"
+	`, username, friends).Scan(&lines.Lines)
 	return
 }
 
-// GetNumberOfRoasts returns the number of Roasts for everyone or a specific
-// user. An empty string as username represents everyone.
-func GetNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
+// GetNumberOfRoasts returns the number of Roasts for everyone, a specific
+// user, or that user's friends. An empty string as username represents everyone.
+func GetNumberOfRoasts(username string, friends bool) (numberOfRoasts NumberOfRoasts, err error) {
 	err = database.QueryRow(`
-		SELECT COUNT(username)
-		FROM roaster.roast
+		SELECT COUNT(r."username")
+		FROM roaster.roast AS r
+
+		-- Optionally collect the users friends.
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+			ON $2 AND LOWER(f."username")=LOWER(TRIM($1))
+
+		-- Return either globally, for specific user, or for specific users friends.
 		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(username)=LOWER(TRIM($1))
-	`, username).Scan(&numberOfRoasts.Count)
+		      (NOT $2 AND LOWER(r."username")=LOWER(TRIM($1))) OR
+		      ($2 AND r."username" = f."friend")
+	`, username, friends).Scan(&numberOfRoasts.Count)
 	return
 }
 
-// GetRoastRatio returns the lines of code, number of errors and warnings for
-// everyone or a specific user. An Empty string as username represents everyone.
+// GetRoastRatio returns the lines of code, number of errors and warnings for a
+// specific user.
 func GetRoastRatio(username string) (roastRatio RoastRatio, err error) {
 	err = database.QueryRow(`
 		SELECT
@@ -148,8 +177,7 @@ func GetRoastRatio(username string) (roastRatio RoastRatio, err error) {
 		FROM roaster.roast_statistics AS s
 			JOIN roaster.roast AS r
 			ON r.id = s.roast
-		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(r.username)=LOWER(TRIM($1))
+		WHERE LOWER(r.username)=LOWER(TRIM($1))
 	`, username).Scan(&roastRatio.NumberOfErrors, &roastRatio.NumberOfWarnings, &roastRatio.LinesOfCode)
 	return
 }

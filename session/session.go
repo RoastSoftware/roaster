@@ -56,7 +56,7 @@ func Save(request *http.Request, writer http.ResponseWriter, session *sessions.S
 }
 
 // Invalidate sets the max age of a cookie to -1, rendering it invalid.
-func Invalidate(request *http.Request, writer http.ResponseWriter, session *sessions.Session) {
+func Invalidate(request *http.Request, writer http.ResponseWriter, session *sessions.Session) error {
 	session.Options.MaxAge = -1
-	Save(request, writer, session)
+	return Save(request, writer, session)
 }
