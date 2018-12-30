@@ -32,8 +32,15 @@ type flake8Message struct {
 	Text         string `json:"text"`
 	PhysicalLine string `json:"physical_line"`
 }
-
 type flake8Result map[string][]flake8Message
+
+type flake8CacheItem struct {
+	Score      uint
+	Language   string
+	Errors     []model.RoastError
+	Warnings   []model.RoastWarning
+	Statistics model.RoastStatistics
+}
 
 func (f flake8Result) toRoast(username string, code string) (roast *model.RoastResult) {
 	result := f["stdin"]
@@ -67,12 +74,8 @@ func (f flake8Result) toRoast(username string, code string) (roast *model.RoastR
 // WithFlake8 statically analyzes the code with Flake8 and parses the result.
 func WithFlake8(username, code string) (result *model.RoastResult, err error) {
 	if r, ok := flake8Cache.Get(code); ok {
-		if result, ok := r.(model.RoastResult); ok {
-
-			result.Username = username
-			result.Code = code
-
-			return &result, err
+		if c, ok := r.(flake8Result); ok {
+			return c.toRoast(username, code), err
 		}
 	}
 
@@ -105,8 +108,8 @@ func WithFlake8(username, code string) (result *model.RoastResult, err error) {
 		return
 	}
 
+	flake8Cache.Set(code, r)
 	result = r.toRoast(username, code)
-	flake8Cache.Set(code, *result)
 
 	return
 }
