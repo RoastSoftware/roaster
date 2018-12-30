@@ -48,7 +48,7 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 			if pgerr.Constraint == "user_email_key" {
 				return http.StatusConflict, causerr.New(err, "Email already in use")
 			}
-			if pgerr.Constraint == "user_pkey" {
+			if (pgerr.Constraint == "user_pkey" || pgerr.Constraint == "username_user_idx"){
 				return http.StatusConflict, causerr.New(err, "Username already in use")
 			}
 		}
