@@ -124,34 +124,50 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 	return
 }
 
-// GetLinesOfCode returns the number of lines of code for everyone or a specific
-// user. An empty string as username represents everyone.
-func GetLinesOfCode(username string) (lines LinesOfCode, err error) {
+// GetLinesOfCode returns the number of lines of code for everyone, a specific
+// user or that user's friends. An empty string as username represents everyone.
+func GetLinesOfCode(username string, friends bool) (lines LinesOfCode, err error) {
 	err = database.QueryRow(`
 		SELECT COALESCE(SUM("lines_of_code"), 0) AS "lines_of_code"
-		FROM roaster.roast_statistics AS s
-		JOIN roaster.roast AS r
-		ON r.id = s.roast
+		FROM "roaster"."roast_statistics" AS s
+
+		-- Optionally collect the users friends.
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+			ON $2 AND LOWER(f."username")=LOWER(TRIM($1))
+
+		-- Collect Roasts to compare with specfic username.
+		JOIN "roaster"."roast" AS r
+			ON r."id" = s."roast"
+
+		-- Return either globally, for specific user, or for specific users friends.
 		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(r.username)=LOWER(TRIM($1))
-	`, username).Scan(&lines.Lines)
+		      NOT $2 AND LOWER(r."username")=LOWER(TRIM($1)) OR
+		      $2 AND r."username" = f."username"
+	`, username, friends).Scan(&lines.Lines)
 	return
 }
 
-// GetNumberOfRoasts returns the number of Roasts for everyone or a specific
-// user. An empty string as username represents everyone.
-func GetNumberOfRoasts(username string) (numberOfRoasts NumberOfRoasts, err error) {
+// GetNumberOfRoasts returns the number of Roasts for everyone, a specific
+// user, or that user's friends. An empty string as username represents everyone.
+func GetNumberOfRoasts(username string, friends bool) (numberOfRoasts NumberOfRoasts, err error) {
 	err = database.QueryRow(`
-		SELECT COUNT(username)
-		FROM roaster.roast
+		SELECT COUNT(r."username")
+		FROM roaster.roast AS r
+
+		-- Optionally collect the users friends.
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+			ON $2 AND LOWER(f."username")=LOWER(TRIM($1))
+
+		-- Return either globally, for specific user, or for specific users friends.
 		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(username)=LOWER(TRIM($1))
-	`, username).Scan(&numberOfRoasts.Count)
+		      NOT $2 AND LOWER(r."username")=LOWER(TRIM($1)) OR
+		      $2 AND r."username" = f."username"
+	`, username, friends).Scan(&numberOfRoasts.Count)
 	return
 }
 
-// GetRoastRatio returns the lines of code, number of errors and warnings for
-// everyone or a specific user. An Empty string as username represents everyone.
+// GetRoastRatio returns the lines of code, number of errors and warnings for a
+// specific user.
 func GetRoastRatio(username string) (roastRatio RoastRatio, err error) {
 	err = database.QueryRow(`
 		SELECT
@@ -161,8 +177,7 @@ func GetRoastRatio(username string) (roastRatio RoastRatio, err error) {
 		FROM roaster.roast_statistics AS s
 			JOIN roaster.roast AS r
 			ON r.id = s.roast
-		WHERE COALESCE(TRIM($1), '')='' OR
-		      LOWER(r.username)=LOWER(TRIM($1))
+		WHERE LOWER(r.username)=LOWER(TRIM($1))
 	`, username).Scan(&roastRatio.NumberOfErrors, &roastRatio.NumberOfWarnings, &roastRatio.LinesOfCode)
 	return
 }
