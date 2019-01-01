@@ -126,18 +126,33 @@ class RoastMessageList implements ξ.ClassComponent {
 
 export default class Home implements ξ.ClassComponent {
   roast: RoastResult = {} as RoastResult;
+  analyzing: boolean = false;
+  error: Error;
 
   roastMe() {
-    Network.request<RoastResult>('POST', '/roast', {
-      'code': EditorModel.getCode(),
-      'language': EditorModel.getLanguage(),
-    }).then((roast: RoastResult) => {
-      this.roast = roast;
-    });
+    if (!this.analyzing) {
+      this.reset(); // Clean up errors.
+      this.analyzing = true;
+
+      Network.request<RoastResult>('POST', '/roast', {
+        'code': EditorModel.getCode(),
+        'language': EditorModel.getLanguage(),
+      }).then((roast: RoastResult) => {
+        this.roast = roast;
+        this.analyzing = false;
+        ξ.redraw();
+      }).catch((error: Error) => {
+        this.error = error;
+        this.analyzing = false;
+        ξ.redraw();
+      });
+    }
   };
 
   reset() {
     this.roast = {} as RoastResult;
+    this.error = undefined;
+    this.analyzing = false;
   };
 
   view(vnode: ξ.CVnode): ξ.Children {
@@ -181,8 +196,16 @@ export default class Home implements ξ.ClassComponent {
                 ),
 
                 ξ('#controls-row', {style: controlsRowStyle},
+                    this.error ?
+                    ξ('.ui.error.message',
+                        ξ('.header',
+                            'We had some problems with your submission!',
+                        ),
+                        ξ('p', `${this.error.message}.`),
+                    ): '',
                     ξ('.ui.buttons.large',
                         ξ('button.ui.primary.button', {
+                          class: this.analyzing ? 'loading disabled' : '',
                           onclick: () => {
                             this.roastMe();
                           },
