@@ -29,7 +29,10 @@ export default class Login implements ξ.ClassComponent {
         ξ('.ui.grid',
             ξ('.ui.container.eight.wide.column.centered',
                 ξ('.ui.segments',
-                    ξ('.ui.segment', ξ('h2', 'LOGIN')),
+                    ξ('.ui.segment',
+                        ξ('h2',
+                            ξ('i.sign.in.icon'),
+                            ' LOGIN')),
 
                     (this.loginError == null ? '':
                       ξ('.ui.segment',
@@ -47,30 +50,35 @@ export default class Login implements ξ.ClassComponent {
                       ξ('.field', {
                         class: UserModel.validUsername() ? '' : 'error'}, [
                         ξ('label', 'Username'),
-                        ξ('.ui.input',
+                        ξ('.ui.left.icon.input',
                             ξ('input', {
                               type: 'text',
                               value: UserModel.getUsername(),
                               oninput: (e: any) =>
                                 UserModel.setUsername(e.currentTarget.value),
                               placeholder: 'Thisisausername',
-                            }))]),
+                            }),
+                            ξ('i.user.icon'),
+                        )]),
 
                       ξ('.field', {
                         class: UserModel.validPassword() ? '' : 'error'}, [
                         ξ('label', 'Password'),
-                        ξ('.ui.input',
+                        ξ('.ui.left.icon.input',
                             ξ('input', {
                               type: 'password',
                               value: UserModel.getPassword(),
                               oninput: (e: any) =>
                                 UserModel.setPassword(e.currentTarget.value),
                               placeholder: 's3cur3p#55w0rd',
-                            }))]),
+                            }),
+                            ξ('i.lock.icon'),
+                        )]),
 
                       ξ('button.ui.teal.basic.button.right.floated', {
                         disabled: !(UserModel.validLogin()),
-                      }, 'LOGIN!'),
+                      },
+                      ξ('i.sign.in.icon'), 'LOGIN!'),
                     ]))
                 ),
             ),

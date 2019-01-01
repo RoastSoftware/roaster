@@ -33,7 +33,10 @@ export default class Register implements ξ.ClassComponent {
             ξ('.ui.grid',
                 ξ('.ui.container.eight.wide.column.centered',
                     ξ('.ui.segments',
-                        ξ('.ui.segment', ξ('h2', 'REGISTER')),
+                        ξ('.ui.segment',
+                            ξ('h2',
+                                ξ('i.user.plus.icon'),
+                                ' REGISTER')),
 
                         (this.registerError == null ? '':
                           ξ('.ui.segment',
@@ -51,7 +54,7 @@ export default class Register implements ξ.ClassComponent {
                                 class:
                                 UserModel.validUsername() ? '' : 'error'}, [
                                 ξ('label', 'Username'),
-                                ξ('.ui.input',
+                                ξ('.ui.left.icon.input',
                                     ξ('input', {
                                       type: 'text',
                                       value: UserModel.getUsername(),
@@ -59,12 +62,15 @@ export default class Register implements ξ.ClassComponent {
                                         UserModel.setUsername(
                                             e.currentTarget.value),
                                       placeholder: 'Thisisausername',
-                                    }))]),
+                                    }),
+                                    ξ('i.user.icon'),
+                                )]),
+
                               ξ('.field', {
                                 class:
                                 UserModel.validFullname() ? '' : 'error'}, [
                                 ξ('label', 'Full name'),
-                                ξ('.ui.input',
+                                ξ('.ui.left.icon.input',
                                     ξ('input', {
                                       type: 'text',
                                       value: UserModel.getFullname(),
@@ -72,12 +78,14 @@ export default class Register implements ξ.ClassComponent {
                                         UserModel.setFullname(
                                             e.currentTarget.value),
                                       placeholder: 'Mynameis',
-                                    }))]),
+                                    }),
+                                    ξ('i.info.icon'),
+                                )]),
                               ξ('.field', {
                                 class:
                                 UserModel.validPassword() ? '' : 'error'}, [
                                 ξ('label', 'Password'),
-                                ξ('.ui.input',
+                                ξ('.ui.left.icon.input',
                                     ξ('input', {
                                       type: 'password',
                                       value: UserModel.getPassword(),
@@ -85,23 +93,27 @@ export default class Register implements ξ.ClassComponent {
                                         UserModel.setPassword(
                                             e.currentTarget.value),
                                       placeholder: 's3cur3p#55w0rd',
-                                    }))]),
+                                    }),
+                                    ξ('i.lock.icon'),
+                                )]),
                               ξ('.field', {
                                 class:
                                 UserModel.validEmail() ? '' : 'error'}, [
                                 ξ('label', 'Email'),
-                                ξ('.ui.input',
+                                ξ('.ui.left.icon.input',
                                     ξ('input', {
                                       type: 'text',
                                       value: UserModel.getEmail(),
                                       oninput: (e: any) => UserModel.setEmail(
                                           e.currentTarget.value),
                                       placeholder: 'Mynameis@example.com',
-                                    }))]),
+                                    }),
+                                    ξ('i.envelope.icon'),
+                                )]),
                               ξ('button.ui.teal.basic.button.right.floated', {
                                 disabled: !(UserModel.validAll()),
                               },
-                              'GET ROASTED!'),
+                              ξ('i.user.plus.icon'), 'GET ROASTED!'),
                             ])),
                     ),
                 ),
