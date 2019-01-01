@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/analyze"
 	"github.com/LuleaUniversityOfTechnology/2018-project-roaster/middleware"
@@ -14,12 +15,29 @@ import (
 	"github.com/willeponken/causerr"
 )
 
+// maxBodySize is 500 Kb for a analyze/roast request.
+const maxBodySize = 500000
+
 type snippet struct {
 	Language string `json:"language"`
 	Code     string `json:"code"`
 }
 
 func analyzeCode(w http.ResponseWriter, r *http.Request) (int, error) {
+	r.Body = http.MaxBytesReader(w, r.Body, maxBodySize)
+
+	cl, err := strconv.Atoi(r.Header.Get("Content-Length"))
+	if err != nil {
+		return http.StatusBadRequest,
+			causerr.New(err, "Invalid or missing Content-Length header in request")
+	}
+
+	if cl > maxBodySize {
+		return http.StatusRequestEntityTooLarge, causerr.New(
+			fmt.Errorf("value for Content-Length is too large, must be below %d", maxBodySize),
+			fmt.Sprintf("Too large code snippet sent, must be below %d kilobytes (about %d characters)", maxBodySize/1000, maxBodySize))
+	}
+
 	var in snippet
 
 	s, err := session.Get(r, "roaster_auth")
