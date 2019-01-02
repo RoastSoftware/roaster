@@ -35,8 +35,8 @@ class Roaster {
 
         return;
       }
-    } catch (e) {
-      console.log('Unhandled response: ' + e);
+    } catch (error) {
+      console.log('Unhandled response: ' + error);
     }
 
     UserModel.setLoggedIn(false);
