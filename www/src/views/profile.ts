@@ -7,9 +7,9 @@ import Chart from 'chart.js';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
-    downloadError: Error;
 
     upload(e: Any) {
+        this.uploadError = null;
       const avatar = e.target.files[0];
       if (avatar == undefined || avatar.length == 0) {
         return;
@@ -28,17 +28,13 @@ export default class Profile implements ξ.ClassComponent {
           .catch((err: Error) => {
             this.uploadError = err;
             console.error(this.uploadError);
+            ξ.redraw();
           });
     };
 
     clickImg() {
       document.getElementById('upload').click();
     };
-
-    getUserStat() {
-      console.log('getting user statistics');
-      // TODO: Network.request statistics
-    }
 
     view(vnode: ξ.CVnode) {
       return ξ(base,
@@ -54,10 +50,17 @@ export default class Profile implements ξ.ClassComponent {
                   ξ('.sub.header', `Hello there, ${UserModel.getFullname()}!`)),
           ),
           ξ('.ui.divider')),
+          this.uploadError ?
+          ξ('.ui.text.container', {
+            style: 'margin-bottom: 1em;',
+          },
+            ξ('.ui.negative.message',
+            ξ('.header',
+            this.uploadError.message))): '',
           ξ('.ui.main.text.container.two.column.stackable.grid',
               ξ('.ui.column',
                   ξ('input#upload',
-                      {onchange: this.upload,
+                      {onchange: (e) => {this.upload(e)},
                         type: 'File',
                         style: 'display: none;',
                         accept: '.png, .jpg, .jpeg;',

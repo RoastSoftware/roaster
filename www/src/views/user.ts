@@ -24,7 +24,6 @@ class UserProfile implements ξ.ClassComponent {
           .then((result) => {
             UserModel.friends = result;
             this.hasFriend(username);
-            ξ.redraw();
           });
     };
 
@@ -127,7 +126,6 @@ export default class UserView implements ξ.ClassComponent {
           .then((user: User) => {
             this.user = user;
             this.ready = true;
-            ξ.redraw();
           });
     }
 
