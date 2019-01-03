@@ -11,7 +11,6 @@ import {UserModel} from '../models/user';
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
 
-    downloadError: Error;
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
     username: string = UserModel.getUsername();
