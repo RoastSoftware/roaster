@@ -10,7 +10,7 @@ import {UserModel} from '../models/user';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
-    
+
     downloadError: Error;
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
@@ -70,9 +70,9 @@ export default class Profile implements ξ.ClassComponent {
           ξ('.ui.text.container', {
             style: 'margin-bottom: 1em;',
           },
-            ξ('.ui.negative.message',
-            ξ('.header',
-            this.uploadError.message))): '',
+          ξ('.ui.negative.message',
+              ξ('.header',
+                  this.uploadError.message))): '',
           ξ('.ui.main.text.container.two.column.stackable.grid',
               ξ('.ui.column',
                   ξ('input#upload', {
