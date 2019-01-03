@@ -94,7 +94,10 @@ func removeSession(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
-	session.Invalidate(r, w, s)
+	err = session.Invalidate(r, w, s)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
 
 	return http.StatusOK, nil
 }

@@ -1,29 +1,39 @@
 import ξ from 'mithril';
 import base from './base';
-import {UserModel} from '../models/user';
 import Network from '../services/network';
-import Model from '../models/statistics';
-import Chart from 'chart.js';
+import {
+  UserProfileHeader,
+  RoastRatio,
+} from './user';
+import {StatisticsFilter} from '../models/statistics';
+import {UserModel} from '../models/user';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
+    
+    downloadError: Error;
+    profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
+      new Date().getTime();
+    username: string = UserModel.getUsername();
+    fullname: string = UserModel.getFullname();
+    email: string = UserModel.getEmail();
+    score: number = 0;
 
-    upload(e: Any) {
-        this.uploadError = null;
-      const avatar = e.target.files[0];
+    upload({target}) {
+      this.uploadError = null;
+      const avatar = target.files[0];
       if (avatar == undefined || avatar.length == 0) {
         return;
       }
-      console.log('SUCCESS');
+
       const data = new FormData();
       data.append('file', avatar);
+
       Network.request<FormData>('PUT', '/user/' +
           UserModel.getUsername() + '/avatar', data)
-          .then((_: any) => {
-            const img = document
-                .getElementById('picture') as HTMLImageElement;
-            img.src = '/user/' + UserModel.getUsername() +
-                    '/avatar?' + new Date().getTime();
+          .then(() => {
+            this.profileImageURI = `/user/${UserModel.getUsername()}/avatar?`
+              + new Date().getTime();
           })
           .catch((err: Error) => {
             this.uploadError = err;
@@ -32,23 +42,28 @@ export default class Profile implements ξ.ClassComponent {
           });
     };
 
-    clickImg() {
+    oncreate() {
+      Network.request<Object>('GET', '/user/' + this.username + '/score')
+          .then(({score}) => {
+            this.score = score;
+          });
+    };
+
+    clickImage() {
       document.getElementById('upload').click();
     };
 
-    view(vnode: ξ.CVnode) {
+    view({attrs}) {
       return ξ(base,
           ξ('.ui.text.container', {
             style: 'margin-top: 1em;',
           },
-          ξ('h1.ui.header',
-              ξ('img.ui.circular.image', {
-                src: '/user/' + UserModel.getUsername() + '/avatar',
-              }),
-              ξ('.content',
-                  'MY PROFILE',
-                  ξ('.sub.header', `Hello there, ${UserModel.getFullname()}!`)),
-          ),
+          ξ(UserProfileHeader, {
+            username: this.username,
+            fullname: this.fullname,
+            score: this.score,
+            loggedIn: true,
+          }),
           ξ('.ui.divider')),
           this.uploadError ?
           ξ('.ui.text.container', {
@@ -59,40 +74,36 @@ export default class Profile implements ξ.ClassComponent {
             this.uploadError.message))): '',
           ξ('.ui.main.text.container.two.column.stackable.grid',
               ξ('.ui.column',
-                  ξ('input#upload',
-                      {onchange: (e) => {this.upload(e)},
-                        type: 'File',
-                        style: 'display: none;',
-                        accept: '.png, .jpg, .jpeg;',
-                      }),
-                  ξ('img.ui.image.rounded.medium#picture',
-                      {src: '/user/' + UserModel.getUsername() + '/avatar',
-                        onclick: this.clickImg,
-                        style: 'cursor: pointer;'},
-                      'User profile picture.'),
+                  ξ('input#upload', {
+                    onchange: (e) => {
+                      this.upload(e);
+                    },
+                    type: 'File',
+                    style: 'display: none;',
+                    accept: '.png, .jpg, .jpeg;',
+                  }),
+                  ξ('img.ui.image.rounded.medium#picture', {
+                    src: this.profileImageURI,
+                    onclick: this.clickImage,
+                    style: 'cursor: pointer;',
+                  },
+                  'User profile picture.'),
                   ξ('h2',
-                      UserModel.getFullname()),
+                      this.fullname),
                   ξ('p',
                       ξ('i.user.icon'),
-                      UserModel.getUsername()),
+                      this.username),
                   ξ('p',
                       ξ('i.mail.icon'),
-                      UserModel.getEmail()),
+                      this.email),
               ),
               ξ('.ui.column[minheight=10em]',
-                  ξ('canvas#chart-area', {
-                    oncreate: ({dom}) => {
-                      const ctx = (document.getElementById(
-                          'chart-area') as HTMLCanvasElement)
-                          .getContext('2d');
-                      new Chart(ctx, {
-                        type: 'doughnut',
-                        data: Model.dataDonut,
-                        options: Model.optionsDonut,
-                      });
-                    }})
-              )
-          )
+                  ξ(RoastRatio, {
+                    filter: StatisticsFilter.User,
+                    username: this.username,
+                  }),
+              ),
+          ),
       );
     }
 };

@@ -123,17 +123,57 @@ class RoastMessageList implements ξ.ClassComponent {
   }
 }
 
+const maxBodySize = 500000; // Actual server limit.
+const requestOverhead = 40000; // Arbitrary overhead that should be enough.
+const maxSnippetLength = maxBodySize - requestOverhead;
 
 export default class Home implements ξ.ClassComponent {
   roast: RoastResult = {} as RoastResult;
+  analyzing: boolean = false;
+  error: Error;
 
-  roastMe() {
-    Network.request<RoastResult>('POST', '/roast', {
-      'code': EditorModel.getCode(),
-      'language': EditorModel.getLanguage(),
-    }).then((roast: RoastResult) => {
-      this.roast = roast;
-    });
+  tooLargeCodeSnippetMessage() {
+    return `\
+Too large code snippet, must be below ${maxSnippetLength.toLocaleString()} \
+characters (you've sent us ${EditorModel.getCode().length.toLocaleString()})`;
+  };
+
+  async roastMe() {
+    if (!this.analyzing) {
+      this.reset(); // Clean up errors.
+
+      if (EditorModel.getCode().length > maxSnippetLength) {
+        this.error = new Error(this.tooLargeCodeSnippetMessage());
+        return ξ.redraw();
+      }
+
+      this.analyzing = true;
+
+      try {
+        this.roast = await Network.request<RoastResult>('POST', '/roast', {
+          'code': EditorModel.getCode(),
+          'language': EditorModel.getLanguage(),
+        });
+      } catch (error) {
+        // Nginx or the-like will stop the Roast web server from responding with
+        // its error, so we'll just set the message ourselves.
+        if ('code' in error && error.code == 413) {
+          error.message = this.tooLargeCodeSnippetMessage();
+        }
+
+        this.error = error;
+      } finally {
+        this.analyzing = false;
+      }
+
+      return ξ.redraw();
+    }
+  };
+
+  reset() {
+    this.roast = {} as RoastResult;
+    this.error = undefined;
+    this.analyzing = false;
   };
 
   view(vnode: ξ.CVnode): ξ.Children {
@@ -146,7 +186,10 @@ export default class Home implements ξ.ClassComponent {
 
             ξ('#roast-column', {style: roastColumnStyle},
                 ξ('#messages-row', {style: messagesRowStyle},
-                    ξ('.ui.teal.dividing.header',
+                    ξ('.ui.vertical.basic.segment.clearing', {
+                      style: 'padding: 0; margin: 0;',
+                    },
+                    ξ('h3.ui.header.teal.left.floated[style=margin: 0;]',
                         ξ('i.bug.icon'),
                         ξ('.content',
                             'Code Result',
@@ -155,6 +198,16 @@ export default class Home implements ξ.ClassComponent {
                             )
                         )
                     ),
+                    this.roast.score ?
+                    ξ('.ui.small.right.floated.statistic', {
+                      style: 'margin-bottom: -2px;',
+                    },
+                    ξ('.value',
+                        ξ('i.trophy.icon[style=color: gold;]'),
+                        ` ${this.roast.score}`,
+                    ),
+                    ): ''),
+                    ξ('.ui.divider'),
                     ξ('.ui.relaxed.list.divided', {style: messagesListStyle}, [
                       ξ(RoastMessageList, {
                         errors: this.roast.errors,
@@ -164,8 +217,16 @@ export default class Home implements ξ.ClassComponent {
                 ),
 
                 ξ('#controls-row', {style: controlsRowStyle},
+                    this.error ?
+                    ξ('.ui.error.message',
+                        ξ('.header',
+                            'We had some problems with your submission!',
+                        ),
+                        ξ('p', `${this.error.message}.`),
+                    ): '',
                     ξ('.ui.buttons.large',
                         ξ('button.ui.primary.button', {
+                          class: this.analyzing ? 'loading disabled' : '',
                           onclick: () => {
                             this.roastMe();
                           },
@@ -176,8 +237,12 @@ export default class Home implements ξ.ClassComponent {
                         }),
                         'ROAST ME!'),
                         ξ('.or'),
-                        ξ('button.ui.button',
-                            'Reset'),
+                        ξ('button.ui.button', {
+                          onclick: () => {
+                            this.reset();
+                          },
+                        },
+                        'Reset'),
                     ),
                     ξ('select.ui.compact.selection.dropdown', {
                       style: dropdownStyle,

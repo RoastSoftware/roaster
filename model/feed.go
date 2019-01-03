@@ -25,26 +25,28 @@ type Feed struct {
 	Items []FeedItem `json:"items"`
 }
 
-// GetGlobalFeed collects the latest N (N = pageSize) feed items for all users.
+// GetFeed collects the latest N (N = pageSize) feed items for either everyone,
+// friends or for a user.
+//
+// * An empty username string returns the feed items for all users.
+// * A set username together with the friends parameter set to true returns the
+//   users friends feed items.
+// * A set username together with the friends parameter set to false returns
+//   only the users feed items.
+//
 // Pagination is supported where page = 0 is the first (latest) page.
-func GetGlobalFeed(page uint64) (feed Feed, err error) {
-	return getFeed("", false, page)
-}
-
-// GetUserFeed collects the latest N (N = pageSize) feed items for an user.
-// Pagination is supported where page = 0 is the first (latest) page.
-func GetUserFeed(username string, friends bool, page uint64) (feed Feed, err error) {
-	return getFeed(username, friends, page)
-}
-
-// TODO: Add friends to SQL query when the Friends table has been implemented.
-func getFeed(username string, friends bool, page uint64) (feed Feed, err error) {
+func GetFeed(username string, friends bool, page uint64) (feed Feed, err error) {
 	rows, err := database.Query(`
-	SELECT username, score, language, create_time
-	FROM "roaster"."roast"
-	WHERE coalesce(TRIM($1), '')='' OR LOWER(username)=LOWER(TRIM($1))
-	ORDER BY create_time DESC LIMIT $2 OFFSET $3
-	`, username, pageSize, pageSize*page)
+	SELECT DISTINCT r.username, r.score, r.language, r.create_time
+	FROM "roaster"."roast" AS r
+		LEFT OUTER JOIN "roaster"."user_friends" AS f
+		ON $2 AND LOWER(f.username)=LOWER(TRIM($1))
+	WHERE
+		COALESCE(TRIM($1), '')='' OR
+		NOT $2 AND LOWER(r.username)=LOWER(TRIM($1)) OR
+		$2 AND r.username = f.friend
+	ORDER BY r.create_time DESC LIMIT $3 OFFSET $4
+	`, username, friends, pageSize, pageSize*page)
 	if err != nil {
 		return
 	}

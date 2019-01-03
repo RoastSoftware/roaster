@@ -134,9 +134,9 @@ export default class Feed implements ξ.ClassComponent {
       case 'global':
         break;
       case 'friends':
-        categoryQuery = `&user=${UserModel.getUsername()}&friends=true`;
+        categoryQuery += `&friends=true`;
       case 'you':
-        categoryQuery = `&user=${UserModel.getUsername()}`;
+        categoryQuery += `&user=${UserModel.getUsername()}`;
     }
 
     Network.request<Feed>('GET', '/feed?page='
@@ -180,7 +180,6 @@ export default class Feed implements ξ.ClassComponent {
   };
 
   view(vnode: ξ.CVnode): ξ.Children {
-    console.log(this.feed.items);
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 1em;]',
             ξ('h1.ui.header',
@@ -190,32 +189,33 @@ export default class Feed implements ξ.ClassComponent {
                         'Check out what everyone has been up to!')),
             ),
             ξ('.ui.divider'),
-            ξ('.ui.top.attached.secondary.pointing.menu', {style: menuStyle},
-                ξ('a.item', {
-                  class: this.setItemActiveClass('global'),
-                  style: this.setItemActiveStyle('global'),
-                  onclick: () => {
-                    this.updateCategory('global');
+            UserModel.isLoggedIn() ?
+              ξ('.ui.top.attached.secondary.pointing.menu', {style: menuStyle},
+                  ξ('a.item', {
+                    class: this.setItemActiveClass('global'),
+                    style: this.setItemActiveStyle('global'),
+                    onclick: () => {
+                      this.updateCategory('global');
+                    },
                   },
-                },
-                ξ('i.globe.icon'), 'GLOBAL'),
-                ξ('a.item', {
-                  class: this.setItemActiveClass('friends'),
-                  style: this.setItemActiveStyle('friends'),
-                  onclick: () => {
-                    this.updateCategory('friends');
+                  ξ('i.globe.icon'), 'GLOBAL'),
+                  ξ('a.item', {
+                    class: this.setItemActiveClass('friends'),
+                    style: this.setItemActiveStyle('friends'),
+                    onclick: () => {
+                      this.updateCategory('friends');
+                    },
                   },
-                },
-                ξ('i.users.icon'), 'FRIENDS'),
-                ξ('a.item', {
-                  class: this.setItemActiveClass('you'),
-                  style: this.setItemActiveStyle('you'),
-                  onclick: () => {
-                    this.updateCategory('you');
+                  ξ('i.users.icon'), 'FRIENDS'),
+                  ξ('a.item', {
+                    class: this.setItemActiveClass('you'),
+                    style: this.setItemActiveStyle('you'),
+                    onclick: () => {
+                      this.updateCategory('you');
+                    },
                   },
-                },
-                ξ('i.user.icon'), 'YOU'),
-            ),
+                  ξ('i.user.icon'), 'YOU'),
+              ): '',
             ξ('.ui.bottom.attached.segment',
                 (this.feed.items ?
                   ξ('.ui.feed', [
