@@ -61,6 +61,7 @@ export default class Profile implements ξ.ClassComponent {
           ξ(UserProfileHeader, {
             username: this.username,
             fullname: this.fullname,
+            avatar: this.profileImageURI,
             score: this.score,
             loggedIn: true,
           }),

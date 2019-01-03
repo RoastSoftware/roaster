@@ -59,7 +59,7 @@ export class UserProfileHeader implements ξ.ClassComponent {
     },
     ξ('h1.ui.header.left.floated[style=margin: 0;]',
         ξ('img.ui.circular.image', {
-          src: `/user/${attrs.username}/avatar`,
+          src: attrs.avatar || `/user/${attrs.username}/avatar`,
         }),
         attrs.loggedIn ?
         ξ('.content', 'MY PROFILE',
