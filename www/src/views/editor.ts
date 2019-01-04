@@ -72,9 +72,9 @@ export default class Editor implements ClassComponent {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
       if (EditorModel.getCode() == '') {
         EditorModel.setCode(`\
-          """
+"""
 Roaster roasts your code with static code analysis, for free!
-          """
+"""
 def welcome(ξ):
     print('Please write your fabulous code here!')
 
