@@ -17,8 +17,8 @@ interface Feed {
 }
 
 class UserLink implements ξ.ClassComponent {
-  view(vnode: ξ.CVnode) {
-    const username: string = vnode.attrs.username;
+  view({attrs}) {
+    const username: string = attrs.username;
 
     return ξ('a.user', {
       href: `/user/${username.toLowerCase()}`,
@@ -27,13 +27,13 @@ class UserLink implements ξ.ClassComponent {
   };
 }
 
-class FeedList implements ξ.ClassComponent {
+export class FeedList implements ξ.ClassComponent {
   capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-  view(vnode: ξ.CVnode) {
-    const feed: Feed = vnode.attrs.feed;
+  view({attrs}) {
+    const feed: Feed = attrs.feed;
 
     return [
       (feed.items && feed.items.length > 0) ?
@@ -69,9 +69,9 @@ ${this.capitalize(i.description)} code.`),
 }
 
 class PaginationListItem implements ξ.ClassComponent {
-  view(vnode: ξ.CVnode) {
-    const page = vnode.attrs.page;
-    const active = vnode.attrs.active;
+  view({attrs}) {
+    const page = attrs.page;
+    const active = attrs.active;
 
     if (page == -1) {
       return ξ('a.disabled.item', '...');
@@ -90,8 +90,8 @@ class PaginationListItem implements ξ.ClassComponent {
 };
 
 class PaginationList implements ξ.ClassComponent {
-  view(vnode: ξ.CVnode) {
-    const currentPage: number = vnode.attrs.currentPage;
+  view({attrs}) {
+    const currentPage: number = attrs.currentPage;
     let pages: Array<number> = [];
 
     if (currentPage < 2) {
@@ -165,12 +165,12 @@ export default class Feed implements ξ.ClassComponent {
     return this.currentCategory == category ? menuActiveItemStyle : '';
   }
 
-  oncreate(vnode: ξ.CVnodeDOM) {
+  oncreate() {
     this.updatePage();
     this.fetchFeed();
   };
 
-  onupdate(vnode: ξ.CVnodeDOM) {
+  onupdate() {
     this.updatePage();
 
     // Only fetch new page if the actual query parameter has updated.
@@ -179,7 +179,7 @@ export default class Feed implements ξ.ClassComponent {
     }
   };
 
-  view(vnode: ξ.CVnode): ξ.Children {
+  view(): ξ.Children {
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 1em;]',
             ξ('h1.ui.header',
