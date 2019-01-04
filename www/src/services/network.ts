@@ -29,11 +29,9 @@ export default class Network {
   private static extractCSRFToken(xhr, xhrOptions): string {
     const token: string = xhr.getResponseHeader(xCsrfToken);
 
-    if (token == '') {
-      throw new Error('empty CSRF token received');
+    if (token) {
+      Network.nextCSRFToken = token;
     }
-
-    Network.nextCSRFToken = token;
 
     let response: any;
     if (xhr.responseText.length > 0
