@@ -132,7 +132,7 @@ func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err er
 	return http.StatusOK, nil
 }
 
-func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
+func putFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
@@ -143,7 +143,7 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusNoContent, nil
 	}
 
-	f := model.Friend{}
+	f := model.Followee{}
 
 	err = json.NewDecoder(r.Body).Decode(&f)
 	if err != nil {
@@ -151,13 +151,13 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusBadRequest, causerr.New(err,
 			"unable to decode request")
 	}
-	if f.Friend == "" {
+	if f.Username == "" {
 		return http.StatusBadRequest, causerr.New(
-			errors.New("friend is empty"),
-			"Missing friend parameter in URI")
+			errors.New("username is empty"),
+			"Missing username parameter in URI")
 	}
 
-	err = model.PutFriend(username, f.Friend)
+	err = model.PutFollowee(username, f.Username)
 	if err != nil {
 		log.Println(err)
 		if pgerr, ok := err.(*pq.Error); ok {
@@ -174,7 +174,7 @@ func putFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 	return http.StatusOK, nil
 }
 
-func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
+func retrieveFollowees(w http.ResponseWriter, r *http.Request) (int, error) {
 	vars := mux.Vars(r)
 	username := vars["username"]
 
@@ -183,15 +183,15 @@ func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
 			errors.New("missing username for lookup"),
 			"Missing username for lookup")
 	}
-	friends, err := model.GetFriends(username)
+	followees, err := model.GetFollowees(username)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
-	if len(friends) <= 0 {
+	if len(followees) <= 0 {
 		return http.StatusNoContent, nil
 	}
 
-	err = json.NewEncoder(w).Encode(friends)
+	err = json.NewEncoder(w).Encode(followees)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "error when preparing response")
 	}
@@ -199,7 +199,7 @@ func retrieveFriends(w http.ResponseWriter, r *http.Request) (int, error) {
 	return http.StatusOK, nil
 }
 
-func removeFriend(w http.ResponseWriter, r *http.Request) (int, error) {
+func removeFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
@@ -211,13 +211,13 @@ func removeFriend(w http.ResponseWriter, r *http.Request) (int, error) {
 	}
 
 	vars := mux.Vars(r)
-	friend := vars["username"]
+	followee := vars["username"]
 	if username == "" {
 		return http.StatusBadRequest, causerr.New(
 			errors.New("missing username for lookup"),
 			"Missing username for lookup")
 	}
-	err = model.RemoveFriend(username, friend)
+	err = model.RemoveFollowee(username, followee)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "error removing friend")
 	}
@@ -237,9 +237,9 @@ func User(r *mux.Router) {
 	r.Handle("/{username}", handler(changeUser)).Methods(http.MethodPatch)
 	r.Handle("/{username}", handler(removeUser)).Methods(http.MethodDelete)
 	r.Handle("/{username}", handler(retrieveUser)).Methods(http.MethodGet)
-	r.Handle("/{username}/friend", handler(putFriend)).Methods(http.MethodPost)
-	r.Handle("/{username}/friend", handler(retrieveFriends)).Methods(http.MethodGet)
-	r.Handle("/{username}/friend", handler(removeFriend)).Methods(http.MethodDelete)
+	r.Handle("/{username}/friend", handler(putFollowee)).Methods(http.MethodPost)
+	r.Handle("/{username}/friend", handler(retrieveFollowees)).Methods(http.MethodGet)
+	r.Handle("/{username}/friend", handler(removeFollowee)).Methods(http.MethodDelete)
 
 	r.Handle("/{username}/score", handler(retrieveUserScore)).Methods(http.MethodGet)
 }

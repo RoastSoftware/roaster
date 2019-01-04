@@ -37,7 +37,6 @@ export default class Login implements ξ.ClassComponent {
                     (this.loginError == null ? '':
                       ξ('.ui.segment',
                           ξ('.ui.negative.message',
-                              ξ('i.close.icon'),
                               ξ('.header',
                                   'Oh noeh!'),
                               ξ('p', this.loginError.message)))),

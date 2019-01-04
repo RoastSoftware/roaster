@@ -6,10 +6,9 @@ export interface User {
   email: string;
 }
 
-export interface Friend {
+export interface Followee {
     username: string;
     createTime: string;
-    friend: string;
 }
 
 export class UserModel {
@@ -24,7 +23,7 @@ export class UserModel {
     static email: string = '';
     private static emailError: string = '';
 
-    static friends: Array<Friend> = [];
+    static followees: Array<Followee> = [];
 
     static empty() {
       UserModel.username = '';
@@ -32,7 +31,7 @@ export class UserModel {
       UserModel.password = '';
       UserModel.email = '';
       UserModel.loggedIn = false;
-      UserModel.friends = [];
+      UserModel.followees = [];
     };
 
     static isLoggedIn(): boolean {
@@ -158,24 +157,8 @@ that is more than 1 googol^98 in entropy`;
       return UserModel.passwordError == '';
     };
 
-    static emptyFriends() {
-      UserModel.friends = [];
+    static emptyFollowees() {
+      UserModel.followees = [];
     };
-};
-
-export function getFriend(username: string) {
-  return Network.request('GET', '/user/' + username + '/friend', {
-    'friend': username,
-  });
-};
-
-export function addFriend(username: string) {
-  return Network.request('POST', '/user/' + username + '/friend', {
-    'friend': username,
-  });
-};
-
-export function unFriend(username: string) {
-  return Network.request('DELETE', '/user/' + username + '/friend');
 };
 

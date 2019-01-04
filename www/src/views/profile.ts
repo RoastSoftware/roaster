@@ -12,6 +12,10 @@ import {UserModel} from '../models/user';
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
 
+    tooLargeImageMessage() {
+        return 'The image is too large, please choose a picture under 9MB'
+    };
+
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
     username: string = UserModel.getUsername();
@@ -36,7 +40,10 @@ export default class Profile implements ξ.ClassComponent {
               + new Date().getTime();
           })
           .catch((err: Error) => {
-            this.uploadError = err;
+              this.uploadError = err; 
+              if ('code' in err && err.code == 413) {
+                this.uploadError.message = this.tooLargeImageMessage();
+              }
             console.error(this.uploadError);
             ξ.redraw();
           });
@@ -65,7 +72,7 @@ export default class Profile implements ξ.ClassComponent {
             score: this.score,
             loggedIn: true,
           }),
-          ξ('.ui.divider')),
+              ξ('.ui.divider')),
           this.uploadError ?
           ξ('.ui.text.container', {
             style: 'margin-bottom: 1em;',

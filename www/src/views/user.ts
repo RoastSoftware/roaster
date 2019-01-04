@@ -8,6 +8,7 @@ import {
   RoastDoughnutStatisticsModel,
   StatisticsFilter,
 } from '../models/statistics';
+import moment from 'moment';
 
 export class RoastRatio implements ξ.ClassComponent {
   chart: Chart;
@@ -73,6 +74,65 @@ export class UserProfileHeader implements ξ.ClassComponent {
   };
 };
 
+class UserLink implements ξ.ClassComponent {
+  view({attrs}) {
+    const username: string = attrs.username;
+
+    return ξ('a.user', {
+      href: `/user/${username.toLowerCase()}`,
+      oncreate: ξ.route.link,
+    }, username);
+  };
+}
+
+export class UserFolloweeList implements ξ.ClassComponent {
+    followees: Array<Followee> = [];
+    username: string;
+    
+    async getFolloweeList(username: string) {
+        return Network.request<Array<Followee>>('GET', '/user/' +
+            username + '/friend')
+            .then((result: any) => {
+                this.followees = result;
+                console.log(this.followees);
+                console.log('getfriendlist');
+            });
+    }
+
+    capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
+    oncreate({attrs}) {
+        console.log('userfolloweelist, on create');
+        this.username = attrs.username;
+        this.getFolloweeList(this.username);
+    }
+
+    view() {
+        console.log('sprinkle little prints');
+        return [
+            (this.followees.length > 0) ?
+            this.followees.map((i: Followee) => {
+                return ξ('.event',
+                    ξ('.label',
+                        ξ('img', {
+                            src: `/user/${i.username}/avatar`,
+                        }),
+                    ),
+                    ξ('.content',
+                        ξ('.summary',
+                            ξ(UserLink, {'username': i.username.toUpperCase()}),
+                            ξ('.date[style=float:right;]',
+                                ξ('i.clock.outline.icon'),
+                                'followed ' + moment(new Date(i.createTime)).fromNow())),
+                    ),
+                );
+            }) : '',
+        ];
+    }
+}
+
 export class UserFeed implements ξ.ClassComponent {
   username: string = '';
   feed: Feed = {} as Feed;
@@ -120,8 +180,8 @@ class UserProfile implements ξ.ClassComponent {
 
     hasFriend(username: string) {
       this.isFriend = false;
-      for (const friend of UserModel.friends) {
-        if (friend.friend == username) {
+      for (const followee of UserModel.followees) {
+        if (followee.username == username) {
           this.isFriend = true;
           break;
         }
@@ -129,10 +189,10 @@ class UserProfile implements ξ.ClassComponent {
     };
 
     async friendCheck(username: string) {
-      return Network.request<Array<Friend>>('GET', '/user/' +
+      return Network.request<Array<Followee>>('GET', '/user/' +
             UserModel.getUsername() + '/friend')
           .then((result) => {
-            UserModel.friends = result;
+            UserModel.followees = result;
             this.hasFriend(username);
           });
     };
@@ -146,7 +206,7 @@ class UserProfile implements ξ.ClassComponent {
 
     async addFriend(username: string) {
       Network.request('POST', '/user/' + username + '/friend', {
-        'friend': username,
+        'username': username,
       })
           .then(() => {
             this.friendCheck(username);
@@ -224,17 +284,32 @@ class UserProfile implements ξ.ClassComponent {
                                       `What has ${username} been up to?`)),
                           ),
                           ξ(UserFeed, {
-                            username: username,
+                              username: username,
                           }),
                           ξ('.ui.basic.center.aligned.segment',
                               'Check out the ', ξ('a', {
-                                href: '/feed',
-                                oncreate: ξ.route.link,
+                                  href: '/feed',
+                                  oncreate: ξ.route.link,
                               }, 'feed page'), ' for more!',
                           ),
                       ),
                   ),
               ),
+              ξ('.ui.one.column.row',
+                  ξ('.column',
+                      ξ('.ui.basic.segment',
+                          ξ('h2.ui.dividing.header',
+                              ξ('i.users.icon'),
+                              ξ('.content', 'FOLLOWING',
+                              ξ('.sub.header',`${username} finds these people intriguing.`)),
+                        ),
+                      ξ('.ui.feed', 
+                          ξ(UserFolloweeList, {
+                              username: username,
+                          }),
+                      )
+                      ),
+                  )),
           ),
       );
     }

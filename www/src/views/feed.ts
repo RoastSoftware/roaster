@@ -218,11 +218,11 @@ export default class Feed implements ξ.ClassComponent {
               ): '',
             ξ('.ui.bottom.attached.segment',
                 (this.feed.items ?
-                  ξ('.ui.feed', [
+                  ξ('.ui.feed', 
                     ξ(FeedList, {
                       'feed': this.feed,
                     }),
-                  ]) : [
+                  ) : [
                     ξ('h2', 'You\'ve reached the end.'),
                     ξ('p', 'Welp, there are no more events to show you.'),
                   ]
