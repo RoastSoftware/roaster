@@ -395,6 +395,24 @@ export class RoastDoughnutStatisticsModel extends RoastRatioModel {
           ctx.fillText(text, textX, textY);
           ctx.save();
         },
+      }, {
+        afterDraw: function(chart) {
+          if (obj.linesOfCode == 0) {
+            const ctx = chart.chart.ctx;
+            const width = chart.chart.width;
+            const height = chart.chart.height;
+
+            chart.clear();
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '700 1.7rem "Source Sans Pro"';
+            ctx.fillStyle= '#839496';
+            ctx.fillText('No data :(', width / 2, height / 2);
+            ctx.restore();
+          }
+        },
       }],
       options: {
         aspectRatio: 1,
