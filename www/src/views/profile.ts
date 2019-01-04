@@ -11,7 +11,7 @@ import {UserModel} from '../models/user';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
-    downloadError: Error;
+
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
     username: string = UserModel.getUsername();
@@ -20,6 +20,7 @@ export default class Profile implements ξ.ClassComponent {
     score: number = 0;
 
     upload({target}) {
+      this.uploadError = null;
       const avatar = target.files[0];
       if (avatar == undefined || avatar.length == 0) {
         return;
@@ -37,6 +38,7 @@ export default class Profile implements ξ.ClassComponent {
           .catch((err: Error) => {
             this.uploadError = err;
             console.error(this.uploadError);
+            ξ.redraw();
           });
     };
 
@@ -59,10 +61,18 @@ export default class Profile implements ξ.ClassComponent {
           ξ(UserProfileHeader, {
             username: this.username,
             fullname: this.fullname,
+            avatar: this.profileImageURI,
             score: this.score,
             loggedIn: true,
           }),
           ξ('.ui.divider')),
+          this.uploadError ?
+          ξ('.ui.text.container', {
+            style: 'margin-bottom: 1em;',
+          },
+          ξ('.ui.negative.message',
+              ξ('.header',
+                  this.uploadError.message))): '',
           ξ('.ui.main.text.stackable.two.column.grid.container',
               ξ('.ui.row',
                   ξ('.column',

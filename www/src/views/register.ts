@@ -38,13 +38,13 @@ export default class Register implements ξ.ClassComponent {
                                 ξ('i.user.plus.icon'),
                                 ' REGISTER')),
 
-                        (this.registerError == null ? '':
-                          ξ('.ui.segment',
-                              ξ('.ui.negative.message',
-                                  ξ('i.close.icon'),
-                                  ξ('.header',
-                                      'Oh noeh!'),
-                                  ξ('p', this.registerError.message)))),
+                        this.registerError ?
+                        ξ('.ui.segment',
+                            ξ('.ui.negative.message',
+                                ξ('i.close.icon'),
+                                ξ('.header',
+                                    'Oh noeh!'),
+                                ξ('p', this.registerError.message))): '',
 
                         ξ('.ui.segment.clearing',
                             ξ('form.ui.form', {onsubmit: () => {

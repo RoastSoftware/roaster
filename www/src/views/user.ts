@@ -60,7 +60,7 @@ export class UserProfileHeader implements ξ.ClassComponent {
     },
     ξ('h1.ui.header.left.floated[style=margin: 0;]',
         ξ('img.ui.circular.image', {
-          src: `/user/${attrs.username}/avatar`,
+          src: attrs.avatar || `/user/${attrs.username}/avatar`,
         }),
         attrs.loggedIn ?
         ξ('.content', 'MY PROFILE',
@@ -134,7 +134,6 @@ class UserProfile implements ξ.ClassComponent {
           .then((result) => {
             UserModel.friends = result;
             this.hasFriend(username);
-            ξ.redraw();
           });
     };
 
@@ -245,7 +244,6 @@ export default class UserView implements ξ.ClassComponent {
     downloadError: Error;
     user: User;
     score: number = 0;
-    ready: boolean;
 
     oncreate({attrs}) {
       Network.request<User>('GET', '/user/' + attrs.username)
