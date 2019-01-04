@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/disintegration/imaging"
-	"github.com/o1egl/govatar"
+	"github.com/willeponken/govatar"
 )
 
 // NewAvatar creates, converts and resizes the avatar, returns Avatar struct.
