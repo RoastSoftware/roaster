@@ -23,18 +23,20 @@ func getBooleanFromString(s string) bool {
 }
 
 func retrieveFeed(w http.ResponseWriter, r *http.Request) (int, error) {
-	pageStr := r.URL.Query().Get("page")
-	if pageStr == "" {
-		return http.StatusBadRequest, causerr.New(
-			errors.New("invalid query parameters"),
-			"Must provide '?page=' query parameter with a single number value")
-	}
-
-	page, err := strconv.ParseUint(pageStr, 10, 64)
+	page, err := strconv.ParseUint(r.URL.Query().Get("page"), 10, 64)
 	if err != nil {
 		// Internal server error because the router should have
 		// made sure the `page` query is a number.
 		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+
+	var pageSize uint64 = 25 // Default page size.
+	if p := r.URL.Query().Get("page-size"); p != "" {
+		pageSize, err = strconv.ParseUint(p, 10, 64)
+		if err != nil {
+			return http.StatusBadRequest, causerr.New(err,
+				"Unable to parse ?page-size as a positive number")
+		}
 	}
 
 	username := r.URL.Query().Get("user")
@@ -46,7 +48,7 @@ func retrieveFeed(w http.ResponseWriter, r *http.Request) (int, error) {
 			"Friends query parameter also requires the user query parameter")
 	}
 
-	feed, err := model.GetFeed(username, friends, page)
+	feed, err := model.GetFeed(username, friends, page, pageSize)
 	if err != nil {
 		// Returns Internal Server Error even for non-existing
 		// usernames because it'll return an empty feed (and not any
