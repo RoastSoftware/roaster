@@ -74,9 +74,9 @@ class RoastMessageStatisticsModel {
   public filter: StatisticsFilter = StatisticsFilter.Global;
 
   public update(): Promise {
-    const interval = '30m';
+    const interval = '1h';
     const end = moment();
-    const start = moment().subtract(5, 'hours');
+    const start = moment().subtract(24, 'hours');
 
     let uri = `\
 /statistics/roast/timeseries\
