@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-const pageSize = 25
-
 const (
 	roastCategory = iota
 )
@@ -35,7 +33,7 @@ type Feed struct {
 //   only the users feed items.
 //
 // Pagination is supported where page = 0 is the first (latest) page.
-func GetFeed(username string, friends bool, page uint64) (feed Feed, err error) {
+func GetFeed(username string, friends bool, page uint64, pageSize uint64) (feed Feed, err error) {
 	rows, err := database.Query(`
 	SELECT DISTINCT r.username, r.score, r.language, r.create_time
 	FROM "roaster"."roast" AS r

@@ -2,6 +2,7 @@ import ξ from 'mithril';
 import base from './base';
 import Network from '../services/network';
 import {
+  UserFeed,
   UserProfileHeader,
   RoastRatio,
 } from './user';
@@ -72,36 +73,59 @@ export default class Profile implements ξ.ClassComponent {
           ξ('.ui.negative.message',
               ξ('.header',
                   this.uploadError.message))): '',
-          ξ('.ui.main.text.container.two.column.stackable.grid',
-              ξ('.ui.column',
-                  ξ('input#upload', {
-                    onchange: (e) => {
-                      this.upload(e);
-                    },
-                    type: 'File',
-                    style: 'display: none;',
-                    accept: '.png, .jpg, .jpeg;',
-                  }),
-                  ξ('img.ui.image.rounded.medium#picture', {
-                    src: this.profileImageURI,
-                    onclick: this.clickImage,
-                    style: 'cursor: pointer;',
-                  },
-                  'User profile picture.'),
-                  ξ('h2',
-                      this.fullname),
-                  ξ('p',
-                      ξ('i.user.icon'),
-                      this.username),
-                  ξ('p',
-                      ξ('i.mail.icon'),
-                      this.email),
+          ξ('.ui.main.text.stackable.two.column.grid.container',
+              ξ('.ui.row',
+                  ξ('.column',
+                      ξ('input#upload', {
+                        onchange: (e) => {
+                          this.upload(e);
+                        },
+                        type: 'File',
+                        style: 'display: none;',
+                        accept: '.png, .jpg, .jpeg;',
+                      }),
+                      ξ('img.ui.image.rounded.medium#picture', {
+                        src: this.profileImageURI,
+                        onclick: this.clickImage,
+                        style: 'cursor: pointer;',
+                      },
+                      'User profile picture.'),
+                      ξ('h2',
+                          this.fullname),
+                      ξ('p',
+                          ξ('i.user.icon'),
+                          this.username),
+                      ξ('p',
+                          ξ('i.mail.icon'),
+                          this.email),
+                  ),
+                  ξ('.column[minheight=10em]',
+                      ξ(RoastRatio, {
+                        filter: StatisticsFilter.User,
+                        username: this.username,
+                      }),
+                  ),
               ),
-              ξ('.ui.column[minheight=10em]',
-                  ξ(RoastRatio, {
-                    filter: StatisticsFilter.User,
-                    username: this.username,
-                  }),
+              ξ('.ui.one.column.row',
+                  ξ('.column',
+                      ξ('.ui.basic.segment',
+                          ξ('h2.ui.dividing.header',
+                              ξ('i.feed.icon'),
+                              ξ('.content', 'YOUR FEED',
+                                  ξ('.sub.header',
+                                      `What have you been up to lately?`)),
+                          ),
+                          ξ(UserFeed, {
+                            username: this.username,
+                          }),
+                      ),
+                      ξ('.ui.basic.center.aligned.segment',
+                          'Check out the ', ξ('a', {
+                            href: '/feed',
+                            oncreate: ξ.route.link,
+                          }, 'feed page'), ' for more!',
+                      ),
+                  ),
               ),
           ),
       );

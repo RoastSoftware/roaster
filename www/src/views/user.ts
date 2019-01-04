@@ -3,6 +3,7 @@ import Chart from 'chart.js';
 import base from './base';
 import Network from '../services/network';
 import {UserModel} from '../models/user';
+import {FeedList} from './feed';
 import {
   RoastDoughnutStatisticsModel,
   StatisticsFilter,
@@ -72,6 +73,48 @@ export class UserProfileHeader implements ξ.ClassComponent {
   };
 };
 
+export class UserFeed implements ξ.ClassComponent {
+  username: string = '';
+  feed: Feed = {} as Feed;
+  error: Error;
+
+  oncreate({attrs}) {
+    this.username = attrs.username;
+    this.fetchFeed();
+  };
+
+  fetchFeed() {
+    const username = this.username;
+    Network.request<Feed>('GET', `/feed?page=0&page-size=5&user=${username}`)
+        .then((feed: Feed) => {
+          this.feed = feed;
+        }).catch((error) => {
+          this.error = error;
+        });
+  };
+
+  view(): ξ.Children {
+    return [
+      this.error ?
+      ξ('.ui.error.message',
+          ξ('.header',
+              'Hmm, we failed to fetch the latest user events...',
+          ),
+          ξ('p', `${this.error.message}.`),
+      ): '',
+      this.feed.items ?
+      ξ('.ui.feed', [
+        ξ(FeedList, {
+          'feed': this.feed,
+        }),
+      ]) : [
+        ξ('h2', 'Oh no!'),
+        ξ('p', 'This user hasn\'t got Roasted™ yet!'),
+      ],
+    ];
+  };
+}
+
 class UserProfile implements ξ.ClassComponent {
     isFriend: boolean = false;
 
@@ -110,8 +153,8 @@ class UserProfile implements ξ.ClassComponent {
           });
     };
 
-    oncreate(vnode: ξ.CVnodeDOM) {
-      this.friendCheck(vnode.attrs.username);
+    oncreate({attrs}) {
+      this.friendCheck(attrs.username);
     };
 
     view({attrs}) {
@@ -131,43 +174,66 @@ class UserProfile implements ξ.ClassComponent {
             loggedIn: false,
           }),
           ξ('.ui.divider')),
-          ξ('.ui.main.text.container.two.column.stackable.grid',
-              ξ('.ui.column',
-                  ξ('img.ui.image.rounded.medium#picture', {
-                    src: `/user/${username}/avatar`,
-                  },
-                  'User profile picture.'),
-                  ξ('h2',
-                      fullname),
-                  ξ('p',
-                      ξ('i.user.icon'),
-                      username),
-                  ξ('p',
-                      ξ('i.mail.icon'),
-                      email),
-                  ξ('.ui.placeholder',
-                      ξ('ui.image')),
-                UserModel.isLoggedIn() ? [
-                  this.isFriend ?
-                  ξ('button.ui.basic.red.button', {
-                    onclick: () => {
-                      this.unFriend(username);
-                    },
-                  }, 'UNFOLLOW')
-                  :
-                  ξ('button.ui.basic.teal.button', {
-                    onclick: () => {
-                      this.addFriend(username);
-                    },
-                  },
-                  'FOLLOW!'),
-                ]: '',
+          ξ('.ui.main.text.stackable.two.column.grid.container',
+              ξ('.ui.row',
+                  ξ('.column',
+                      ξ('img.ui.image.rounded.medium#picture', {
+                        src: `/user/${username}/avatar`,
+                      },
+                      'User profile picture.'),
+                      ξ('h2',
+                          fullname),
+                      ξ('p',
+                          ξ('i.user.icon'),
+                          username),
+                      ξ('p',
+                          ξ('i.mail.icon'),
+                          email),
+                      ξ('.ui.placeholder',
+                          ξ('ui.image')),
+                      UserModel.isLoggedIn() ? [
+                        this.isFriend ?
+                        ξ('button.ui.basic.red.button', {
+                          onclick: () => {
+                            this.unFriend(username);
+                          },
+                        }, 'UNFOLLOW')
+                        :
+                        ξ('button.ui.basic.teal.button', {
+                          onclick: () => {
+                            this.addFriend(username);
+                          },
+                        },
+                        'FOLLOW!'),
+                      ]: '',
+                  ),
+                  ξ('.column[min-height = 10em]',
+                      ξ(RoastRatio, {
+                        filter: StatisticsFilter.User,
+                        username: username,
+                      }),
+                  ),
               ),
-              ξ('.ui.column[min-height = 10em]',
-                  ξ(RoastRatio, {
-                    filter: StatisticsFilter.User,
-                    username: username,
-                  }),
+              ξ('.ui.one.column.row',
+                  ξ('.column',
+                      ξ('.ui.basic.segment',
+                          ξ('h2.ui.dividing.header',
+                              ξ('i.feed.icon'),
+                              ξ('.content', 'USER FEED',
+                                  ξ('.sub.header',
+                                      `What has ${username} been up to?`)),
+                          ),
+                          ξ(UserFeed, {
+                            username: username,
+                          }),
+                          ξ('.ui.basic.center.aligned.segment',
+                              'Check out the ', ξ('a', {
+                                href: '/feed',
+                                oncreate: ξ.route.link,
+                              }, 'feed page'), ' for more!',
+                          ),
+                      ),
+                  ),
               ),
           ),
       );
