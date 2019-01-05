@@ -1,4 +1,4 @@
-import $ from 'jquery';
+// import $ from 'jquery';
 import ξ from 'mithril';
 import {UserModel} from '../models/user';
 import Auth from '../services/auth';
@@ -33,13 +33,13 @@ class SearchItem implements ξ.ClassComponent {
 
   view() {
     return ξ('.ui.fluid.category.search.loading.item',
-      ξ('.ui.transparent.icon.input',
-        ξ('input.prompt', {
-          placeholder: 'Search people...',
-          type: 'text',
-        }),
-        ξ('i.search.link.icon')),
-      ξ('.results'));
+        ξ('.ui.transparent.icon.input',
+            ξ('input.prompt', {
+              placeholder: 'Search people...',
+              type: 'text',
+            }),
+            ξ('i.search.link.icon')),
+        ξ('.results'));
   };
 };
 

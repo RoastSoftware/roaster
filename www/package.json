@@ -64,6 +64,6 @@
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "monaco-themes": "^0.2.5",
-    "semantic-ui-less": "^2.4.1",
+    "semantic-ui-less": "^2.4.1"
   }
 }
