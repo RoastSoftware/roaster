@@ -48,7 +48,7 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 			if pgerr.Constraint == "user_email_key" {
 				return http.StatusConflict, causerr.New(err, "Email already in use")
 			}
-			if (pgerr.Constraint == "user_pkey" || pgerr.Constraint == "username_user_idx"){
+			if pgerr.Constraint == "user_pkey" || pgerr.Constraint == "username_user_idx" {
 				return http.StatusConflict, causerr.New(err, "Username already in use")
 			}
 		}
@@ -225,15 +225,15 @@ func removeFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func retrieveFollowers(w http.ResponseWriter, r *http.Request) (int, error) {
-    vars := mux.Vars(r)
-    username := vars["username"]
+	vars := mux.Vars(r)
+	username := vars["username"]
 
-    if username == "" {
+	if username == "" {
 		return http.StatusBadRequest, causerr.New(
 			errors.New("missing username for lookup"),
 			"Missing username for lookup")
 	}
-    followers, err := model.GetFollowers(username)
+	followers, err := model.GetFollowers(username)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -265,7 +265,7 @@ func User(r *mux.Router) {
 	r.Handle("/{username}/followees", handler(putFollowee)).Methods(http.MethodPost)
 	r.Handle("/{username}/followees", handler(retrieveFollowees)).Methods(http.MethodGet)
 	r.Handle("/{username}/followees", handler(removeFollowee)).Methods(http.MethodDelete)
-    r.Handle("/{username}/followers", handler(retrieveFollowers)).Methods(http.MethodGet)
+	r.Handle("/{username}/followers", handler(retrieveFollowers)).Methods(http.MethodGet)
 
 	r.Handle("/{username}/score", handler(retrieveUserScore)).Methods(http.MethodGet)
 }

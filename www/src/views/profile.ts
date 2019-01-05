@@ -2,11 +2,11 @@ import ξ from 'mithril';
 import base from './base';
 import Network from '../services/network';
 import {
-    UserFeed,
-    UserProfileHeader,
-    RoastRatio,
-    UserFolloweeList,
-    UserFollowerList,
+  UserFeed,
+  UserProfileHeader,
+  RoastRatio,
+  UserFolloweeList,
+  UserFollowerList,
 } from './user';
 import {StatisticsFilter} from '../models/statistics';
 import {UserModel} from '../models/user';

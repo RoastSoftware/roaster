@@ -132,8 +132,7 @@ export default class Feed implements ξ.ClassComponent {
 
     switch (this.currentCategory) {
       case 'global':
-            break;
-    // TODO: change API to match change from friends to followee
+        break;
       case 'followees':
         categoryQuery += `&followees=true`;
       case 'you':
