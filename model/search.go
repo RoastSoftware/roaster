@@ -20,11 +20,11 @@ type SearchResult struct {
 func SearchUsers(query string) (results []SearchResult, err error) {
 	rows, err := database.Query(`
 	SELECT username, fullname, create_time FROM roaster.user
-		-- Naive search, can be extended with Full Text Search in the
-		-- future.
-		WHERE username LIKE $1 OR
-	   	      fullname LIKE $1 OR
-	   	      email LIKE $1
+                -- Naive search, can be extended with Full Text Search in the
+                -- future.
+                WHERE LOWER(username) LIKE LOWER($1) OR
+                      LOWER(fullname) LIKE LOWER($1) OR
+                      LOWER(email) LIKE LOWER($1)
 	ORDER BY username DESC
 	`, fmt.Sprintf("%%%s%%", query))
 	if err != nil {
