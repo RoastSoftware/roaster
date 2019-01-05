@@ -183,7 +183,7 @@ type Follower struct {
 // Followee represents a user that is being tracked by someone.
 type Followee Follower
 
-// GetFollowing returns a list of followees if successful, otherwise error.
+// GetFollowees returns a list of followees if successful, otherwise error.
 func GetFollowees(username string) (followees []Followee, err error) {
 	followeeRows, err := database.Query(`
     SELECT followee, create_time
