@@ -1,4 +1,4 @@
-const CopyWebpack = require('copy-webpack-plugin');
+const path = require('path');
 const HtmlWebpack = require('html-webpack-plugin');
 const HtmlWebpackIncludeAssets = require('html-webpack-include-assets-plugin');
 const WebappWebpack = require('webapp-webpack-plugin');
@@ -16,6 +16,11 @@ module.exports = {
   resolve: {
     // Add '.ts' as resolvable extensions.
     extensions: ['.ts', '.js', '.json'],
+    // Alias ../../theme.config to semantic theme.config in src/styles/semantic
+    alias: {
+      '../../theme.config$': path.join(__dirname,
+          'src/styles/semantic/theme.config'),
+    },
   },
 
   module: {
@@ -36,6 +41,11 @@ module.exports = {
         exclude: [/.*monaco-editor.*/],
       },
 
+      {
+        test: /\.less$/,
+        use: ['style-loader', 'css-loader', 'less-loader'],
+      },
+
       // All files with a '.css' extension are handled style-loader.
       {test: /\.css$/, use: ['style-loader', 'css-loader']},
 
@@ -47,25 +57,14 @@ module.exports = {
     ],
   },
   plugins: [
-    new CopyWebpack([
-      {from: 'node_modules/semantic-ui-site/site.min.css', to: 'semantic/'},
-      {
-        from: 'node_modules/semantic-ui-forest-themes/semantic.solar.min.css',
-        to: 'semantic/',
-      },
-      {
-        from: 'node_modules/semantic-ui-forest-themes/themes',
-        to: 'semantic/themes',
-      },
-    ]),
     new HtmlWebpack({title: 'Get Roasted! - Roaster Inc.'}),
     new HtmlWebpackIncludeAssets({
-      assets: [
-        'semantic/site.min.css',
-        'semantic/semantic.solar.min.css',
-      ],
-      hash: true,
+      assets: [{
+        path: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro',
+        type: 'css',
+      }],
       append: false,
+      publicPath: '',
     }),
     new WebappWebpack('./src/assets/icons/roaster-icon-teal.svg'),
     new CleanWebpack(['dist']),

@@ -1,3 +1,12 @@
+// Forgive me Father, for I have imported jQuery.
+// I pray that you guide to forgiveness and move past this dark spot in my life.
+// In the name of the Father, Son, and Holy Spirit. Amen.
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+import 'jquery-ui/ui/effect.js'; // semantic-ui-search requires `easing` effect
+$.fn.api = require('semantic-ui-api');
+$.fn.search = require('semantic-ui-search');
+
 import ξ from 'mithril';
 import {UserModel} from '../models/user';
 import Auth from '../services/auth';
@@ -18,6 +27,66 @@ color: #fff;\
 const headerTextStyle = `\
 color: #00b5ad;\
 `;
+
+class SearchItem implements ξ.ClassComponent {
+  oncreate({dom}) {
+    $(dom)
+        .search({
+          type: 'category',
+          minCharacters: 1,
+          apiSettings: {
+            onResponse: function(resp) {
+              const response = {
+                results: {},
+              };
+
+              $.each(resp, function(index, item) {
+                const maxResults = 8;
+                let category = 'Misc.';
+
+                switch (item.category) {
+                  case 0:
+                    category = 'Users';
+                }
+
+                if (index >= maxResults) {
+                  return false;
+                }
+
+                // Create new category group if it doesn't exist.
+                if (!(category in response.results)) {
+                  response.results[category] = {
+                    name: category,
+                    results: [],
+                  };
+                }
+
+                // Add result to category.
+                response.results[category].results.push({
+                  title: item.title,
+                  description: item.description,
+                  url: '/#/' + item.url,
+                });
+              });
+
+              return response;
+            },
+            url: '/search/{query}',
+          },
+        });
+  };
+
+  view() {
+    return ξ('.ui.fluid.category.search.item',
+        ξ('.ui.transparent.icon.input',
+            ξ('input.prompt', {
+              placeholder: 'Search...',
+              type: 'text',
+            }),
+            ξ('i.search.link.icon')),
+        ξ('.results'));
+  };
+};
 
 /**
  * Nav component provides a navigation bar for the top of the page.
@@ -57,6 +126,8 @@ export default class Nav implements ξ.ClassComponent {
 
       // TODO: Make this DRY, generate the navbar instead?
       ξ('.right.menu',
+
+          ξ(SearchItem),
 
           ξ.route.get() != '/' ?
           ξ('.item',
