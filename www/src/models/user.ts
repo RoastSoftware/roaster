@@ -1,5 +1,3 @@
-import Network from '../services/network';
-
 export interface User {
   username: string;
   fullname: string;

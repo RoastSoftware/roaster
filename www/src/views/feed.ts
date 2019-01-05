@@ -132,9 +132,10 @@ export default class Feed implements ξ.ClassComponent {
 
     switch (this.currentCategory) {
       case 'global':
-        break;
-      case 'friends':
-        categoryQuery += `&friends=true`;
+            break;
+    // TODO: change API to match change from friends to followee
+      case 'followees':
+        categoryQuery += `&followees=true`;
       case 'you':
         categoryQuery += `&user=${UserModel.getUsername()}`;
     }
@@ -200,13 +201,13 @@ export default class Feed implements ξ.ClassComponent {
                   },
                   ξ('i.globe.icon'), 'GLOBAL'),
                   ξ('a.item', {
-                    class: this.setItemActiveClass('friends'),
-                    style: this.setItemActiveStyle('friends'),
+                    class: this.setItemActiveClass('followees'),
+                    style: this.setItemActiveStyle('followees'),
                     onclick: () => {
-                      this.updateCategory('friends');
+                      this.updateCategory('followees');
                     },
                   },
-                  ξ('i.users.icon'), 'FRIENDS'),
+                  ξ('i.users.icon'), 'FOLLOWING'),
                   ξ('a.item', {
                     class: this.setItemActiveClass('you'),
                     style: this.setItemActiveStyle('you'),
@@ -218,10 +219,10 @@ export default class Feed implements ξ.ClassComponent {
               ): '',
             ξ('.ui.bottom.attached.segment',
                 (this.feed.items ?
-                  ξ('.ui.feed', 
-                    ξ(FeedList, {
-                      'feed': this.feed,
-                    }),
+                  ξ('.ui.feed',
+                      ξ(FeedList, {
+                        'feed': this.feed,
+                      }),
                   ) : [
                     ξ('h2', 'You\'ve reached the end.'),
                     ξ('p', 'Welp, there are no more events to show you.'),

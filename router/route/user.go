@@ -224,6 +224,31 @@ func removeFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 	return http.StatusOK, nil
 }
 
+func retrieveFollowers(w http.ResponseWriter, r *http.Request) (int, error) {
+    vars := mux.Vars(r)
+    username := vars["username"]
+
+    if username == "" {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("missing username for lookup"),
+			"Missing username for lookup")
+	}
+    followers, err := model.GetFollowers(username)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+	if len(followers) <= 0 {
+		return http.StatusNoContent, nil
+	}
+
+	err = json.NewEncoder(w).Encode(followers)
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "error when preparing response")
+	}
+
+	return http.StatusOK, nil
+}
+
 // User adds the handlers for the User [/user] endpoint.
 func User(r *mux.Router) {
 	// All handlers are required to use application/json as their
@@ -237,9 +262,10 @@ func User(r *mux.Router) {
 	r.Handle("/{username}", handler(changeUser)).Methods(http.MethodPatch)
 	r.Handle("/{username}", handler(removeUser)).Methods(http.MethodDelete)
 	r.Handle("/{username}", handler(retrieveUser)).Methods(http.MethodGet)
-	r.Handle("/{username}/friend", handler(putFollowee)).Methods(http.MethodPost)
-	r.Handle("/{username}/friend", handler(retrieveFollowees)).Methods(http.MethodGet)
-	r.Handle("/{username}/friend", handler(removeFollowee)).Methods(http.MethodDelete)
+	r.Handle("/{username}/followees", handler(putFollowee)).Methods(http.MethodPost)
+	r.Handle("/{username}/followees", handler(retrieveFollowees)).Methods(http.MethodGet)
+	r.Handle("/{username}/followees", handler(removeFollowee)).Methods(http.MethodDelete)
+    r.Handle("/{username}/followers", handler(retrieveFollowers)).Methods(http.MethodGet)
 
 	r.Handle("/{username}/score", handler(retrieveUserScore)).Methods(http.MethodGet)
 }

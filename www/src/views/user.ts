@@ -88,48 +88,98 @@ class UserLink implements ξ.ClassComponent {
 export class UserFolloweeList implements ξ.ClassComponent {
     followees: Array<Followee> = [];
     username: string;
-    
+
     async getFolloweeList(username: string) {
-        return Network.request<Array<Followee>>('GET', '/user/' +
-            username + '/friend')
-            .then((result: any) => {
-                this.followees = result;
-                console.log(this.followees);
-                console.log('getfriendlist');
-            });
+      return Network.request<Array<Followee>>('GET', '/user/' +
+            username + '/followees')
+          .then((result: any) => {
+            this.followees = result;
+            console.log(this.followees);
+            console.log('getfriendlist');
+          });
     }
 
     capitalize(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+      return string.charAt(0).toUpperCase() + string.slice(1);
     };
 
     oncreate({attrs}) {
-        console.log('userfolloweelist, on create');
-        this.username = attrs.username;
-        this.getFolloweeList(this.username);
+      console.log('userfolloweelist, on create');
+      this.username = attrs.username;
+      this.getFolloweeList(this.username);
     }
 
     view() {
-        console.log('sprinkle little prints');
-        return [
+      console.log('sprinkle little prints');
+      return [
             (this.followees.length > 0) ?
             this.followees.map((i: Followee) => {
-                return ξ('.event',
-                    ξ('.label',
-                        ξ('img', {
-                            src: `/user/${i.username}/avatar`,
-                        }),
-                    ),
-                    ξ('.content',
-                        ξ('.summary',
-                            ξ(UserLink, {'username': i.username.toUpperCase()}),
-                            ξ('.date[style=float:right;]',
-                                ξ('i.clock.outline.icon'),
-                                'followed ' + moment(new Date(i.createTime)).fromNow())),
-                    ),
-                );
+              return ξ('.event',
+                  ξ('.label',
+                      ξ('img', {
+                        src: `/user/${i.username}/avatar`,
+                      }),
+                  ),
+                  ξ('.content',
+                      ξ('.summary',
+                          ξ(UserLink, {'username': i.username.toUpperCase()}),
+                          ξ('.date[style=float:right;]',
+                              ξ('i.clock.outline.icon'),
+                              'followed '
+                              + moment(new Date(i.createTime)).fromNow())),
+                  ),
+              );
             }) : '',
-        ];
+      ];
+    }
+}
+
+export class UserFollowerList implements ξ.ClassComponent {
+    followers: Array<Follower> = [];
+    username: string;
+
+    async getFollowerList(username: string) {
+      return Network.request<Array<Follower>>('GET', '/user/' +
+            username + '/followers')
+          .then((result: any) => {
+            this.followers = result;
+            console.log(this.followers);
+            console.log('getfollowerlist');
+          });
+    }
+
+    capitalize(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    };
+
+    oncreate({attrs}) {
+      console.log('userfollowerlist, on create');
+      this.username = attrs.username;
+      this.getFollowerList(this.username);
+    }
+
+    view() {
+      console.log('sprinkle little prints');
+      return [
+            (this.followers.length > 0) ?
+            this.followers.map((i: Follower) => {
+              return ξ('.event',
+                  ξ('.label',
+                      ξ('img', {
+                        src: `/user/${i.username}/avatar`,
+                      }),
+                  ),
+                  ξ('.content',
+                      ξ('.summary',
+                          ξ(UserLink, {'username': i.username.toUpperCase()}),
+                          ξ('.date[style=float:right;]',
+                              ξ('i.clock.outline.icon'),
+                              'followed '
+                              + moment(new Date(i.createTime)).fromNow())),
+                  ),
+              );
+            }) : '',
+      ];
     }
 }
 
@@ -190,7 +240,7 @@ class UserProfile implements ξ.ClassComponent {
 
     async friendCheck(username: string) {
       return Network.request<Array<Followee>>('GET', '/user/' +
-            UserModel.getUsername() + '/friend')
+            UserModel.getUsername() + '/followees')
           .then((result) => {
             UserModel.followees = result;
             this.hasFriend(username);
@@ -198,14 +248,14 @@ class UserProfile implements ξ.ClassComponent {
     };
 
     async unFriend(username: string) {
-      Network.request('DELETE', '/user/' + username + '/friend')
+      Network.request('DELETE', '/user/' + username + '/followees')
           .then(() => {
             this.friendCheck(username);
           });
     };
 
     async addFriend(username: string) {
-      Network.request('POST', '/user/' + username + '/friend', {
+      Network.request('POST', '/user/' + username + '/followees', {
         'username': username,
       })
           .then(() => {
@@ -251,21 +301,21 @@ class UserProfile implements ξ.ClassComponent {
                           email),
                       ξ('.ui.placeholder',
                           ξ('ui.image')),
-                      UserModel.isLoggedIn() ? [
-                        this.isFriend ?
-                        ξ('button.ui.basic.red.button', {
-                          onclick: () => {
-                            this.unFriend(username);
-                          },
-                        }, 'UNFOLLOW')
-                        :
-                        ξ('button.ui.basic.teal.button', {
-                          onclick: () => {
-                            this.addFriend(username);
-                          },
-                        },
-                        'FOLLOW!'),
-                      ]: '',
+                        UserModel.isLoggedIn() ? [
+                            this.isFriend ?
+                            ξ('button.ui.basic.red.button', {
+                              onclick: () => {
+                                this.unFriend(username);
+                              },
+                            }, 'UNFOLLOW')
+                            :
+                            ξ('button.ui.basic.teal.button', {
+                              onclick: () => {
+                                this.addFriend(username);
+                              },
+                            },
+                            'FOLLOW!'),
+                        ]: '',
                   ),
                   ξ('.column[min-height = 10em]',
                       ξ(RoastRatio, {
@@ -284,32 +334,49 @@ class UserProfile implements ξ.ClassComponent {
                                       `What has ${username} been up to?`)),
                           ),
                           ξ(UserFeed, {
-                              username: username,
+                            username: username,
                           }),
                           ξ('.ui.basic.center.aligned.segment',
                               'Check out the ', ξ('a', {
-                                  href: '/feed',
-                                  oncreate: ξ.route.link,
+                                href: '/feed',
+                                oncreate: ξ.route.link,
                               }, 'feed page'), ' for more!',
                           ),
                       ),
                   ),
               ),
-              ξ('.ui.one.column.row',
+              ξ('.ui.two.column.row',
                   ξ('.column',
                       ξ('.ui.basic.segment',
                           ξ('h2.ui.dividing.header',
                               ξ('i.users.icon'),
                               ξ('.content', 'FOLLOWING',
-                              ξ('.sub.header',`${username} finds these people intriguing.`)),
-                        ),
-                      ξ('.ui.feed', 
-                          ξ(UserFolloweeList, {
-                              username: username,
-                          }),
-                      )
+                                  ξ('.sub.header', `${username} finds these
+                                      people intriguing.`)),
+                          ),
+                          ξ('.ui.feed',
+                              ξ(UserFolloweeList, {
+                                username: username,
+                              }),
+                          )
                       ),
-                  )),
+                  ),
+                  ξ('.column',
+                      ξ('.ui.basic.segment',
+                          ξ('h2.ui.dividing.header',
+                              ξ('i.users.icon'),
+                              ξ('.content', 'FOLLOWERS',
+                                  ξ('.sub.header', `${username} is followed by 
+                                    EVERYONE! No, but by these people.`)),
+                          ),
+                          ξ('.ui.feed',
+                              ξ(UserFollowerList, {
+                                username: username,
+                              }),
+                          )
+                      ),
+                  ),
+              ),
           ),
       );
     }

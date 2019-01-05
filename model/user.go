@@ -184,12 +184,12 @@ type Follower struct {
 type Followee Follower
 
 // GetFollowing returns a list of followees if successful, otherwise error. 
-func GetFollowees(identifier string) (followees []Followee, err error) {
+func GetFollowees(username string) (followees []Followee, err error) {
 	followeeRows, err := database.Query(`
-    SELECT friend, create_time
-    FROM "roaster"."user_friends"
+    SELECT followee, create_time
+    FROM "roaster"."user_followees"
     WHERE (LOWER(username)=LOWER(TRIM($1)))
-    `, identifier)
+    `, username)
 	if err != nil {
 		return
 	}
@@ -207,25 +207,44 @@ func GetFollowees(identifier string) (followees []Followee, err error) {
 }
 
 // PutFollowee saves a followee relation to the DB, returns error if unsuccessful.
-func PutFollowee(identifier string, followee string) (err error) {
+func PutFollowee(username string, followee string) (err error) {
 	_, err = database.Exec(`
-    INSERT INTO "roaster"."user_friends"
-    (username, create_time, friend)
+    INSERT INTO "roaster"."user_followees"
+    (username, create_time, followee)
     VALUES
     (TRIM($1), $2, TRIM($3))
-    `, identifier, time.Now(), followee)
+    `, username, time.Now(), followee)
 	return
 }
 
-// RemoveFriend deletes a friend relation from DB, returns error if unsuccessful.
+// RemoveFollowee deletes a followee relation from DB, returns error if unsuccessful.
 func RemoveFollowee(username string, followee string) (err error) {
 	_, err = database.Exec(`
-    DELETE FROM "roaster"."user_friends"
-    WHERE (lower(username)=lower(TRIM($1)) AND lower(friend)=lower(TRIM($2)))
+    DELETE FROM "roaster"."user_followees"
+    WHERE (lower(username)=lower(TRIM($1)) AND lower(followee)=lower(TRIM($2)))
     `, username, followee)
 	return
 }
 
-func GetFollowers(identifier string) (followers []Follower, err error) {
+// GetFollowers gets a list of followers for a specific user, returns error if unsuccsessful.
+func GetFollowers(username string) (followers []Follower, err error) {
+    followerRows, err := database.Query(`
+    SELECT username, create_time
+    FROM "roaster"."user_followees"
+    WHERE (LOWER(followee)=LOWER(TRIM($1)))
+    `, username)
+    if err != nil {
+        return
+    }
+    defer followerRows.Close()
+
+    for followerRows.Next() {
+        res := Follower{}
+        err = followerRows.Scan(&res.Username, &res.CreateTime)
+        if err != nil {
+            return
+        }
+        followers = append(followers, res)
+    }
     return
 }

@@ -177,7 +177,7 @@ export default class Statistics implements ξ.ClassComponent {
                               this.setFilter(StatisticsFilter.Friends);
                             },
                           },
-                          ξ('i.users.icon'), 'FRIENDS'),
+                          ξ('i.users.icon'), 'FOLLOWING'),
                           ξ('a.item', {
                             class: this.setActive(StatisticsFilter.User),
                             onclick: () => {

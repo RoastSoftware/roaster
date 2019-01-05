@@ -41,7 +41,7 @@ type RoastRatio struct {
 //
 // The minimum interval is 1 minute, anything less will be set to 1 minute per
 // default.
-func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string, friends bool) (
+func GetRoastTimeseries(start, end time.Time, interval time.Duration, username string, followees bool) (
 	timeseries RoastTimeseries, err error) {
 
 	// Round the interval to the closest minute.
@@ -73,8 +73,8 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 			COALESCE(SUM(s."lines_of_code"), 0) AS "lines_of_code"
 		FROM "time_series" AS t
 
-		-- Collect users friends if requested.
-		LEFT OUTER JOIN "roaster"."user_friends" AS f
+		-- Collect users followees if requested.
+		LEFT OUTER JOIN "roaster"."user_followees" AS f
 			ON $6 AND LOWER(f."username")=LOWER(TRIM($5))
 
 		-- Collect all the Roasts per resolution.
@@ -84,7 +84,7 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 				date_trunc('minute', "roaster".round_minutes(r."create_time"::timestamp, $4)) = t."datapoint"
 				AND (COALESCE(TRIM($5), '')='' OR
 				NOT $6 AND LOWER(r."username")=LOWER(TRIM($5)) OR -- Optionally only return for specified user.
-				$6 AND r."username" = f."friend") -- Or only return that users friends.
+				$6 AND r."username" = f."followee") -- Or only return that users followees.
 
 			-- Collect statistics for the Roasts.
 			LEFT JOIN "roaster"."roast_statistics" AS s
@@ -99,7 +99,7 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 		fmt.Sprintf("%.0f minutes", interval.Minutes()),
 		interval.Minutes(),
 		username,
-		friends)
+		followees)
 	if err != nil {
 		return
 	}
@@ -125,44 +125,44 @@ func GetRoastTimeseries(start, end time.Time, interval time.Duration, username s
 }
 
 // GetLinesOfCode returns the number of lines of code for everyone, a specific
-// user or that user's friends. An empty string as username represents everyone.
-func GetLinesOfCode(username string, friends bool) (lines LinesOfCode, err error) {
+// user or that user's followees. An empty string as username represents everyone.
+func GetLinesOfCode(username string, followees bool) (lines LinesOfCode, err error) {
 	err = database.QueryRow(`
 		SELECT COALESCE(SUM("lines_of_code"), 0) AS "lines_of_code"
 		FROM "roaster"."roast_statistics" AS s
 
-		-- Optionally collect the users friends.
-		LEFT OUTER JOIN "roaster"."user_friends" AS f
+		-- Optionally collect the users followees.
+		LEFT OUTER JOIN "roaster"."user_followees" AS f
 			ON $2 AND LOWER(f."username")=LOWER(TRIM($1))
 
 		-- Collect Roasts to compare with specfic username.
 		JOIN "roaster"."roast" AS r
 			ON r."id" = s."roast"
 
-		-- Return either globally, for specific user, or for specific users friends.
+		-- Return either globally, for specific user, or for specific users followees.
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      NOT $2 AND LOWER(r."username")=LOWER(TRIM($1)) OR
-		      $2 AND r."username" = f."friend"
-	`, username, friends).Scan(&lines.Lines)
+		      $2 AND r."username" = f."followee"
+	`, username, followees).Scan(&lines.Lines)
 	return
 }
 
 // GetNumberOfRoasts returns the number of Roasts for everyone, a specific
-// user, or that user's friends. An empty string as username represents everyone.
-func GetNumberOfRoasts(username string, friends bool) (numberOfRoasts NumberOfRoasts, err error) {
+// user, or that user's followees. An empty string as username represents everyone.
+func GetNumberOfRoasts(username string, followees bool) (numberOfRoasts NumberOfRoasts, err error) {
 	err = database.QueryRow(`
 		SELECT COUNT(r."username")
 		FROM roaster.roast AS r
 
-		-- Optionally collect the users friends.
-		LEFT OUTER JOIN "roaster"."user_friends" AS f
+		-- Optionally collect the users followees.
+		LEFT OUTER JOIN "roaster"."user_followees" AS f
 			ON $2 AND LOWER(f."username")=LOWER(TRIM($1))
 
-		-- Return either globally, for specific user, or for specific users friends.
+		-- Return either globally, for specific user, or for specific users followees.
 		WHERE COALESCE(TRIM($1), '')='' OR
 		      (NOT $2 AND LOWER(r."username")=LOWER(TRIM($1))) OR
-		      ($2 AND r."username" = f."friend")
-	`, username, friends).Scan(&numberOfRoasts.Count)
+		      ($2 AND r."username" = f."followee")
+	`, username, followees).Scan(&numberOfRoasts.Count)
 	return
 }
 
