@@ -17,6 +17,10 @@ func searchAll(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
+	if len(result) == 0 {
+		return http.StatusNoContent, nil
+	}
+
 	err = json.NewEncoder(w).Encode(result)
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")

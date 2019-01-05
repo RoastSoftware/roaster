@@ -49,8 +49,6 @@ class SearchItem implements ξ.ClassComponent {
                     category = 'Users';
                 }
 
-                console.log(item);
-
                 if (index >= maxResults) {
                   return false;
                 }
