@@ -1,4 +1,12 @@
-// import $ from 'jquery';
+// Forgive me Father, for I have imported jQuery.
+// I pray that you guide to forgiveness and move past this dark spot in my life.
+// In the name of the Father, Son, and Holy Spirit. Amen.
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+import 'jquery-ui/ui/effect.js'; // semantic-ui-search requires `easing` effect
+$.fn.api = require('semantic-ui-api');
+$.fn.search = require('semantic-ui-search');
+
 import ξ from 'mithril';
 import {UserModel} from '../models/user';
 import Auth from '../services/auth';
@@ -21,15 +29,47 @@ color: #00b5ad;\
 `;
 
 class SearchItem implements ξ.ClassComponent {
-  /*
   oncreate({dom}) {
-    console.log(dom);
-    $('.ui.search')
-        .search({
-          source: content,
-        });
+    $(dom)
+      .search({
+        type          : 'category',
+        minCharacters : 3,
+        apiSettings   : {
+          onResponse: function(githubResponse) {
+            var
+            response = {
+              results : {}
+            }
+            ;
+            // translate GitHub API response to work with search
+            $.each(githubResponse.items, function(index, item) {
+              var
+              language   = item.language || 'Unknown',
+                maxResults = 8
+              ;
+              if(index >= maxResults) {
+                return false;
+              }
+              // create new language category
+              if(response.results[language] === undefined) {
+                response.results[language] = {
+                  name    : language,
+                  results : []
+                };
+              }
+              // add result to category
+              response.results[language].results.push({
+                title       : item.name,
+                description : item.description,
+                url         : item.html_url
+              });
+            });
+            return response;
+          },
+          url: '//api.github.com/search/repositories?q={query}'
+        }
+      });
   };
-  */
 
   view() {
     return ξ('.ui.fluid.category.search.loading.item',
