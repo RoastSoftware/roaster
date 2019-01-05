@@ -31,51 +31,58 @@ color: #00b5ad;\
 class SearchItem implements ξ.ClassComponent {
   oncreate({dom}) {
     $(dom)
-      .search({
-        type          : 'category',
-        minCharacters : 3,
-        apiSettings   : {
-          onResponse: function(githubResponse) {
-            var
-            response = {
-              results : {}
-            }
-            ;
-            // translate GitHub API response to work with search
-            $.each(githubResponse.items, function(index, item) {
-              var
-              language   = item.language || 'Unknown',
-                maxResults = 8
-              ;
-              if(index >= maxResults) {
-                return false;
-              }
-              // create new language category
-              if(response.results[language] === undefined) {
-                response.results[language] = {
-                  name    : language,
-                  results : []
-                };
-              }
-              // add result to category
-              response.results[language].results.push({
-                title       : item.name,
-                description : item.description,
-                url         : item.html_url
+        .search({
+          type: 'category',
+          minCharacters: 1,
+          apiSettings: {
+            onResponse: function(resp) {
+              const response = {
+                results: {},
+              };
+
+              $.each(resp, function(index, item) {
+                const maxResults = 8;
+                let category = 'Misc.';
+
+                switch (item.category) {
+                  case 0:
+                    category = 'Users';
+                }
+
+                console.log(item);
+
+                if (index >= maxResults) {
+                  return false;
+                }
+
+                // Create new category group if it doesn't exist.
+                if (!(category in response.results)) {
+                  response.results[category] = {
+                    name: category,
+                    results: [],
+                  };
+                }
+
+                // Add result to category.
+                response.results[category].results.push({
+                  title: item.title,
+                  description: item.description,
+                  url: '/#/' + item.url,
+                });
               });
-            });
-            return response;
+
+              return response;
+            },
+            url: '/search/{query}',
           },
-          url: '//api.github.com/search/repositories?q={query}'
-        }
-      });
+        });
   };
 
   view() {
-    return ξ('.ui.fluid.category.search.loading.item',
+    return ξ('.ui.fluid.category.search.item',
         ξ('.ui.transparent.icon.input',
             ξ('input.prompt', {
-              placeholder: 'Search people...',
+              placeholder: 'Search...',
               type: 'text',
             }),
             ξ('i.search.link.icon')),
