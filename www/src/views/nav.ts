@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import ξ from 'mithril';
 import {UserModel} from '../models/user';
 import Auth from '../services/auth';
@@ -18,6 +19,29 @@ color: #fff;\
 const headerTextStyle = `\
 color: #00b5ad;\
 `;
+
+class SearchItem implements ξ.ClassComponent {
+  /*
+  oncreate({dom}) {
+    console.log(dom);
+    $('.ui.search')
+        .search({
+          source: content,
+        });
+  };
+  */
+
+  view() {
+    return ξ('.ui.fluid.category.search.loading.item',
+      ξ('.ui.transparent.icon.input',
+        ξ('input.prompt', {
+          placeholder: 'Search people...',
+          type: 'text',
+        }),
+        ξ('i.search.link.icon')),
+      ξ('.results'));
+  };
+};
 
 /**
  * Nav component provides a navigation bar for the top of the page.
@@ -57,6 +81,8 @@ export default class Nav implements ξ.ClassComponent {
 
       // TODO: Make this DRY, generate the navbar instead?
       ξ('.right.menu',
+
+          ξ(SearchItem),
 
           ξ.route.get() != '/' ?
           ξ('.item',
