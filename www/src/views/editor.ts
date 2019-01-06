@@ -70,7 +70,8 @@ export default class Editor implements ClassComponent {
    */
   oncreate({dom}) {
     loadMonacoEditor('Solarized-dark').then((monaco) => {
-      EditorModel.setCode(`\
+      if (EditorModel.getCode() == '') {
+        EditorModel.setCode(`\
 """
 Roaster roasts your code with static code analysis, for free!
 """
@@ -108,6 +109,7 @@ def too_complex():
 
     b(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 `);
+      }
 
       EditorModel.createModel();
       EditorModel.setLanguage('python3');

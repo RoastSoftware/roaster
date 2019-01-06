@@ -39,6 +39,9 @@ func New(csrfKey []byte, csrfOpts ...csrf.Option) http.Handler {
 	// Statistics [/statistics].
 	route.Statistics(router.PathPrefix("/statistics").Subrouter())
 
+	// Search [/search].
+	route.Search(router.PathPrefix("/search").Subrouter())
+
 	// Avatar [/user/{username}/avatar].
 	route.Avatar(router.PathPrefix("/user/{username}/avatar").Subrouter())
 

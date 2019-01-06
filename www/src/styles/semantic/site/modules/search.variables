@@ -1,0 +1,20 @@
+/* Result Box */
+@resultsBackground: @gray-dark;
+@resultsBorder: 1px solid @borderColor;
+
+/* All Results Link */
+@actionBackground: @gray-dark;
+
+/* Hover */
+@resultHoverBackground: @gray-darker;
+@actionHoverBackground: @gray-darker;
+
+/* Active Category */
+@categoryActiveBackground: @gray-darker;
+
+/* Active Result */
+@resultActiveBackground: @gray-dark;
+
+/* Category */
+@categoryBackground: @gray-darker;
+@categoryResultBackground: @gray-dark;

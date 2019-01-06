@@ -1,3 +1,5 @@
+import 'semantic-ui-less/semantic.less';
+
 import ξ from 'mithril';
 import home from './views/home';
 import about from './views/about';

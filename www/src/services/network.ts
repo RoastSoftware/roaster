@@ -26,14 +26,12 @@ class APIError extends Error {
 export default class Network {
   private static nextCSRFToken: string = '';
 
-  private static extractCSRFToken(xhr, xhrOptions): string {
+  private static extract(xhr, xhrOptions): string {
     const token: string = xhr.getResponseHeader(xCsrfToken);
 
-    if (token == '') {
-      throw new Error('empty CSRF token received');
+    if (token) {
+      Network.nextCSRFToken = token;
     }
-
-    Network.nextCSRFToken = token;
 
     let response: any;
     if (xhr.responseText.length > 0
@@ -55,7 +53,7 @@ export default class Network {
     return ξ.request({
       method: 'HEAD',
       url: '/',
-      extract: Network.extractCSRFToken,
+      extract: Network.extract,
     });
   };
 
@@ -72,7 +70,7 @@ export default class Network {
       url: url,
       data: data,
       headers: {[xCsrfToken]: Network.nextCSRFToken},
-      extract: Network.extractCSRFToken,
+      extract: Network.extract,
     });
   };
 }
