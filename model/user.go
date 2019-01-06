@@ -174,52 +174,77 @@ func GetUserScore(username string) (score UserScore, err error) {
 	return
 }
 
-// Friend holds a friend with the associated user and the date they became friends.
-type Friend struct {
+// Follower represents a user that is tracking someone.
+type Follower struct {
 	Username   string    `json:"username"`
 	CreateTime time.Time `json:"createTime"`
-	Friend     string    `json:"friend"`
 }
 
-// GetFriends returns a list of friends if successful, otherwise error.
-func GetFriends(identifier string) (friends []Friend, err error) {
-	friendRows, err := database.Query(`
-    SELECT username, create_time, friend
-    FROM "roaster"."user_friends"
+// Followee represents a user that is being tracked by someone.
+type Followee Follower
+
+// GetFollowees returns a list of followees if successful, otherwise error.
+func GetFollowees(username string) (followees []Followee, err error) {
+	followeeRows, err := database.Query(`
+    SELECT followee, create_time
+    FROM "roaster"."user_followees"
     WHERE (LOWER(username)=LOWER(TRIM($1)))
-    `, identifier)
+    `, username)
 	if err != nil {
 		return
 	}
-	defer friendRows.Close()
+	defer followeeRows.Close()
 
-	for friendRows.Next() {
-		res := Friend{}
-		err = friendRows.Scan(&res.Username, &res.CreateTime, &res.Friend)
+	for followeeRows.Next() {
+		res := Followee{}
+		err = followeeRows.Scan(&res.Username, &res.CreateTime)
 		if err != nil {
 			return
 		}
-		friends = append(friends, res)
+		followees = append(followees, res)
 	}
 	return
 }
 
-// PutFriend saves a friend relation to the DB, returns error if unsuccessful.
-func PutFriend(identifier string, friend string) (err error) {
+// PutFollowee saves a followee relation to the DB, returns error if unsuccessful.
+func PutFollowee(username string, followee string) (err error) {
 	_, err = database.Exec(`
-    INSERT INTO "roaster"."user_friends"
-    (username, create_time, friend)
+    INSERT INTO "roaster"."user_followees"
+    (username, create_time, followee)
     VALUES
     (TRIM($1), $2, TRIM($3))
-    `, identifier, time.Now(), friend)
+    `, username, time.Now(), followee)
 	return
 }
 
-// RemoveFriend deletes a friend relation from DB, returns error if unsuccessful.
-func RemoveFriend(username string, friend string) (err error) {
+// RemoveFollowee deletes a followee relation from DB, returns error if unsuccessful.
+func RemoveFollowee(username string, followee string) (err error) {
 	_, err = database.Exec(`
-    DELETE FROM "roaster"."user_friends"
-    WHERE (lower(username)=lower(TRIM($1)) AND lower(friend)=lower(TRIM($2)))
-    `, username, friend)
+    DELETE FROM "roaster"."user_followees"
+    WHERE (lower(username)=lower(TRIM($1)) AND lower(followee)=lower(TRIM($2)))
+    `, username, followee)
+	return
+}
+
+// GetFollowers gets a list of followers for a specific user, returns error if unsuccsessful.
+func GetFollowers(username string) (followers []Follower, err error) {
+	followerRows, err := database.Query(`
+    SELECT username, create_time
+    FROM "roaster"."user_followees"
+    WHERE (LOWER(followee)=LOWER(TRIM($1)))
+    `, username)
+	if err != nil {
+		return
+	}
+	defer followerRows.Close()
+
+	for followerRows.Next() {
+		res := Follower{}
+		err = followerRows.Scan(&res.Username, &res.CreateTime)
+		if err != nil {
+			return
+		}
+		followers = append(followers, res)
+	}
 	return
 }

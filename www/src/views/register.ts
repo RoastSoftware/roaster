@@ -41,7 +41,6 @@ export default class Register implements ξ.ClassComponent {
                         this.registerError ?
                         ξ('.ui.segment',
                             ξ('.ui.negative.message',
-                                ξ('i.close.icon'),
                                 ξ('.header',
                                     'Oh noeh!'),
                                 ξ('p', this.registerError.message))): '',

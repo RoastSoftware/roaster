@@ -32,7 +32,7 @@ export class LineCountModel extends CountModel {
 
     switch (this.filter) {
       case StatisticsFilter.Friends:
-        uri += `?user=${UserModel.getUsername()}&friends=true`;
+        uri += `?user=${UserModel.getUsername()}&followees=true`;
         break;
       case StatisticsFilter.User:
         uri += `?user=${UserModel.getUsername()}`;
@@ -53,7 +53,7 @@ export class RoastCountModel extends CountModel {
 
     switch (this.filter) {
       case StatisticsFilter.Friends:
-        uri += `?user=${UserModel.getUsername()}&friends=true`;
+        uri += `?user=${UserModel.getUsername()}&followees=true`;
         break;
       case StatisticsFilter.User:
         uri += `?user=${UserModel.getUsername()}`;
@@ -87,7 +87,7 @@ class RoastMessageStatisticsModel {
 
     switch (this.filter) {
       case StatisticsFilter.Friends:
-        uri += `&friends=true`;
+        uri += `&followees=true`;
       case StatisticsFilter.User:
         uri += `&user=${UserModel.getUsername()}`;
     }
@@ -316,7 +316,7 @@ class RoastRatioModel {
 
     switch (this.filter) {
       case StatisticsFilter.Friends:
-        uri += `?user=${this.username}&friends=true`;
+        uri += `?user=${this.username}&followees=true`;
         break;
       case StatisticsFilter.User:
         uri += `?user=${this.username}`;

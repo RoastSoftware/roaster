@@ -230,9 +230,9 @@ API.
 + Request user avatar
 + Response 200 (image/png)
 
-### Friends for User [/user/{username}/friend]
-#### Add New Friend [POST]
-+ Request add new friend (application/json)
+### Followees for User [/user/{username}/followees]
+#### Add New Followee [POST]
++ Request add new followee (application/json)
     + Headers
     ```
     Cookie: roaster_auth=AB32DEAC21A91DE123[...]
@@ -240,7 +240,7 @@ API.
     + Body
     ```json
     {
-        "friend": "MyAwesomeFriend"
+        "followee": "InterestingFollowee"
     }
     ```
     + Schema
@@ -248,7 +248,7 @@ API.
     {
         "type": "object",
         "properties": {
-            "friend": {
+            "followee": {
                 "type": "string",
                 "required": true
             }
@@ -257,19 +257,19 @@ API.
     ```
 + Response 200
 
-#### Retrieve User Friends [GET]
-+ Request user friends
+#### Retrieve User Followees [GET]
++ Request user followees
 + Response 200 (application/json)
     + Body
     ```json
     {
-        "friends": [
+        "followees": [
             {
-                "username":"MyAwesomeFriend",
+                "username":"MyAwesomeFollowee",
                 "createTime":"2018-03-04:00:00:00Z"
             }
             {
-                "username":"MyAwesomeFriend2",
+                "username":"MyAwesomeFollowee2",
                 "createTime":"2018-07-04:00:00:00Z"
             }
         ]
@@ -280,7 +280,7 @@ API.
     {
         "type": "object",
         "properties": {
-            "friends": 
+            "followees": 
             {
                 "type": "array",
                 "items": {
@@ -291,13 +291,47 @@ API.
     }
     ```
 
-#### Remove User Friend [DELETE]
-+ Request remove user friend
+#### Remove User Followee [DELETE]
++ Request remove user followee
     + Headers
     ```
     Cookie: roaster_auth=AB32DEAC21A91DE123[...]
     ```
 + Response 200
+
+#### Retrieve User Followers [GET]
++ Request user followers
++ Response 200 (application/json)
+    + Body
+    ```json
+    {
+        "followers": [
+            {
+                "username":"MyAwesomeFollower",
+                "createTime":"2018-03-04:00:00:00Z"
+            }
+            {
+                "username":"MyAwesomeFollower2",
+                "createTime":"2018-07-04:00:00:00Z"
+            }
+        ]
+    }
+    ```
+    + Schema
+    ```json
+    {
+        "type": "object",
+        "properties": {
+            "followers": 
+            {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+    ```
 
 ## Session [/session]
 ### Authenticate for New Session (sign in) [POST]

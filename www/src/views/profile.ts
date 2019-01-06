@@ -5,12 +5,18 @@ import {
   UserFeed,
   UserProfileHeader,
   RoastRatio,
+  UserFolloweeList,
+  UserFollowerList,
 } from './user';
 import {StatisticsFilter} from '../models/statistics';
 import {UserModel} from '../models/user';
 
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
+
+    tooLargeImageMessage() {
+      return 'The image is too large, please choose a picture under 9MB';
+    };
 
     profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
       new Date().getTime();
@@ -37,6 +43,9 @@ export default class Profile implements ξ.ClassComponent {
           })
           .catch((err: Error) => {
             this.uploadError = err;
+            if ('code' in err && err.code == 413) {
+              this.uploadError.message = this.tooLargeImageMessage();
+            }
             console.error(this.uploadError);
             ξ.redraw();
           });
@@ -124,6 +133,39 @@ export default class Profile implements ξ.ClassComponent {
                             href: '/feed',
                             oncreate: ξ.route.link,
                           }, 'feed page'), ' for more!',
+                      ),
+                  ),
+              ),
+              ξ('.ui.two.column.row',
+                  ξ('.column',
+                      ξ('.ui.basic.segment',
+                          ξ('h2.ui.dividing.header',
+                              ξ('i.users.icon'),
+                              ξ('.content', 'FOLLOWING',
+                                  ξ('.sub.header', `${this.username} 
+                                  finds these people very intriguing.`)),
+                          ),
+                          ξ('.ui.feed',
+                              ξ(UserFolloweeList, {
+                                username: this.username,
+                              }),
+                          )
+                      ),
+                  ),
+                  ξ('.column',
+                      ξ('.ui.basic.segment',
+                          ξ('h2.ui.dividing.header',
+                              ξ('i.users.icon'),
+                              ξ('.content', 'FOLLOWERS',
+                                  ξ('.sub.header', `${this.username} 
+                                  is followed by EVERYONE! No, but
+                                      by these people.`)),
+                          ),
+                          ξ('.ui.feed',
+                              ξ(UserFollowerList, {
+                                username: this.username,
+                              }),
+                          )
                       ),
                   ),
               ),
