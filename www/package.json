@@ -28,7 +28,7 @@
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-typescript": "^7.1.0",
-    "@types/mithril": "^1.1.13",
+    "@types/mithril": "^1.1.14",
     "@types/webpack-env": "^1.13.6",
     "babel-loader": "^8.0.4",
     "clean-webpack-plugin": "^1.0.0",
