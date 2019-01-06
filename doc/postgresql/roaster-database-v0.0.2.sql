@@ -1,27 +1,43 @@
 set search_path to roaster;
 
+do $$
+begin
+  -- Almost everything with an @ is a valid e-mail, so what the hell.
+  create domain email as text check (value ~ '@' and
+				     char_length(value) < 255 and
+				     char_length(value) > 2); --
+
+  create domain username as text check (value !~* '\s' and
+					char_length(value) > 0 and
+					char_length(value) <= 30); --
+
+  create domain fullname as text check(char_length(value) < 255); --
+
+  create domain code as text check(char_length(value) <= 500000); --
+
+  create domain score as integer check (value >= 0); --
+
+  exception when others then
+    raise notice 'domains already exists, skipping...'; --
+end
+$$;
+
 create table if not exists "user"
 (
-  username text  not null
+  username username not null
     constraint user_pkey
-    primary key
-    constraint username_chk
-    check (char_length(username) <= 30),
+    primary key,
   hash     bytea not null,
   create_time	timestamp with time zone not null,
-  fullname text
-    constraint fullname_chk
-    check (char_length(fullname) < 255),
-  email    text  not null unique
-    constraint email_chk
-    check (char_length(email) < 255)
+  fullname fullname,
+  email    email not null unique
 );
 
 create unique index if not exists username_user_idx on "user" (lower(username));
 
 create table if not exists user_followees
 (
-    username text not null,
+    username username not null,
     create_time timestamp with time zone not null,
     followee text not null,
     constraint followee_relation_uq unique (username, followee),
@@ -43,17 +59,13 @@ create table if not exists "roast"
   id       	serial        	not null
     constraint roast_pk
     primary key,
-  code     	text          	not null
-    constraint code_chk
-    check (char_length(code) <= 500000),
-  username 	text          	not null
+  code     	code 		not null,
+  username 	username	not null
     constraint user_fk
     references "user" (username)
     on update cascade
     on delete cascade,
-  score    	integer 	not null
-    constraint score_chk
-    check (score >= 0),
+  score    	score 		not null,
   language 	text          	not null,
   create_time	timestamp	with time zone not null
 );
@@ -121,7 +133,7 @@ create table if not exists "roast_has_warnings"
 create table if not exists avatar
 (
   avatar bytea not null,
-  username text not null,
+  username username not null,
   constraint username_uq unique (username),
   constraint username_fk foreign key (username)
     references "user" (username) match simple

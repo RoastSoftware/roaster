@@ -41,11 +41,20 @@ export class UserModel {
     }
 
     static setUsername(user: string) {
+      // Disallow usernames with whitespaces.
+      const re = new RegExp(/\s/);
+
       UserModel.username = user;
+
       if (UserModel.username.length < 1) {
-        UserModel.usernameError = 'Username must be longer than 0 characters';
-      } else if (UserModel.username.length > 30) {
-        UserModel.usernameError = 'Username must be shorter than 30 characters';
+        UserModel.usernameError =
+          'Username must be longer than 0 characters';
+      } else if (UserModel.username.length >= 30) {
+        UserModel.usernameError =
+          'Username must not be longer than 30 characters';
+      } else if (re.test(UserModel.username)) {
+        UserModel.usernameError =
+          'Username must not contain spaces';
       } else {
         UserModel.usernameError = '';
       }
@@ -102,6 +111,9 @@ that is more than 1 googol^98 in entropy`;
     };
 
     static setEmail(user: string) {
+      // The database only cares that the e-mail contains an @ and is longer
+      // than 2 characters. But we're using this crazy RegExp here that _should_
+      // take care of _most_ cases.
       /* eslint max-len: ["error", { "ignoreRegExpLiterals": true }] */
       const re = new RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
 
@@ -127,12 +139,23 @@ that is more than 1 googol^98 in entropy`;
       return UserModel.emailError;
     };
 
+    static allErrors(): Array<string> {
+      const errors = [];
+
+      errors.push(UserModel.errorUsername());
+      errors.push(UserModel.errorPassword());
+      errors.push(UserModel.errorFullname());
+      errors.push(UserModel.errorEmail());
+
+      return errors.filter((e) => e != '');
+    };
+
     static validAll(): boolean {
       return (
         UserModel.validUsername() && UserModel.validEmail() &&
         UserModel.validFullname() && UserModel.validPassword()
       ) && (
-        (UserModel.getUsername() !='') && (UserModel.getEmail() != '') &&
+        (UserModel.getUsername() != '') && (UserModel.getEmail() != '') &&
         (UserModel.getFullname() != '') && (UserModel.getPassword() != ''));
     };
 
@@ -159,4 +182,3 @@ that is more than 1 googol^98 in entropy`;
       UserModel.followees = [];
     };
 };
-

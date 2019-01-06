@@ -8,7 +8,7 @@ export default class Register implements ξ.ClassComponent {
   registerError: Error;
 
   registerUser() {
-    if (UserModel.validUsername()) {
+    if (UserModel.validAll()) {
       Auth.register<User>(
           Object.assign({}, UserModel), // TODO: Implement encode/decode funcs.
           UserModel.getPassword()) // TODO: Password isn't separated yet.
@@ -27,7 +27,7 @@ export default class Register implements ξ.ClassComponent {
     }
   };
 
-  view(vnode: ξ.CVnode) {
+  view() {
     return ξ(base,
         ξ('.ui.main.text.container[style=margin-top: 2em;]',
             ξ('.ui.grid',
@@ -42,13 +42,16 @@ export default class Register implements ξ.ClassComponent {
                         ξ('.ui.segment',
                             ξ('.ui.negative.message',
                                 ξ('.header',
-                                    'Oh noeh!'),
+                                    'Failed to register you!'),
                                 ξ('p', this.registerError.message))): '',
 
                         ξ('.ui.segment.clearing',
-                            ξ('form.ui.form', {onsubmit: () => {
-                              this.registerUser();
-                            }}, [
+                            ξ('form.ui.form', {
+                              class: UserModel.validAll() ? '' : 'error',
+                              onsubmit: () => {
+                                this.registerUser();
+                              },
+                            }, [
                               ξ('.field', {
                                 class:
                                 UserModel.validUsername() ? '' : 'error'}, [
@@ -109,6 +112,16 @@ export default class Register implements ξ.ClassComponent {
                                     }),
                                     ξ('i.envelope.icon'),
                                 )]),
+
+                              UserModel.allErrors().length != 0 ?
+                              ξ('.ui.error.message',
+                                  ξ('ul.list',
+                                      UserModel.allErrors().map((m: string) => {
+                                        return ξ('li', m);
+                                      }),
+                                  ),
+                              ): '',
+
                               ξ('button.ui.teal.basic.button.right.floated', {
                                 disabled: !(UserModel.validAll()),
                               },
