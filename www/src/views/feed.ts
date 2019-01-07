@@ -1,6 +1,6 @@
 import ξ from 'mithril';
 import base from './base';
-import Network from '../services/network';
+import Network, {encodeURL} from '../services/network';
 import {UserModel} from '../models/user';
 import moment from 'moment';
 
@@ -21,9 +21,9 @@ class UserLink implements ξ.ClassComponent {
     const username: string = attrs.username;
 
     return ξ('a.user', {
-      href: `/user/${username.toLowerCase()}`,
+      href: '/user/' + username,
       oncreate: ξ.route.link,
-    }, username);
+    }, username.toUpperCase());
   };
 }
 
@@ -43,12 +43,12 @@ export class FeedList implements ξ.ClassComponent {
             return ξ('.event',
                 ξ('.label',
                     ξ('img', {
-                      src: `/user/${i.username}/avatar`,
+                      src: encodeURL('user', i.username, 'avatar'),
                     }),
                 ),
                 ξ('.content',
                     ξ('.summary',
-                        ξ(UserLink, {'username': i.username.toUpperCase()}),
+                        ξ(UserLink, {'username': i.username}),
                         ` JUST GOT ROASTED!`.toUpperCase(),
                         ξ('span.score[style=margin-left: 5px;]',
                             ξ('i.trophy.icon[style=color: gold;]'),

@@ -1,7 +1,7 @@
 import ξ from 'mithril';
 import Chart from 'chart.js';
 import base from './base';
-import Network from '../services/network';
+import Network, {encodeURL} from '../services/network';
 import {UserModel} from '../models/user';
 import {FeedList} from './feed';
 import {
@@ -64,7 +64,7 @@ export class UserProfileHeader implements ξ.ClassComponent {
     },
     ξ('h1.ui.header.left.floated[style=margin: 0;]',
         ξ('img.ui.circular.image', {
-          src: attrs.avatar || `/user/${attrs.username}/avatar`,
+          src: attrs.avatar || encodeURL('user', attrs.username, 'avatar'),
         }),
         attrs.loggedIn ?
         ξ('.content', 'MY PROFILE',
@@ -82,9 +82,9 @@ class UserLink implements ξ.ClassComponent {
     const username: string = attrs.username;
 
     return ξ('a.user', {
-      href: `/user/${username.toLowerCase()}`,
+      href: `/user/${encodeURIComponent(username)}`,
       oncreate: ξ.route.link,
-    }, username);
+    }, username.toUpperCase());
   };
 }
 
@@ -94,7 +94,7 @@ export class UserFolloweeList implements ξ.ClassComponent {
 
     async getFolloweeList() {
       return Network.request<Array<Followee>>('GET', '/user/' +
-            this.username + '/followees')
+            encodeURIComponent(this.username) + '/followees')
           .then((result: any) => {
             this.followees = result;
           });
@@ -119,12 +119,12 @@ export class UserFolloweeList implements ξ.ClassComponent {
               return ξ('.event',
                   ξ('.label',
                       ξ('img', {
-                        src: `/user/${i.username}/avatar`,
+                        src: encodeURL('user', this.username, 'avatar'),
                       }),
                   ),
                   ξ('.content',
                       ξ('.summary',
-                          ξ(UserLink, {'username': i.username.toUpperCase()}),
+                          ξ(UserLink, {'username': this.username}),
                           ξ('.date[style=float:right;]',
                               ξ('i.clock.outline.icon'),
                               'followed '
@@ -144,8 +144,8 @@ export class UserFollowerList implements ξ.ClassComponent {
     username: string;
 
     async getFollowerList(username: string) {
-      return Network.request<Array<Follower>>('GET', '/user/' +
-            this.username + '/followers')
+      return Network.request<Array<Follower>>('GET',
+          ['user', this.username, 'followers'])
           .then((result: any) => {
             this.followers = result;
           });
@@ -170,12 +170,12 @@ export class UserFollowerList implements ξ.ClassComponent {
               return ξ('.event',
                   ξ('.label',
                       ξ('img', {
-                        src: `/user/${i.username}/avatar`,
+                        src: encodeURL('user', this.username, 'avatar'),
                       }),
                   ),
                   ξ('.content',
                       ξ('.summary',
-                          ξ(UserLink, {'username': i.username.toUpperCase()}),
+                          ξ(UserLink, {'username': this.username}),
                           ξ('.date[style=float:right;]',
                               ξ('i.clock.outline.icon'),
                               'followed '
@@ -209,7 +209,8 @@ export class UserFeed implements ξ.ClassComponent {
 
   fetchFeed() {
     const username = this.username;
-    Network.request<Feed>('GET', `/feed?page=0&page-size=5&user=${username}`)
+    Network.request<Feed>('GET',
+        `/feed?page=0&page-size=5&user=${username}`)
         .then((feed: Feed) => {
           this.feed = feed;
         }).catch((error) => {
@@ -253,8 +254,8 @@ class UserProfile implements ξ.ClassComponent {
     };
 
     async friendCheck(username: string) {
-      return Network.request<Array<Followee>>('GET', '/user/' +
-            UserModel.getUsername() + '/followees')
+      return Network.request<Array<Followee>>('GET',
+          ['user', UserModel.getUsername(), 'followees'])
           .then((result) => {
             UserModel.followees = result;
             this.hasFriend(username);
@@ -262,14 +263,14 @@ class UserProfile implements ξ.ClassComponent {
     };
 
     async unFriend(username: string) {
-      Network.request('DELETE', '/user/' + username + '/followees')
+      Network.request('DELETE', ['user', username, 'followees'])
           .then(() => {
             this.friendCheck(username);
           });
     };
 
     async addFriend(username: string) {
-      Network.request('POST', '/user/' + username + '/followees', {
+      Network.request('POST', ['user', username + 'followees'], {
         'username': username,
       })
           .then(() => {
@@ -304,7 +305,7 @@ class UserProfile implements ξ.ClassComponent {
               ξ('.ui.row',
                   ξ('.column',
                       ξ('img.ui.image.rounded.medium#picture', {
-                        src: `/user/${username}/avatar`,
+                        src: encodeURL('user', username, 'avatar'),
                       },
                       'User profile picture.'),
                       ξ('h2',
@@ -405,12 +406,12 @@ export default class UserView implements ξ.ClassComponent {
     score: number = 0;
 
     fetchUser() {
-      Network.request<User>('GET', '/user/' + this.username)
+      Network.request<User>('GET', ['user', this.username])
           .then((user: User) => {
             this.user = user;
           });
 
-      Network.request<Object>('GET', '/user/' + this.username + '/score')
+      Network.request<Object>('GET', ['user', this.username, 'score'])
           .then(({score}) => {
             this.score = score;
           });
