@@ -119,12 +119,12 @@ export class UserFolloweeList implements ξ.ClassComponent {
               return ξ('.event',
                   ξ('.label',
                       ξ('img', {
-                        src: encodeURL('user', this.username, 'avatar'),
+                        src: encodeURL('user', i.username, 'avatar'),
                       }),
                   ),
                   ξ('.content',
                       ξ('.summary',
-                          ξ(UserLink, {'username': this.username}),
+                          ξ(UserLink, {'username': i.username}),
                           ξ('.date[style=float:right;]',
                               ξ('i.clock.outline.icon'),
                               'followed '
@@ -170,12 +170,12 @@ export class UserFollowerList implements ξ.ClassComponent {
               return ξ('.event',
                   ξ('.label',
                       ξ('img', {
-                        src: encodeURL('user', this.username, 'avatar'),
+                        src: encodeURL('user', i.username, 'avatar'),
                       }),
                   ),
                   ξ('.content',
                       ξ('.summary',
-                          ξ(UserLink, {'username': this.username}),
+                          ξ(UserLink, {'username': i.username}),
                           ξ('.date[style=float:right;]',
                               ξ('i.clock.outline.icon'),
                               'followed '

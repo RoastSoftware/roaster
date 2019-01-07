@@ -39,7 +39,7 @@ create table if not exists user_followees
 (
     username username not null,
     create_time timestamp with time zone not null,
-    followee text not null,
+    followee username not null,
     constraint followee_relation_uq unique (username, followee),
     constraint username_fk foreign key (username)
         references "user" (username) match simple
