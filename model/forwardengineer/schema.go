@@ -1,4 +1,4 @@
-// Package forwardengineer was generated automatically by inlinesql at 2019-01-07 14:50:06.856777351 +0100 CET m=+0.001907264.
+// Package forwardengineer was generated automatically by inlinesql at 2019-01-07 17:11:26.371319814 +0100 CET m=+0.001358337.
 package forwardengineer
 
 // GetQueries returns a pre-parsed slice of SQL queries.
@@ -8,7 +8,7 @@ func GetQueries() []string {
 		"do $$ begin create domain email as text check (value ~ '@' and char_length(value) < 255 and char_length(value) > 2); create domain username as text check (value !~* E'[\\\\s:;,+$\\\\/\\\\\\\\?!*\\'()@=&#]' and char_length(value) > 0 and char_length(value) <= 30); create domain fullname as text check(char_length(value) < 255); create domain code as text check(char_length(value) <= 500000); create domain score as integer check (value >= 0); exception when others then raise notice 'domains already exists, skipping...'; end $$",
 		"create table if not exists \"user\" ( username username not null constraint user_pkey primary key, hash bytea not null, create_time timestamp with time zone not null, fullname fullname, email email not null unique )",
 		"create unique index if not exists username_user_idx on \"user\" (lower(username))",
-		"create table if not exists user_followees ( username username not null, create_time timestamp with time zone not null, followee text not null, constraint followee_relation_uq unique (username, followee), constraint username_fk foreign key (username) references \"user\" (username) match simple on update cascade on delete cascade, constraint followee_fk foreign key (username) references \"user\" (username) match simple on update cascade on delete cascade )",
+		"create table if not exists user_followees ( username username not null, create_time timestamp with time zone not null, followee username not null, constraint followee_relation_uq unique (username, followee), constraint username_fk foreign key (username) references \"user\" (username) match simple on update cascade on delete cascade, constraint followee_fk foreign key (username) references \"user\" (username) match simple on update cascade on delete cascade )",
 		"create index if not exists username_user_followees_idx on user_followees using btree (username)",
 		"create table if not exists \"roast\" ( id serial not null constraint roast_pk primary key, code code not null, username username not null constraint user_fk references \"user\" (username) on update cascade on delete cascade, score score not null, language text not null, create_time timestamp with time zone not null )",
 		"create table if not exists \"warning\" ( id uuid not null constraint warning_pk primary key, row integer not null, \"column\" integer not null, engine text not null, name text not null, description text not null )",
