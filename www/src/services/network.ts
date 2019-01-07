@@ -26,13 +26,6 @@ class APIError extends Error {
 export function encodeURL(...url: string): string {
   let u = '';
 
-  for (let i = 0; i < url.length; i++) {
-    // Fix shitty escapeURIComponent in some browsers.
-    // This will escape \\ if it hasn't already been, we don't really care
-    // for Windows users that uses \ in their URI's.
-    url[i] = url[i].split('\\').join('%5C');
-  }
-
   if (url.length > 1) {
     u = '/' + url.join('/');
   } else {

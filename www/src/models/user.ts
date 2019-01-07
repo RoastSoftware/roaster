@@ -41,8 +41,8 @@ export class UserModel {
     }
 
     static setUsername(user: string) {
-      // Disallow usernames with whitespaces.
-      const re = new RegExp(/\s/);
+      // Disallow usernames with whitespaces and URL control/unsafe characters.
+      const re = new RegExp(/[\s;\/\?:@=&<>#%{}\|\\^~\[\]]/);
 
       UserModel.username = user;
 
@@ -54,7 +54,7 @@ export class UserModel {
           'Username must not be longer than 30 characters';
       } else if (re.test(UserModel.username)) {
         UserModel.usernameError =
-          'Username must not contain spaces';
+          'Username must not contain spaces or any of ;/?:@=&<>#%{}|\^~[]';
       } else {
         UserModel.usernameError = '';
       }

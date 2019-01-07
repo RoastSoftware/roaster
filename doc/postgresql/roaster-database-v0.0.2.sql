@@ -7,7 +7,7 @@ begin
 				     char_length(value) < 255 and
 				     char_length(value) > 2); --
 
-  create domain username as text check (value !~* '\s' and
+  create domain username as text check (value !~* '[\s;\/\?:@=&<>#%{}\|\\^~\[\]]' and
 					char_length(value) > 0 and
 					char_length(value) <= 30); --
 
