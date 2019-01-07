@@ -26,8 +26,11 @@ export class RoastRatio implements ξ.ClassComponent {
   };
 
   onupdate({attrs}) {
-    if (this.ratio.filter != attrs.filter) {
+    if (this.ratio.filter != attrs.filter ||
+        this.ratio.username != attrs.username) {
       this.ratio.filter = attrs.filter;
+      this.ratio.username = attrs.username;
+
       this.ratio.update().then(() => {
         this.chart.data = this.ratio.getData();
         this.chart.update();
@@ -86,31 +89,30 @@ class UserLink implements ξ.ClassComponent {
 }
 
 export class UserFolloweeList implements ξ.ClassComponent {
-    followees: Array<Followee> = [];
     username: string;
+    followees: Array<Followee> = [];
 
-    async getFolloweeList(username: string) {
+    async getFolloweeList() {
       return Network.request<Array<Followee>>('GET', '/user/' +
-            username + '/followees')
+            this.username + '/followees')
           .then((result: any) => {
             this.followees = result;
-            console.log(this.followees);
-            console.log('getfriendlist');
           });
     }
 
-    capitalize(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
     oncreate({attrs}) {
-      console.log('userfolloweelist, on create');
       this.username = attrs.username;
       this.getFolloweeList(this.username);
     }
 
+    onupdate({attrs}) {
+      if (attrs.username != this.username) {
+        this.username = attrs.username;
+        this.getFolloweeList(this.username);
+      }
+    }
+
     view() {
-      console.log('sprinkle little prints');
       return [
             (this.followees.length > 0) ?
             this.followees.map((i: Followee) => {
@@ -129,7 +131,10 @@ export class UserFolloweeList implements ξ.ClassComponent {
                               + moment(new Date(i.createTime)).fromNow())),
                   ),
               );
-            }) : '',
+            }):
+            ξ('.event',
+                ξ('.content',
+                    ξ('.summary', 'No one :('))),
       ];
     }
 }
@@ -140,26 +145,25 @@ export class UserFollowerList implements ξ.ClassComponent {
 
     async getFollowerList(username: string) {
       return Network.request<Array<Follower>>('GET', '/user/' +
-            username + '/followers')
+            this.username + '/followers')
           .then((result: any) => {
             this.followers = result;
-            console.log(this.followers);
-            console.log('getfollowerlist');
           });
     }
 
-    capitalize(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    };
-
     oncreate({attrs}) {
-      console.log('userfollowerlist, on create');
       this.username = attrs.username;
       this.getFollowerList(this.username);
     }
 
+    onupdate({attrs}) {
+      if (attrs.username != this.username) {
+        this.username = attrs.username;
+        this.getFollowerList(this.username);
+      }
+    }
+
     view() {
-      console.log('sprinkle little prints');
       return [
             (this.followers.length > 0) ?
             this.followers.map((i: Follower) => {
@@ -178,7 +182,10 @@ export class UserFollowerList implements ξ.ClassComponent {
                               + moment(new Date(i.createTime)).fromNow())),
                   ),
               );
-            }) : '',
+            }):
+            ξ('.event',
+                ξ('.content',
+                    ξ('.summary', 'No one :('))),
       ];
     }
 }
@@ -191,6 +198,13 @@ export class UserFeed implements ξ.ClassComponent {
   oncreate({attrs}) {
     this.username = attrs.username;
     this.fetchFeed();
+  };
+
+  onupdate({attrs}) {
+    if (this.username != attrs.username) {
+      this.username = attrs.username;
+      this.fetchFeed();
+    }
   };
 
   fetchFeed() {
@@ -264,7 +278,9 @@ class UserProfile implements ξ.ClassComponent {
     };
 
     oncreate({attrs}) {
-      this.friendCheck(attrs.username);
+      if (UserModel.isLoggedIn()) {
+        this.friendCheck(attrs.username);
+      }
     };
 
     view({attrs}) {
@@ -366,7 +382,7 @@ class UserProfile implements ξ.ClassComponent {
                           ξ('h2.ui.dividing.header',
                               ξ('i.users.icon'),
                               ξ('.content', 'FOLLOWERS',
-                                  ξ('.sub.header', `${username} is followed by 
+                                  ξ('.sub.header', `${username} is followed by
                                     EVERYONE! No, but by these people.`)),
                           ),
                           ξ('.ui.feed',
@@ -383,23 +399,36 @@ class UserProfile implements ξ.ClassComponent {
 };
 
 export default class UserView implements ξ.ClassComponent {
-    downloadError: Error;
-    user: User;
+    downloadError: Error = null;
+    username: string;
+    user: User = null;
     score: number = 0;
 
-    oncreate({attrs}) {
-      Network.request<User>('GET', '/user/' + attrs.username)
+    fetchUser() {
+      Network.request<User>('GET', '/user/' + this.username)
           .then((user: User) => {
             this.user = user;
           });
 
-      Network.request<Object>('GET', '/user/' + attrs.username + '/score')
+      Network.request<Object>('GET', '/user/' + this.username + '/score')
           .then(({score}) => {
             this.score = score;
           });
     }
 
-    view(vnode: ξ.CVnode) {
+    oncreate({attrs}) {
+      this.username = attrs.username;
+      this.fetchUser(this.username);
+    }
+
+    onupdate({attrs}) {
+      if (attrs.username != this.username) {
+        this.username = attrs.username;
+        this.fetchUser();
+      }
+    }
+
+    view() {
       return this.user ?
             ξ(UserProfile, {
               username: this.user.username,
