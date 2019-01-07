@@ -17,8 +17,8 @@ begin
 
   create domain score as integer check (value >= 0); --
 
-  -- exception when others then
-  --  raise notice 'domains already exists, skipping...'; --
+  exception when others then
+    raise notice 'domains already exists, skipping...'; --
 end
 $$;
 

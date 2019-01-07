@@ -54,9 +54,11 @@ export default class Profile implements ξ.ClassComponent {
           });
     };
 
-    oncreate() {
+    oninit() {
       this.updateProfileImageURI();
+    };
 
+    oncreate() {
       Network.request<Object>('GET', ['user', this.username, 'score'])
           .then(({score}) => {
             this.score = score;
