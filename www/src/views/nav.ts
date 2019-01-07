@@ -28,6 +28,18 @@ const headerTextStyle = `\
 color: #00b5ad;\
 `;
 
+function escapeString(text: string): string {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    '\'': '&#039;',
+  };
+
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
 class SearchItem implements ξ.ClassComponent {
   oncreate({dom}) {
     $(dom)
@@ -63,9 +75,9 @@ class SearchItem implements ξ.ClassComponent {
 
                 // Add result to category.
                 response.results[category].results.push({
-                  title: item.title,
-                  description: item.description,
-                  url: '/#/' + item.url,
+                  title: escapeString(item.title),
+                  description: escapeString(item.description),
+                  url: '#/' + escapeString(item.url),
                 });
               });
 
