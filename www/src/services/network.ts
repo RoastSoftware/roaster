@@ -32,7 +32,7 @@ export function encodeURL(...url: string): string {
     u = url[0];
   }
 
-  return u;
+  return encodeURI(u);
 };
 
 export default class Network {

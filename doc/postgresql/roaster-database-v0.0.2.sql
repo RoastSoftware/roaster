@@ -7,7 +7,7 @@ begin
 				     char_length(value) < 255 and
 				     char_length(value) > 2); --
 
-  create domain username as text check (value !~* '[\s;\/\?:@=&<>#%{}\|\\^~\[\]]' and
+  create domain username as text check (value !~* E'[\\s:;,+$\\/\\\\?!*\'()@=&#]' and
 					char_length(value) > 0 and
 					char_length(value) <= 30); --
 
@@ -17,8 +17,8 @@ begin
 
   create domain score as integer check (value >= 0); --
 
-  exception when others then
-    raise notice 'domains already exists, skipping...'; --
+  -- exception when others then
+  --  raise notice 'domains already exists, skipping...'; --
 end
 $$;
 
