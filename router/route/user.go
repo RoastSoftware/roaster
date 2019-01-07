@@ -35,20 +35,31 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 			"Unable to decode request")
 	}
 
-	// TODO: Maybe add some kind of helper for empty fields?
 	if u.Username == "" || u.Email == "" || u.Password == "" {
 		return http.StatusBadRequest, causerr.New(
 			errors.New("missing field in request"),
 			"Missing field in request")
 	}
 
+	if len(u.Password) < 8 || len(u.Password) >= 4096 {
+		return http.StatusBadRequest, causerr.New(
+			fmt.Errorf("invalid password length (%d)", len(u.Password)),
+			"Invalid password")
+	}
+
 	err = model.PutUser(u.User, []byte(u.Password))
 	if err != nil {
 		if pgerr, ok := err.(*pq.Error); ok {
-			if pgerr.Constraint == "user_email_key" {
+			switch pgerr.Constraint {
+			case "username_check":
+				return http.StatusBadRequest, causerr.New(err, "Invalid username")
+			case "email_check":
+				return http.StatusBadRequest, causerr.New(err, "Invalid email address")
+			case "fullname_check":
+				return http.StatusBadRequest, causerr.New(err, "Invalid full name")
+			case "user_email_key":
 				return http.StatusConflict, causerr.New(err, "Email already in use")
-			}
-			if pgerr.Constraint == "user_pkey" || pgerr.Constraint == "username_user_idx" {
+			case "user_pkey":
 				return http.StatusConflict, causerr.New(err, "Username already in use")
 			}
 		}

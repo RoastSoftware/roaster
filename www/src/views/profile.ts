@@ -1,6 +1,6 @@
 import ξ from 'mithril';
 import base from './base';
-import Network from '../services/network';
+import Network, {encodeURL} from '../services/network';
 import {
   UserFeed,
   UserProfileHeader,
@@ -14,16 +14,20 @@ import {UserModel} from '../models/user';
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
 
-    tooLargeImageMessage() {
-      return 'The image is too large, please choose a picture under 9MB';
-    };
-
-    profileImageURI: string = `/user/${UserModel.getUsername()}/avatar?` +
-      new Date().getTime();
+    profileImageURI: string = '';
     username: string = UserModel.getUsername();
     fullname: string = UserModel.getFullname();
     email: string = UserModel.getEmail();
     score: number = 0;
+
+    tooLargeImageMessage() {
+      return 'The image is too large, please choose a picture under 9MB';
+    };
+
+    updateProfileImageURI() {
+      this.profileImageURI = encodeURL(
+          'user', UserModel.getUsername(), 'avatar?' + new Date().getTime());
+    }
 
     upload({target}) {
       this.uploadError = null;
@@ -35,11 +39,10 @@ export default class Profile implements ξ.ClassComponent {
       const data = new FormData();
       data.append('file', avatar);
 
-      Network.request<FormData>('PUT', '/user/' +
-          UserModel.getUsername() + '/avatar', data)
+      Network.request<FormData>('PUT',
+          ['user', UserModel.getUsername(), 'avatar'], data)
           .then(() => {
-            this.profileImageURI = `/user/${UserModel.getUsername()}/avatar?`
-              + new Date().getTime();
+            this.updateProfileImageURI();
           })
           .catch((err: Error) => {
             this.uploadError = err;
@@ -51,8 +54,12 @@ export default class Profile implements ξ.ClassComponent {
           });
     };
 
+    oninit() {
+      this.updateProfileImageURI();
+    };
+
     oncreate() {
-      Network.request<Object>('GET', '/user/' + this.username + '/score')
+      Network.request<Object>('GET', ['user', this.username, 'score'])
           .then(({score}) => {
             this.score = score;
           });
@@ -142,7 +149,7 @@ export default class Profile implements ξ.ClassComponent {
                           ξ('h2.ui.dividing.header',
                               ξ('i.users.icon'),
                               ξ('.content', 'FOLLOWING',
-                                  ξ('.sub.header', `${this.username} 
+                                  ξ('.sub.header', `${this.username}
                                   finds these people very intriguing.`)),
                           ),
                           ξ('.ui.feed',
@@ -157,7 +164,7 @@ export default class Profile implements ξ.ClassComponent {
                           ξ('h2.ui.dividing.header',
                               ξ('i.users.icon'),
                               ξ('.content', 'FOLLOWERS',
-                                  ξ('.sub.header', `${this.username} 
+                                  ξ('.sub.header', `${this.username}
                                   is followed by EVERYONE! No, but
                                       by these people.`)),
                           ),

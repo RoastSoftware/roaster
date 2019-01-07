@@ -114,7 +114,7 @@ func PutUser(user User, password []byte) (err error) {
 		INSERT INTO "roaster"."user"
 		(username, email, fullname, create_time, hash)
 		VALUES
-		(TRIM($1), LOWER(TRIM($2)), $3, $4, $5)
+		($1, TRIM($2), TRIM($3), $4, $5)
 	`, user.Username, user.Email, user.Fullname, time.Now(), hash)
 
 	return

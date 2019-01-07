@@ -23,7 +23,7 @@ func parseSQLFile(in []byte) []string {
 
 	// Split file into seperate queries.
 	var tmp []string
-	tmp = strings.Split(string(in), ";")
+	tmp = strings.Split(string(in), ";\n")
 
 	// Remove superflous spaces around each query.
 	for i := range tmp {

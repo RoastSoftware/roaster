@@ -23,6 +23,18 @@ class APIError extends Error {
   }
 };
 
+export function encodeURL(...url: string): string {
+  let u = '';
+
+  if (url.length > 1) {
+    u = '/' + url.join('/');
+  } else {
+    u = url[0];
+  }
+
+  return encodeURI(u);
+};
+
 export default class Network {
   private static nextCSRFToken: string = '';
 
@@ -59,7 +71,7 @@ export default class Network {
 
   public static async request<T>(
       method: string,
-      url: string,
+      url: string | Array<string>,
       data?: any): Promise<T> {
     if (Network.nextCSRFToken == '') {
       await Network.initCSRFToken();
@@ -67,7 +79,7 @@ export default class Network {
 
     return ξ.request<T>({
       method: method,
-      url: url,
+      url: Array.isArray(url) ? encodeURL(...url) : encodeURL(url),
       data: data,
       headers: {[xCsrfToken]: Network.nextCSRFToken},
       extract: Network.extract,
