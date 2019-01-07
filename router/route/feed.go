@@ -40,15 +40,15 @@ func retrieveFeed(w http.ResponseWriter, r *http.Request) (int, error) {
 	}
 
 	username := r.URL.Query().Get("user")
-	friends := getBooleanFromString(r.URL.Query().Get("friends"))
+	followees := getBooleanFromString(r.URL.Query().Get("followees"))
 
-	if username == "" && friends {
+	if username == "" && followees {
 		return http.StatusBadRequest, causerr.New(
-			errors.New("request for friends is missing user query parameter"),
+			errors.New("request for followees is missing user query parameter"),
 			"Friends query parameter also requires the user query parameter")
 	}
 
-	feed, err := model.GetFeed(username, friends, page, pageSize)
+	feed, err := model.GetFeed(username, followees, page, pageSize)
 	if err != nil {
 		// Returns Internal Server Error even for non-existing
 		// usernames because it'll return an empty feed (and not any
