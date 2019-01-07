@@ -77,7 +77,7 @@ class SearchItem implements ξ.ClassComponent {
                 response.results[category].results.push({
                   title: escapeString(item.title),
                   description: escapeString(item.description),
-                  url: '#/' + escapeString(item.url),
+                  url: '/#/' + escapeString(item.url),
                 });
               });
 

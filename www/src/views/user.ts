@@ -93,8 +93,8 @@ export class UserFolloweeList implements ξ.ClassComponent {
     followees: Array<Followee> = [];
 
     async getFolloweeList() {
-      return Network.request<Array<Followee>>('GET', '/user/' +
-            encodeURIComponent(this.username) + '/followees')
+      return Network.request<Array<Followee>>('GET',
+          ['user', this.username, 'followees'])
           .then((result: any) => {
             this.followees = result;
           });
@@ -270,7 +270,7 @@ class UserProfile implements ξ.ClassComponent {
     };
 
     async addFriend(username: string) {
-      Network.request('POST', ['user', username + 'followees'], {
+      Network.request('POST', ['user', username, 'followees'], {
         'username': username,
       })
           .then(() => {
