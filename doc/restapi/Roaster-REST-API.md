@@ -577,12 +577,13 @@ API.
 
 ## Feed [/feed{?user}{?followees}{?page}{?page-size}]
 ### Get Feed [GET]
++ Parameters
+    + page: 0 (number) - Page of feed to return.
+    + `page-size`: 25 (number, optional) - Page size for each page.
+        + Default: 25
+    + user: willeponken (string, optional) - Display only for user.
+    + followees: true (string, optional) - Display only user followees (excluding user).
 + Request a feed (application/json)
-    + Parameters
-        + page: 0 (number) - Page of feed to return.
-        + page-size: 25 (number, optional) - Page size for each page (default is 25).
-        + user: willeponken (string, optional) - Display only for user.
-        + followees: true (string, optional) - Display only user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -639,13 +640,13 @@ API.
 ## Statistics [/statistics]
 ### Roast Statistics Timeseries [/statistics/roast/timeseries{?start}{?end}{?interval}{?user}{?followees}]
 #### Get Statistics for Roasts as Time series [GET]
++ Parameters
+    + start: `2018-12-17T23:00:00Z` (string) - Start date according to RFC3339.
+    + end: `2018-12-17T23:10:00Z` (string) - End date according to RFC3339.
+    + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
+    + user: willeponken (string, optional) - Show statistics for specific user.
+    + followees: true (string, optional) - Show statistics for specific user followees (excluding user).
 + Request Roast count statistics as time series
-    + Parameters
-        + start: 2018-12-17T23:00:00Z (string) - Start date according to RFC3339.
-        + end: 2018-12-17T23:10:00Z (string) - End date according to RFC3339.
-        + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
-        + user: willeponken (string, optional) - Show statistics for specific user.
-        + followees: true (string, optional) - Show statistics for specific user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -669,10 +670,10 @@ API.
 
 ### Roast Statistics Count [/statistics/roast/count{?user}{?followees}]
 #### Get Number of Roasts [GET]
++ Parameters
+    + user: willeponken (string, optional) - Show count for specific user.
+    + followees: true (string, optional) - Show count for specific user followees (excluding user).
 + Request Number of Roasts
-    + Parameters
-        + user: willeponken (string, optional) - Show count for specific user.
-        + followees: true (string, optional) - Show count for specific user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -683,10 +684,10 @@ API.
 
 ### Roast Statistics Lines of Code [/statistics/roast/lines{?user}{?followees}]
 #### Get Lines of Code Analyzed [GET]
++ Parameters
+    + user: willeponken (string, optional) - Show lines of code for specific user.
+    + followees: true (string, optional) - Show lines of code for specific user followees (excluding user).
 + Request Lines of code analyzed
-    + Parameters
-        + user: willeponken (string, optional) - Show lines of code for specific user.
-        + followees: true (string, optional) - Show lines of code for specific user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -697,9 +698,9 @@ API.
 
 ### Search [/search{?query}]
 #### Search for content [GET]
++ Parameters
+    + query: willeponken%2Fcool+guy (string) - Search query (percent-encoded).
 + Request search results for query
-    + Parameters
-        + query: willeponken%2Fcool+guy (string) - Search query (percent-encoded).
 + Response 200 (application/json)
     + Body
     ```json
