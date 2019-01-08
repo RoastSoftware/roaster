@@ -81,10 +81,10 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func changeUser(w http.ResponseWriter, r *http.Request) (int, error) {
-    u := struct{
-        Email string `json:"email"`
-        Fullname string `json:"fullname"`
-    }{}
+	u := struct {
+		Email    string `json:"email"`
+		Fullname string `json:"fullname"`
+	}{}
 
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
@@ -108,8 +108,8 @@ func changeUser(w http.ResponseWriter, r *http.Request) (int, error) {
 			"Missing fullname and email parameters in request body")
 	}
 
-    err = model.UpdateUser(model.User{username, u.Email, u.Fullname})
-    if err != nil {
+	err = model.UpdateUser(model.User{username, u.Email, u.Fullname})
+	if err != nil {
 		if pgerr, ok := err.(*pq.Error); ok {
 			switch pgerr.Constraint {
 			case "email_check":
@@ -118,11 +118,11 @@ func changeUser(w http.ResponseWriter, r *http.Request) (int, error) {
 				return http.StatusBadRequest, causerr.New(err, "Invalid full name")
 			case "user_email_key":
 				return http.StatusConflict, causerr.New(err, "Email already in use")
-            }
-        }
-        return http.StatusInternalServerError, causerr.New(err, "")
-    }
-    return http.StatusOK, nil
+			}
+		}
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
+	return http.StatusOK, nil
 }
 
 func removeUser(w http.ResponseWriter, r *http.Request) (int, error) {
