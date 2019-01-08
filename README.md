@@ -96,33 +96,6 @@ go run github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd 
 ```
 Note, if running on Windows, you might need additional flags. Such as the `host` flag for the PostgreSQL database, use the same IP as above for Windows (run `docker-machine ip` in your Docker Shell to show it). The Redis database might also need the `-redis-address=<ip from docker-machine command>:6379` flag. If you encounter problems use the `-help` flag to see other options.
 
-#### Start web server (production mode)
-The `roasterd` server requires two cryptographically secure random keys. They
-can be generated and set to their environment variables with:
-```
-export SESSION_BLOCK_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
-export SESSION_HASH_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
-export CSRF_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
-```
-This will produce two unique keys with 32 bytes of random characters.
-Make sure that you do **NOT** use the same key for both environment variables.
-
-Then run the `roasterd` server with:
-```
-go run github.com/LuleaUniversityOfTechnology/2018-project-roaster/cmd/roasterd \
-	-database-source="user=<db user> dbname=<db name> password=<db password> sslmode=disable"
-```
-
-If you do not set the environment variables above you can expect a crash from
-the server telling you that you do not have enough amount of bytes for the keys.
-
-#### A note about `sslmode`
-The `sslmode` key can be set to one of:
- * `require` - Use SSL/TLS w/o verification
- * `verify_ca` - Verify CA for SSL/TLS, but not the hostname
- * `verify_full` - Verify both CA and hostname for SSL/TLS
- * `disable` - No SSL/TLS
-
 ### Frontend (roasterc)
 The frontend is written in TypeScript, HTML and CSS. Everything is packaged and
 compiled using webpack.
@@ -145,3 +118,59 @@ npm start
 Now, everytime you make any change to the frontend, everything will
 automatically recompile and can be accessed from: `http://localhost:5000`
 (hosted by the `roasterd` backend).
+
+## Setup Roaster (production)
+### Prerequisites
+ * Go ≥ v1.11
+ * NodeJS w/ npm
+ * Docker
+ * Host running Linux
+
+### Build production
+The `tool/build-production.sh` script creates a `build/` folder with all the
+required binaries and data to run a production ready variant of Roaster.
+
+Run the script with:
+```
+./tool/build-production.sh
+```
+
+When the script is done, enter the `build/` folder:
+```
+cd build
+```
+
+### Configure and start backend (roasterd)
+#### Requirements (see Initial setup above in developer guide)
+ * A PostgreSQL database must be set up with a scheme named `roaster` that the
+provided user has access to.
+ * A Redis server on localhost without any password listening on port `6379`.
+
+#### Configure secret keys
+The `roasterd` server requires three cryptographically secure random keys. They
+can be generated and set to their environment variables with:
+```
+export SESSION_BLOCK_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
+export SESSION_HASH_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
+export CSRF_KEY=$(LC_ALL=C tr -dc '[:alnum:]' < /dev/urandom | head -c32)
+```
+This will produce three unique keys with 32 bytes of random characters.
+Make sure that you do **NOT** use the same key for any of the environment variables.
+The keys are **REQUIRED** to be unique for the cryptography to work securely.
+
+#### Start web server (production mode)
+Run the `roasterd` server with:
+```
+./roasterd \
+	-database-source="user=<db user> dbname=<db name> password=<db password> sslmode=disable"
+```
+
+If you do not set the environment variables above you can expect a crash from
+the server telling you that you do not have enough amount of bytes for the keys.
+
+##### A note about `sslmode`
+The `sslmode` key can be set to one of:
+ * `require` - Use SSL/TLS w/o verification
+ * `verify_ca` - Verify CA for SSL/TLS, but not the hostname
+ * `verify_full` - Verify both CA and hostname for SSL/TLS
+ * `disable` - No SSL/TLS
