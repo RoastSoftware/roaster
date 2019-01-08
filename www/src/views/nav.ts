@@ -90,7 +90,7 @@ class SearchItem implements ξ.ClassComponent {
 
   view() {
     return ξ('.ui.fluid.category.search.item',
-        ξ('.ui.transparent.icon.input',
+        ξ('.ui.icon.input',
             ξ('input.prompt', {
               placeholder: 'Search...',
               type: 'text',
@@ -139,14 +139,14 @@ export default class Nav implements ξ.ClassComponent {
       // TODO: Make this DRY, generate the navbar instead?
       ξ('.right.menu',
 
-          ξ(SearchItem),
-
           ξ.route.get() != '/' ?
           ξ('.item',
               ξ('a.ui.primary.button[style=max-height=0.1em;]', {
                 href: '/',
                 oncreate: ξ.route.link,
               }, 'GET ROASTED!')): '',
+
+          ξ(SearchItem),
 
           ξ('a.item', {
             href: '/about',
