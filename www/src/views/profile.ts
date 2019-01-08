@@ -38,11 +38,14 @@ class FullnameField implements ξ.ClassComponent {
                 style: 'cursor: pointer;',
             },
             ξ('i.user.icon'),
-                attrs.fullname)
+                `${attrs.fullname} `,
+                ξ('sup', ξ('i.pencil.icon')),
+            )
             :
             [
-                ξ('.ui.icon.input.fluid',{
+                ξ('.ui.icon.action.input.fluid[]',{
                         class: UserModel.validFullname() ? '' : 'error',
+                        style: 'margin-bottom: 1em;',
                     },
                     [
                     ξ('input', {
@@ -61,7 +64,6 @@ class FullnameField implements ξ.ClassComponent {
           ξ('.ui.negative.message',
               ξ('.header',
                   this.updateError.message)): '',
-            ξ.redraw(),
             ]
         ]
     }
@@ -94,11 +96,14 @@ class EmailField implements ξ.ClassComponent {
                 style: 'cursor: pointer;',
             },
             ξ('i.mail.icon'),
-                attrs.email)
+                `${attrs.email} `,
+                ξ('sup', ξ('i.pencil.icon')),
+            )
             :
             [
-                ξ('.ui.icon.input.fluid',{
+                ξ('.ui.action.icon.input.fluid',{
                     class: UserModel.validEmail() ? '' : 'error',
+                        style: 'margin-bottom: 1em;',
                     },
                     [
                     ξ('input', {
@@ -117,7 +122,6 @@ class EmailField implements ξ.ClassComponent {
           ξ('.ui.negative.message',
               ξ('.header',
                   this.updateError.message)): '',
-            ξ.redraw(),
             ]
         ]
     }
@@ -186,7 +190,6 @@ export default class Profile implements ξ.ClassComponent {
           },
           ξ(UserProfileHeader, {
             username: this.username,
-            fullname: this.fullname,
             avatar: this.profileImageURI,
             score: this.score,
             loggedIn: true,

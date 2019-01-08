@@ -68,10 +68,10 @@ export class UserProfileHeader implements ξ.ClassComponent {
         }),
         attrs.loggedIn ?
         ξ('.content', 'MY PROFILE',
-            ξ('.sub.header', `Hello there, ${attrs.fullname}!`))
+            ξ('.sub.header', `Hello there, ${attrs.username}!`))
         :
         ξ('.content', `${attrs.username}\'S PROFILE`.toUpperCase(),
-            ξ('.sub.header', `You are viewing ${attrs.fullname}'s profile.`)),
+            ξ('.sub.header', `You are viewing ${attrs.username}'s profile.`)),
     ),
     ξ(RoastScore, {score: attrs.score}));
   };
@@ -153,7 +153,12 @@ export class UserFollowerList implements ξ.ClassComponent {
 
     oncreate({attrs}) {
       this.username = attrs.username;
-      this.getFollowerList(this.username);
+
+      if (attrs.followers) {
+        this.followers = attrs.followers;
+      } else {
+        this.getFollowerList(this.username);
+      }
     }
 
     onupdate({attrs}) {
@@ -296,7 +301,6 @@ class UserProfile implements ξ.ClassComponent {
           },
           ξ(UserProfileHeader, {
             username: username,
-            fullname: fullname,
             score: score,
             loggedIn: false,
           }),
