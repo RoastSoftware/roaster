@@ -116,7 +116,7 @@ func changeUser(w http.ResponseWriter, r *http.Request) (int, error) {
 				return http.StatusBadRequest, causerr.New(err, "Invalid email address")
 			case "fullname_check":
 				return http.StatusBadRequest, causerr.New(err, "Invalid full name")
-			case "user_email_key":
+			case "email_user_idx":
 				return http.StatusConflict, causerr.New(err, "Email already in use")
 			}
 		}
