@@ -36,7 +36,7 @@ docker run -it --rm -p 6379:6379 --name roaster-redis -d redis
 ```
 
 #### PostgreSQL
-Run the PostgreSQL Docker image with (exposed at port: `5432`), replace "<db password>" with any password you want:
+Run the PostgreSQL Docker image with (exposed at port: `5432`), replace `<db password>` with any password you want:
 ```
 docker run --name roaster-postgresql -e POSTGRES_PASSWORD=<db password> -p 5432:5432 -d postgres
 ```
