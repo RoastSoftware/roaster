@@ -30,10 +30,11 @@ create table if not exists "user"
   hash     bytea not null,
   create_time	timestamp with time zone not null,
   fullname fullname,
-  email    email not null unique
+  email    email not null
 );
 
 create unique index if not exists username_user_idx on "user" (lower(username));
+create unique index if not exists email_user_idx on "user" (lower(email));
 
 create table if not exists user_followees
 (
