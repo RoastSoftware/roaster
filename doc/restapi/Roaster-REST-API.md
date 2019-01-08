@@ -280,7 +280,7 @@ API.
     {
         "type": "object",
         "properties": {
-            "followees": 
+            "followees":
             {
                 "type": "array",
                 "items": {
@@ -322,7 +322,7 @@ API.
     {
         "type": "object",
         "properties": {
-            "followers": 
+            "followers":
             {
                 "type": "array",
                 "items": {
@@ -580,69 +580,14 @@ API.
     }
     ```
 
-## Global Feed [/feed{?page}]
-### Get Global Feed [GET]
-+ Request a global feed (application/json)
+## Feed [/feed{?user}{?followees}{?page}{?page-size}]
+### Get Feed [GET]
++ Request a feed (application/json)
     + Parameters
-        + page: 0 (number) - Page of global feed to return.
-+ Response 200 (application/json)
-    + Body
-    ```json
-    {
-        "items": [
-            {
-                "category": 0,
-                "username": "JustARegularUsername",
-                "title": "Woah, this user failed!",
-                "description": "Something happened [...]",
-                "time": "Mon Dec  3 10:51:52 CET 2018"
-            }, {
-                "category": 3,
-                "username": "JustAnotherRegularUsername",
-                "title": "Woah, this user also failed!",
-                "description": "Something happened [...]",
-                "time": "Mon Dec  3 09:48:12 CET 2018"
-            }
-        ]
-    }
-    ```
-    + Schema
-    ```json
-    {
-        "type": "object",
-        "properties": {
-            "items": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "category": {
-                            "type": "number"
-                        },
-                        "username": {
-                            "type": "string"
-                        },
-                        "title": {
-                            "type": "string"
-                        },
-                        "description": {
-                            "type": "string"
-                        },
-                        "time": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        }
-    }
-    ```
-
-### User Feed [/feed/{username}{?page}]
-#### Get User Feed [GET]
-+ Request a user feed (application/json)
-    + Parameters
-        + page: 0 (number) - Page of user feed to return.
+        + page: 0 (number) - Page of feed to return.
+        + page-size: 25 (number, optional) - Page size for each page (default is 25).
+        + user: willeponken (string, optional) - Display only for user.
+        + followees: true (string, optional) - Display only user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -697,14 +642,15 @@ API.
     ```
 
 ## Statistics [/statistics]
-### Roast Statistics Timeseries [/statistics/roast/timeseries{?start}{?end}{?interval}{?user}]
+### Roast Statistics Timeseries [/statistics/roast/timeseries{?start}{?end}{?interval}{?user}{?followees}]
 #### Get Statistics for Roasts as Time series [GET]
 + Request Roast count statistics as time series
     + Parameters
-        + start: "2018-12-17T23:00:00Z" (string) - Start date according to RFC3339.
-        + end: "2018-12-17T23:10:00Z" (string) - End date according to RFC3339.
+        + start: 2018-12-17T23:00:00Z (string) - Start date according to RFC3339.
+        + end: 2018-12-17T23:10:00Z (string) - End date according to RFC3339.
         + interval: 10m (string) - Interval for each data point in time unit, such as 'm', 'h' etc.
         + user: willeponken (string, optional) - Show statistics for specific user.
+        + followees: true (string, optional) - Show statistics for specific user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -726,11 +672,12 @@ API.
     ]
     ```
 
-### Roast Statistics Count [/statistics/roast/count{?user}]
+### Roast Statistics Count [/statistics/roast/count{?user}{?followees}]
 #### Get Number of Roasts [GET]
 + Request Number of Roasts
     + Parameters
         + user: willeponken (string, optional) - Show count for specific user.
+        + followees: true (string, optional) - Show count for specific user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
@@ -739,15 +686,63 @@ API.
  }
     ```
 
-### Roast Statistics Lines of Code [/statistics/roast/lines{?user}]
+### Roast Statistics Lines of Code [/statistics/roast/lines{?user}{?followees}]
 #### Get Lines of Code Analyzed [GET]
 + Request Lines of code analyzed
     + Parameters
         + user: willeponken (string, optional) - Show lines of code for specific user.
+        + followees: true (string, optional) - Show lines of code for specific user followees (excluding user).
 + Response 200 (application/json)
     + Body
     ```json
  {
   "lines": 321
  }
+    ```
+
+### Search [/search{?query}]
+#### Search for content [GET]
++ Request search results for query
+    + Parameters
+        + query: willeponken%2Fcool+guy (string) - Search query (percent-encoded).
++ Response 200 (application/json)
+    + Body
+    ```json
+    [
+    {
+        "category": 0,
+        "title": "User willeponken",
+        "description": "A really cool guy, named willeponken",
+        "url": "/user/willeponken"
+    },
+    {
+        "category": 0,
+        "title": "User coolguy",
+        "description": "A really willeponken, named coolguy",
+        "url": "/user/coolguy"
+    }
+    ]
+    ```
+    + Schema
+    ```json
+    {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "number"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        }
+    }
     ```

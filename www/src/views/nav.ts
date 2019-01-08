@@ -83,7 +83,7 @@ class SearchItem implements ξ.ClassComponent {
 
               return response;
             },
-            url: '/search/{query}',
+            url: '/search?query={query}',
           },
         });
   };

@@ -12,7 +12,7 @@ import (
 )
 
 func searchAll(w http.ResponseWriter, r *http.Request) (int, error) {
-	result, err := model.SearchAll(mux.Vars(r)["query"])
+	result, err := model.SearchAll(r.URL.Query().Get("query"))
 	if err != nil {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
@@ -35,6 +35,10 @@ func Search(r *mux.Router) {
 	// Content-Type.
 	r.Use(middleware.EnforceContentType("application/json"))
 
-	// General Search [/search/{query}]
-	r.Handle("/{query}", handler(searchAll)).Methods(http.MethodGet)
+	// General Search [/search?query={query}]
+	r.Handle("", handler(searchAll)).
+		// A query parameter instead of a endpoint parameter is used so
+		// also reserved and control URI characters can be used.
+		Queries("query", "").
+		Methods(http.MethodGet)
 }
