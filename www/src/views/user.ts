@@ -153,12 +153,7 @@ export class UserFollowerList implements ξ.ClassComponent {
 
     oncreate({attrs}) {
       this.username = attrs.username;
-
-      if (attrs.followers) {
-        this.followers = attrs.followers;
-      } else {
-        this.getFollowerList(this.username);
-      }
+      this.getFollowerList(this.username);
     }
 
     onupdate({attrs}) {
