@@ -3,6 +3,7 @@ package model
 
 import (
 	"crypto/sha512"
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -161,6 +162,31 @@ func GetUser(identifier string) (user User, err error) {
 		FROM "roaster"."user"
 		WHERE (LOWER(username)=LOWER(TRIM($1)) OR email=LOWER(TRIM($1)))
 	`, identifier).Scan(&user.Username, &user.Email, &user.Fullname)
+	return
+}
+
+// UpdateUser updates fullname, password or email of a user, otherwise error.
+func UpdateUser(user User) (err error) {
+	var modifiedUsername string
+
+	err = database.QueryRow(`
+    UPDATE "roaster"."user" SET 
+        fullname = COALESCE(NULLIF($2, ''), fullname),
+        email = COALESCE(NULLIF($3, ''), email)
+    WHERE LOWER(username)=LOWER(TRIM($1))
+    RETURNING username
+    `, user.Username, user.Fullname, user.Email).Scan(&modifiedUsername)
+
+	if err != nil {
+		return
+	}
+
+	if modifiedUsername != user.Username {
+		err = fmt.Errorf("failed to update provided username (%s != %s)",
+			modifiedUsername,
+			user.Username)
+	}
+
 	return
 }
 

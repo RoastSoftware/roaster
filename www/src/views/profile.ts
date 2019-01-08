@@ -11,6 +11,124 @@ import {
 import {StatisticsFilter} from '../models/statistics';
 import {UserModel} from '../models/user';
 
+class FullnameField implements ξ.ClassComponent {
+    updateError: Error;
+    visible: boolean = true;
+
+    updateFullName() {
+      this.visible = !this.visible;
+    };
+
+    submitNewFullname() {
+      Network.request<any>('PATCH', ['user', UserModel.getUsername()],
+          {'fullname': UserModel.getFullname()})
+          .then(() => {
+            this.updateFullName();
+          })
+          .catch((err: Error) => {
+            this.updateError = err;
+            console.error(this.updateError);
+          });
+    }
+
+    view({attrs}) {
+      return [
+            this.visible ?
+            ξ('p', {
+              onclick: () => this.updateFullName(),
+              style: 'cursor: pointer;',
+            },
+            ξ('i.user.icon'),
+            `${attrs.fullname} `,
+            ξ('sup', ξ('i.pencil.icon')),
+            )
+            :
+            [
+              ξ('.ui.icon.action.input.fluid[]', {
+                class: UserModel.validFullname() ? '' : 'error',
+                style: 'margin-bottom: 1em;',
+              },
+              [
+                ξ('input', {
+                  type: 'text',
+                  value: UserModel.getFullname(),
+                  oninput: (e: any) =>
+                    UserModel.setFullname(e.currentTarget.value),
+                  placeholder: 'YourNewFullname',
+                }),
+                ξ('button.ui.button', {
+                  onclick: () => this.submitNewFullname(),
+                  disabled: !(UserModel.validFullname()),
+                }, 'Save'),
+              ]),
+          this.updateError ?
+          ξ('.ui.negative.message',
+              ξ('.header',
+                  this.updateError.message)): '',
+            ],
+      ];
+    }
+}
+
+class EmailField implements ξ.ClassComponent {
+    updateError: Error;
+    visible: boolean = true;
+
+    updateEmail() {
+      this.visible = !this.visible;
+    };
+
+    submitNewEmail() {
+      Network.request<any>('PATCH', ['user', UserModel.getUsername()],
+          {'email': UserModel.getEmail()})
+          .then(() => {
+            this.updateEmail();
+          })
+          .catch((err: Error) => {
+            this.updateError = err;
+            console.error(this.updateError);
+          });
+    }
+
+    view({attrs}) {
+      return [
+            this.visible ?
+            ξ('p', {
+              onclick: () => this.updateEmail(),
+              style: 'cursor: pointer;',
+            },
+            ξ('i.mail.icon'),
+            `${attrs.email} `,
+            ξ('sup', ξ('i.pencil.icon')),
+            )
+            :
+            [
+              ξ('.ui.action.icon.input.fluid', {
+                class: UserModel.validEmail() ? '' : 'error',
+                style: 'margin-bottom: 1em;',
+              },
+              [
+                ξ('input', {
+                  type: 'text',
+                  value: UserModel.getEmail(),
+                  oninput: (e: any) =>
+                    UserModel.setEmail(e.currentTarget.value),
+                  placeholder: 'YourNewEmail',
+                }),
+                ξ('button.ui.button', {
+                  onclick: () => this.submitNewEmail(),
+                  disabled: !(UserModel.validEmail()),
+                }, 'Save'),
+              ]),
+          this.updateError ?
+          ξ('.ui.negative.message',
+              ξ('.header',
+                  this.updateError.message)): '',
+            ],
+      ];
+    }
+}
+
 export default class Profile implements ξ.ClassComponent {
     uploadError: Error;
 
@@ -58,6 +176,11 @@ export default class Profile implements ξ.ClassComponent {
       this.updateProfileImageURI();
     };
 
+    onupdate() {
+      this.fullname = UserModel.getFullname();
+      this.email = UserModel.getEmail();
+    };
+
     oncreate() {
       Network.request<Object>('GET', ['user', this.username, 'score'])
           .then(({score}) => {
@@ -103,17 +226,17 @@ export default class Profile implements ξ.ClassComponent {
                       ξ('img.ui.image.rounded.medium#picture', {
                         src: this.profileImageURI,
                         onclick: this.clickImage,
-                        style: 'cursor: pointer;',
+                        style: 'cursor: pointer; width: 100%',
                       },
                       'User profile picture.'),
                       ξ('h2',
-                          this.fullname),
-                      ξ('p',
-                          ξ('i.user.icon'),
                           this.username),
-                      ξ('p',
-                          ξ('i.mail.icon'),
-                          this.email),
+                      ξ(FullnameField, {
+                        fullname: this.fullname,
+                      }),
+                      ξ(EmailField, {
+                        email: this.email,
+                      }),
                   ),
                   ξ('.column[minheight=10em]',
                       ξ(RoastRatio, {
