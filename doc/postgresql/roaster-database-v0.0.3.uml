@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>d1d42eea-3d17-4e17-9778-11ffde42ddfd.SCHEMA:postgres.roaster</OriginalElement>
+  <nodes>
+    <node x="253.0" y="523.0">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_has_warnings</node>
+    <node x="-19.5" y="243.0">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_has_errors</node>
+    <node x="216.5" y="-19.0">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_statistics</node>
+    <node x="896.0" y="243.0">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.avatar</node>
+    <node x="550.5" y="32.0">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user_followees</node>
+    <node x="190.5" y="198.5">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast</node>
+    <node x="-27.5" y="398.5">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.error</node>
+    <node x="452.5" y="478.5">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.warning</node>
+    <node x="550.5" y="209.5">d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user_followees" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user">
+      <point x="0.0" y="48.0" />
+      <point x="0.0" y="-70.5" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_statistics" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast">
+      <point x="0.0" y="59.0" />
+      <point x="0.0" y="-81.5" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_has_errors" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.error">
+      <point x="0.0" y="37.0" />
+      <point x="0.0" y="-81.5" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_has_errors" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast">
+      <point x="59.5" y="-0.0" />
+      <point x="-129.5" y="-0.0" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.avatar" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user">
+      <point x="-64.0" y="-0.0" />
+      <point x="129.5" y="-0.0" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_has_warnings" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.warning">
+      <point x="67.0" y="-0.0" />
+      <point x="-67.5" y="-0.0" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user">
+      <point x="129.5" y="-0.0" />
+      <point x="-129.5" y="-0.0" />
+    </edge>
+    <edge source="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast_has_warnings" target="d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.roast">
+      <point x="0.0" y="-37.0" />
+      <point x="0.0" y="81.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.6926640926640927" x="599.5" y="261.0" />
+  <SelectedNodes>
+    <node>d1d42eea-3d17-4e17-9778-11ffde42ddfd.TABLE:postgres.roaster.user</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+  </Categories>
+</Diagram>
+

@@ -93,7 +93,6 @@ API.
     ```json
     {
         "email": "email@example.com",
-        "password": "My3venM0reTr3mend0usP@ssw0rd!",
         "fullname": "Sir. Roger Roger"
     }
     ```
@@ -103,10 +102,6 @@ API.
         "type": "object",
         "properties": {
             "email": {
-                "type": "string",
-                "required": false
-            },
-            "password": {
                 "type": "string",
                 "required": false
             },

@@ -76,6 +76,8 @@ export class UserModel {
       UserModel.fullname = user;
       if (!(UserModel.fullname.length < 255)) {
         UserModel.fullnameError = 'Name must be shorter than 255 characters';
+      } else if (UserModel.fullname.length < 1) {
+        UserModel.fullnameError = 'Name can not be empty';
       } else {
         UserModel.fullnameError = '';
       }

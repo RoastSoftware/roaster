@@ -81,14 +81,48 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 }
 
 func changeUser(w http.ResponseWriter, r *http.Request) (int, error) {
-	/* TODO
-	s, _ := session.Get(r, "roaster_auth")
-	if s.Values["username"] == mux.Vars(r)["username"] {
+    u := struct{
+        Email string `json:"email"`
+        Fullname string `json:"fullname"`
+    }{}
 
+	s, err := session.Get(r, "roaster_auth")
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
-	*/
 
-	return http.StatusNotImplemented, nil
+	username, ok := s.Values["username"].(string)
+	if !ok || username == "" {
+		return http.StatusNoContent, nil
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		log.Println(err)
+		return http.StatusBadRequest, causerr.New(err,
+			"unable to decode request")
+	}
+	if u.Email == "" && u.Fullname == "" {
+		return http.StatusBadRequest, causerr.New(
+			errors.New("fullname and email is empty"),
+			"Missing fullname and email parameters in request body")
+	}
+
+    err = model.UpdateUser(model.User{username, u.Email, u.Fullname})
+    if err != nil {
+		if pgerr, ok := err.(*pq.Error); ok {
+			switch pgerr.Constraint {
+			case "email_check":
+				return http.StatusBadRequest, causerr.New(err, "Invalid email address")
+			case "fullname_check":
+				return http.StatusBadRequest, causerr.New(err, "Invalid full name")
+			case "user_email_key":
+				return http.StatusConflict, causerr.New(err, "Email already in use")
+            }
+        }
+        return http.StatusInternalServerError, causerr.New(err, "")
+    }
+    return http.StatusOK, nil
 }
 
 func removeUser(w http.ResponseWriter, r *http.Request) (int, error) {
