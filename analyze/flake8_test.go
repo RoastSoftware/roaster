@@ -102,6 +102,15 @@ func TestWithFlake8HitCache(t *testing.T) {
 	assert.Equal(t, first_result, second_result)
 }
 
+func TestWithFlake8EmptyFile(t *testing.T) {
+	result, err := analyze.WithFlake8("", "")
+
+	assert.Equal(t, nil, err)
+	assert.Equal(t, "", result.Username)
+	assert.Equal(t, uint(0), result.Score)
+	assert.Equal(t, "python3", result.Language)
+}
+
 func TestWithFlake8Simple(t *testing.T) {
 	result, err := analyze.WithFlake8("bot", code)
 	if err != nil {
