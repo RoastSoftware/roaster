@@ -198,7 +198,7 @@ characters (you've sent us ${EditorModel.getCode().length.toLocaleString()})`;
                             )
                         )
                     ),
-                    this.roast.score ?
+                    Number.isInteger(this.roast.score) ?
                     ξ('.ui.small.right.floated.statistic', {
                       style: 'margin-bottom: -2px;',
                     },

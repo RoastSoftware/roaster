@@ -337,12 +337,29 @@ export class RoastDoughnutStatisticsModel extends RoastRatioModel {
   };
 
   private getSuccessLines(): number {
-    return this.linesOfCode - this.numberOfErrors - this.numberOfWarnings;
+    // NOTE: This isn't really true, because there can be more warnings than
+    // lines (test submitting a code snippet with only a blank space).
+    // We should probably do something else and come up with some better graphic
+    // to show the user than this.
+    //
+    // In the mean time, we just return 0 if the
+    // linesOfCode - numberOfErrors - numberOfWarnings is less than 0.
+    const s = this.linesOfCode - this.numberOfErrors - this.numberOfWarnings;
+    return s >= 0 ? s : 0;
   };
 
   private getSuccessRatio(): number {
-    return Math.round((1 - ((this.numberOfErrors + this.numberOfWarnings) /
-      this.getSuccessLines())) * 100);
+    const s = this.getSuccessLines();
+    const e = this.numberOfErrors;
+    const w = this.numberOfWarnings;
+
+    // Return 0 if the number of lines is less than the number of errors and
+    // warnings.
+    if (s < (e + w)) {
+      return 0;
+    }
+
+    return Math.round((1 - ((e + w) / s)) * 100);
   }
 
   public getData(): Object {
