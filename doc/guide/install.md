@@ -1,4 +1,6 @@
-## Set up Roaster (for developers)
+## Set up Roaster (development)
+Please see Set up Roaster (production) below for a production setup.
+
 ### Prerequisites
  * Go ≥ v1.11
  * NodeJS w/ npm
@@ -53,7 +55,7 @@ cd 2018-project-roaster
 
 ### Backend (roasterd)
 The backend is written in Go and therefore requires that Go is installed
-correctly on your machine. Also, a version >= v1.11 is required for Go modules
+correctly on your machine. Also, a version ≥ v1.11 is required for Go modules
 which is used in this project.
 
 Make sure you enable Go modules if you are using Go v1.11:
@@ -149,7 +151,11 @@ the server telling you that you do not have enough amount of bytes for the keys.
 
 ##### A note about `sslmode`
 The `sslmode` key can be set to one of:
- * `require` - Use SSL/TLS w/o verification
- * `verify_ca` - Verify CA for SSL/TLS, but not the hostname
- * `verify_full` - Verify both CA and hostname for SSL/TLS
- * `disable` - No SSL/TLS
+
+ * `require` \- Use SSL/TLS w/o verification.
+ * `verify_ca` \- Verify CA for SSL/TLS, but not the hostname.
+ * `verify_full` \- Verify both CA and hostname for SSL/TLS.
+ * `disable` \- No SSL/TLS.
+
+__Don't forget to use a reverse proxy in front of the web server that uses
+HTTPS/TLS.__

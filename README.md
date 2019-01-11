@@ -20,5 +20,5 @@ displayed on a page that can be viewed by everyone.
 | [![Build Status](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster.svg?branch=master)](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster) | [![Coverage Status](https://coveralls.io/repos/github/LuleaUniversityOfTechnology/2018-project-roaster/badge.svg)](https://coveralls.io/github/LuleaUniversityOfTechnology/2018-project-roaster) |
 
 ## Set up Roaster
-See [doc/install/guide.md](doc/install/guide.md) for installation instructions
-of Roaster.
+See [doc/guide/install.md](doc/guide/install.md) for installation instructions
+for Roaster.
