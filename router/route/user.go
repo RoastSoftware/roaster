@@ -66,10 +66,12 @@ func createUser(w http.ResponseWriter, r *http.Request) (int, error) {
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
-	// TODO: Implement auth middleware instead.
-	s, _ := session.Get(r, "roaster_auth")
-	s.Values["username"] = u.Username
+	s, err := session.Get(r, "roaster_auth")
+	if err != nil {
+		return http.StatusInternalServerError, causerr.New(err, "")
+	}
 
+	s.Values["username"] = u.Username
 	session.Save(r, w, s)
 
 	err = json.NewEncoder(w).Encode(u.User)
@@ -108,7 +110,13 @@ func changeUser(w http.ResponseWriter, r *http.Request) (int, error) {
 			"Missing fullname and email parameters in request body")
 	}
 
-	err = model.UpdateUser(model.User{username, u.Email, u.Fullname})
+	err = model.UpdateUser(
+		model.User{
+			Username: username,
+			Email:    u.Email,
+			Fullname: u.Fullname,
+		},
+	)
 	if err != nil {
 		if pgerr, ok := err.(*pq.Error); ok {
 			switch pgerr.Constraint {
