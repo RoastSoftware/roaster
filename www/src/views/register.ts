@@ -21,6 +21,7 @@ export default class Register implements ξ.ClassComponent {
             }
           })
           .catch((err: Error) => {
+            console.log(err);
             this.registerError = err;
             ξ.redraw();
           });
