@@ -1,0 +1,4 @@
+[submodule "doc/m7011e-project-report"]
+	path = doc/m7011e-project-report
+	url = git@github.com:willeponken/d7011e-project-roaster-report.git
+	branch = master
