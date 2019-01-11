@@ -66,7 +66,10 @@ module.exports = {
       append: false,
       publicPath: '',
     }),
-    new WebappWebpack('./src/assets/icons/roaster-icon-teal.svg'),
+    new WebappWebpack({
+      logo: './src/assets/icons/roaster-icon-teal.svg',
+      prefix: '/assets/',
+    }),
     new CleanWebpack(['dist']),
     new MonacoWebPack(),
   ],
