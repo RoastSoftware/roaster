@@ -15,9 +15,9 @@ Global statistics like most common errors and number of rows analyzed is
 displayed on a page that can be viewed by everyone.
 
 ## Project status
-| Build status | Test coverage |
-|:------------:|:-------------:|
-| [![Build Status](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster.svg?branch=master)](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster) | [![Coverage Status](https://coveralls.io/repos/github/LuleaUniversityOfTechnology/2018-project-roaster/badge.svg)](https://coveralls.io/github/LuleaUniversityOfTechnology/2018-project-roaster) |
+| Build status | Test coverage | Roasterd docs |
+|:------------:|:-------------:|:--------------|
+| [![Build Status](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster.svg?branch=master)](https://travis-ci.org/LuleaUniversityOfTechnology/2018-project-roaster) | [![Coverage Status](https://coveralls.io/repos/github/LuleaUniversityOfTechnology/2018-project-roaster/badge.svg)](https://coveralls.io/github/LuleaUniversityOfTechnology/2018-project-roaster) | [![Roasterd Documentation](https://godoc.org/github.com/LuleaUniversityOfTechnology/2018-project-roaster?status.svg)](https://godoc.org/github.com/LuleaUniversityOfTechnology/2018-project-roaster) |
 
 ## Set up Roaster
 See [doc/guide/install.md](doc/guide/install.md) for installation instructions
