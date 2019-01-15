@@ -85,6 +85,12 @@ API.
         }
     }
     ```
++ Response 400 (application/json)
+    Bad request with either invalid/missing fields or unparsable data structure.
+    + Attributes (Error)
++ Response 409 (application/json)
+    Email or username is conflicting with an already registered user.
+    + Attributes (Error)
 
 ### View/Handle Specific User [/user/{username}]
 #### Change User [PATCH]
@@ -140,6 +146,12 @@ API.
         }
     }
     ```
++ Response 400 (application/json)
+    Bad request with either invalid/missing fields or unparsable data structure.
+    + Attributes (Error)
++ Response 409 (application/json)
+    Email is conflicting with an already registered user.
+    + Attributes (Error)
 
 #### Retrieve User Information [GET]
 + Request user information
@@ -169,6 +181,12 @@ API.
         }
     }
     ```
++ Response 400 (application/json)
+    Bad request with missing username parameter.
+    + Attributes (Error)
++ Response 404 (application/json)
+    Requested user does not exist.
+    + Attributes (Error)
 
 ### User Score [/user/{username}/score]
 #### Retrieve User Score [GET]
@@ -191,6 +209,9 @@ API.
         }
     }
     ```
++ Response 404 (application/json)
+    Requested user does not exist.
+    + Attributes (Error)
 
 #### Remove User [DELETE]
 + Request remove user
@@ -198,11 +219,9 @@ API.
     ```
     Cookie: roaster_auth=AB32DEAC21A91DE123[...]
     ```
-+ Response 200
-    + Headers
-    ```
-    Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
-    ```
++ Response 501 (application/json)
+    Not implemented.
+    + Attributes (Error)
 
 ### Avatar For User [/user/{username}/avatar]
 #### Upload User Avatar [PUT]
@@ -220,10 +239,25 @@ API.
     --{boundary value}
     ```
 + Response 204
++ Response 401 (application/json)
+    Unauthorized request, must be logged in to upload avatar.
+    + Attributes (Error)
++ Response 400 (application/json)
+    Invalid Content-Type or unreadable data in request.
+    + Attributes (Error)
++ Response 413 (application/json)
+    Too large file sent.
+    + Attributes (Error)
++ Response 415 (application/json)
+    Invalid image type, supported formats are: JPEG, PNG and GIF.
+    + Attributes (Error)
 
 #### Retrieve User Avatar [GET]
 + Request user avatar
 + Response 200 (image/png)
++ Response 404 (application/json)
+    Requested user does not exist.
+    + Attributes (Error)
 
 ### Followees for User [/user/{username}/followees]
 #### Add New Followee [POST]
@@ -251,6 +285,12 @@ API.
     }
     ```
 + Response 200
++ Response 400 (application/json)
+    Missing followee field or unparsable data structure.
+    + Attributes (Error)
++ Response 404 (application/json)
+    Requested followee does not exist.
+    + Attributes (Error)
 
 #### Retrieve User Followees [GET]
 + Request user followees
@@ -285,6 +325,13 @@ API.
         }
     }
     ```
++ Response 204
++ Response 400 (application/json)
+    Missing username in request.
+    + Attributes (Error)
++ Response 404 (application/json)
+    Requested user does not exist.
+    + Attributes (Error)
 
 #### Remove User Followee [DELETE]
 + Request remove user followee
@@ -293,6 +340,9 @@ API.
     Cookie: roaster_auth=AB32DEAC21A91DE123[...]
     ```
 + Response 200
++ Response 400 (application/json)
+    Missing username for lookup.
+    + Attribute (Error)
 
 #### Retrieve User Followers [GET]
 + Request user followers
@@ -327,6 +377,10 @@ API.
         }
     }
     ```
++ Response 204
++ Response 400 (application/json)
+    Missing username for lookup.
+    + Attribute (Error)
 
 ## Session [/session]
 ### Authenticate for New Session (sign in) [POST]
@@ -383,6 +437,12 @@ API.
         }
     }
     ```
++ Response 400 (application/json)
+    Empty username or password field or unparsable data structure.
+    + Attribute (Error)
++ Response 401 (application/json)
+    Invalid username or password.
+    + Attribute (Error)
 
 ### Get Current Session (resume login session) [GET]
 + Request current session
@@ -416,6 +476,7 @@ API.
         }
     }
     ```
++ Response 204
 
 ### Remove Current Session (sign out) [DELETE]
 + Request remove current session
@@ -428,6 +489,7 @@ API.
     ```
     Set-Cookie: roaster_auth=deleted; Expires=Thu, 01 Jan 1970 00:00:00 GMT;
     ```
+
 ## Roast [/roast]
 ### Analyze code snippet [POST]
 + Request a static analysation of provided code snippet (application/json)
@@ -574,6 +636,9 @@ API.
         }
     }
     ```
++ Response 400 (application/json)
+    Invalid Roast data sent.
+    + Attribute (Error)
 
 ## Feed [/feed{?user}{?followees}{?page}{?page-size}]
 ### Get Feed [GET]
@@ -636,6 +701,8 @@ API.
         }
     }
     ```
++ Response 400 (application/json)
+    + Attribute (Error)
 
 ## Statistics [/statistics]
 ### Roast Statistics Timeseries [/statistics/roast/timeseries{?start}{?end}{?interval}{?user}{?followees}]
@@ -667,6 +734,8 @@ API.
  }
     ]
     ```
++ Response 400 (application/json)
+    + Attribute (Error)
 
 ### Roast Statistics Count [/statistics/roast/count{?user}{?followees}]
 #### Get Number of Roasts [GET]
@@ -681,6 +750,8 @@ API.
   "count": 321
  }
     ```
++ Response 400 (application/json)
+    + Attribute (Error)
 
 ### Roast Statistics Lines of Code [/statistics/roast/lines{?user}{?followees}]
 #### Get Lines of Code Analyzed [GET]
@@ -695,6 +766,8 @@ API.
   "lines": 321
  }
     ```
++ Response 400 (application/json)
+    + Attribute (Error)
 
 ### Search [/search{?query}]
 #### Search for content [GET]
@@ -742,3 +815,10 @@ API.
         }
     }
     ```
++ Response 204
++ Response 400 (application/json)
+    + Attribute (Error)
+
+# Data Structures
+## Error (object)
++ message: `An error message` (string)
