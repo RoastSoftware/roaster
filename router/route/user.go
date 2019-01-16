@@ -176,6 +176,7 @@ func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err er
 	username := mux.Vars(r)["username"]
 	score, err := model.GetUserScore(username)
 	if err != nil {
+		// TODO(willeponken): 404 if user doesn't exist.
 		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 	err = json.NewEncoder(w).Encode(score)
@@ -185,6 +186,8 @@ func retrieveUserScore(w http.ResponseWriter, r *http.Request) (code int, err er
 	return http.StatusOK, nil
 }
 
+// TODO(Hjortsberg): Fix access control security hole, fix status codes and
+// update the API docs.
 func putFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 	s, err := session.Get(r, "roaster_auth")
 	if err != nil {
@@ -193,7 +196,7 @@ func putFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 
 	username, ok := s.Values["username"].(string)
 	if !ok || username == "" {
-		return http.StatusNoContent, nil
+		return http.StatusInternalServerError, causerr.New(err, "")
 	}
 
 	f := model.Followee{}
@@ -202,7 +205,7 @@ func putFollowee(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err != nil {
 		log.Println(err)
 		return http.StatusBadRequest, causerr.New(err,
-			"unable to decode request")
+			"Unable to decode request")
 	}
 	if f.Username == "" {
 		return http.StatusBadRequest, causerr.New(
