@@ -60,7 +60,7 @@
     "chart.js": "^2.7.3",
     "jquery": "^3.4.0",
     "jquery-ui": "^1.12.1",
-    "mithril": "^1.1.6",
+    "mithril": "^1.1.7",
     "moment": "^2.23.0",
     "monaco-editor": "^0.15.6",
     "monaco-editor-webpack-plugin": "^1.7.0",
