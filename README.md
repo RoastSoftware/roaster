@@ -14,6 +14,13 @@ your own and your friends progress is listed.
 Global statistics like most common errors and number of rows analyzed is
 displayed on a page that can be viewed by everyone.
 
+This project was done during the course M7011E Design of Dynamic Web Systems at
+Luleå University of Technology. The project report is available as a web page at
+[wstrm.dev/posts/course-project-showcase-roaster-inc/](https://wstrm.dev/posts/course-project-showcase-roaster-inc/)
+or as a PDF document at
+[github.com/optmzr/m7011e-project-roaster-report/releases/download/v1.0.0/M7011E_Project_Roaster_Report_wenwil_5_phihjo_2.pdf](https://github.com/optmzr/m7011e-project-roaster-report/releases/download/v1.0.0/M7011E_Project_Roaster_Report_wenwil_5_phihjo_2.pdf).
+Enjoy!
+
 ## Project status
 | Build status | Test coverage | Roasterd docs |
 |:------------:|:-------------:|:--------------|
