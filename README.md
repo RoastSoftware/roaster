@@ -19,7 +19,7 @@ Luleå University of Technology. The project report is available as a web page a
 * [wstrm.dev/posts/course-project-showcase-roaster-inc/](https://wstrm.dev/posts/course-project-showcase-roaster-inc/)
 
 and as a PDF document at
-* [github.com/optmzr/m7011e-project-roaster-report/releases/download/v1.0.0/M7011E_Project_Roaster_Report_wenwil_5_phihjo_2.pdf](https://github.com/optmzr/m7011e-project-roaster-report/releases/download/v1.0.0/M7011E_Project_Roaster_Report_wenwil_5_phihjo_2.pdf).
+* [github.com/wstrm/m7011e-project-roaster-report/releases/download/v1.0.0/M7011E_Project_Roaster_Report_wenwil_5_phihjo_2.pdf](https://github.com/wstrm/m7011e-project-roaster-report/releases/download/v1.0.0/M7011E_Project_Roaster_Report_wenwil_5_phihjo_2.pdf).
 
 Enjoy!
 
