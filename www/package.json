@@ -57,7 +57,7 @@
     "@babel/polyfill": "^7.2.5",
     "@babel/runtime": "^7.2.0",
     "@types/chart.js": "^2.7.42",
-    "chart.js": "^2.7.3",
+    "chart.js": "^2.9.4",
     "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
     "mithril": "^1.1.7",
