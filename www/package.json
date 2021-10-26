@@ -59,7 +59,7 @@
     "@types/chart.js": "^2.7.42",
     "chart.js": "^2.7.3",
     "jquery": "^3.5.0",
-    "jquery-ui": "^1.12.1",
+    "jquery-ui": "^1.13.0",
     "mithril": "^1.1.7",
     "moment": "^2.23.0",
     "monaco-editor": "^0.15.6",
